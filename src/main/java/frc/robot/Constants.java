@@ -4,6 +4,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.XboxController;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -15,5 +20,51 @@ package frc.robot;
 public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
+  }
+
+  public static class Controller {
+    //Buttons
+    public static final XboxController.Button A = XboxController.Button.kA
+        ,B = XboxController.Button.kB
+        ,X = XboxController.Button.kX
+        ,Y = XboxController.Button.kY
+        ,LB = XboxController.Button.kLeftBumper
+        ,RB = XboxController.Button.kRightBumper
+        ,LS = XboxController.Button.kLeftStick
+        ,RS = XboxController.Button.kRightStick
+        ,MENU = XboxController.Button.kStart
+        ,NAVIGATION = XboxController.Button.kBack;
+  //Axis
+    public static final XboxController.Axis LS_Y = XboxController.Axis.kLeftY
+        ,LS_X = XboxController.Axis.kLeftX
+        ,RS_Y = XboxController.Axis.kRightY
+        ,RS_X = XboxController.Axis.kRightX
+        ,LT = XboxController.Axis.kLeftTrigger
+        ,RT = XboxController.Axis.kRightTrigger;
+
+    //Ports
+    public static final int XBOXCONTROLLERPORT = 0;
+  }
+
+  public static class Motors {
+    // Set these later
+    public static final int BACKLEFTSTEER = 0,
+        BACKLEFTDRIVE = 0,
+        BACKRIGHTSTEER = 0,
+        BACKRIGHTDRIVE = 0,
+        FRONTLEFTSTEER = 0,
+        FRONTLEFTDRIVE = 0,
+        FRONTRIGHTSTEER = 0,
+        FRONTRIGHTDRIVE = 0;
+
+    public static final int BACKLEFTENCODER = 0,
+        BACKRIGHTENCODER = 0,
+        FRONTLEFTENCODER = 0,
+        FRONTRIGHTENCODER = 0;
+  }
+
+  public static class Swerve {
+    public static final double L = 20;
+    public static final double W = 20;
   }
 }
