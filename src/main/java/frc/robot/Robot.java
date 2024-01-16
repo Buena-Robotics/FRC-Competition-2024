@@ -5,6 +5,8 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.SwerveDriveSubsystem;
@@ -85,7 +87,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    swerve.arcadeDrive();
+    // swerve.arcadeDrive();
   }
 
   @Override
@@ -100,9 +102,20 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when the robot is first started up. */
   @Override
-  public void simulationInit() {}
+  public void simulationInit() {
+    SmartDashboard.putNumber("BackLeft Angle", 0.0);
+    SmartDashboard.putNumber("BackRight Angle", 0.0);
+    SmartDashboard.putNumber("FrontLeft Angle", 0.0);
+    SmartDashboard.putNumber("FrontRight Angle", 0.0);
+    SmartDashboard.putNumber("BackLeft Speed", 0.0);
+    SmartDashboard.putNumber("BackRight Speed", 0.0);
+    SmartDashboard.putNumber("FrontLeft Speed", 0.0);
+    SmartDashboard.putNumber("FrontRight Speed", 0.0);
+  }
 
   /** This function is called periodically whilst in simulation. */
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+      swerve.arcadeDrive();
+  }
 }

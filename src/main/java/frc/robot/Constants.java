@@ -48,19 +48,22 @@ public final class Constants {
 
   public static class Motors {
     // Set these later
-    public static final int BACKLEFTSTEER = 0,
-        BACKLEFTDRIVE = 0,
-        BACKRIGHTSTEER = 0,
-        BACKRIGHTDRIVE = 0,
-        FRONTLEFTSTEER = 0,
-        FRONTLEFTDRIVE = 0,
-        FRONTRIGHTSTEER = 0,
-        FRONTRIGHTDRIVE = 0;
+    public static final int 
+        FRONTRIGHTDRIVE = 1,
+        FRONTRIGHTSTEER = 2,
+        FRONTLEFTDRIVE = 3,
+        FRONTLEFTSTEER = 4,
+        BACKRIGHTDRIVE = 5,
+        BACKRIGHTSTEER = 6,
+        BACKLEFTDRIVE = 7,
+        BACKLEFTSTEER = 8;
 
-    public static final int BACKLEFTENCODER = 0,
-        BACKRIGHTENCODER = 0,
-        FRONTLEFTENCODER = 0,
-        FRONTRIGHTENCODER = 0;
+
+    public static final int 
+        FRONTRIGHTENCODER = 0,
+        FRONTLEFTENCODER = 1,
+        BACKRIGHTENCODER = 2,
+        BACKLEFTENCODER = 3;
   }
 
   public static class Swerve {
