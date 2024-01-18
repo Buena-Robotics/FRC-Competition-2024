@@ -6,15 +6,14 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.math.controller.PIDController;
 
 public class SwerveModule {
-    
     public CANSparkMax speedMotor;
     public CANSparkMax angleMotor;
     public PIDController pidController;
     public final double MAX_VOLTS = 4.95;
 
-    public SwerveModule(int angleMotor, int speedMotor, int encoder) {
-        this.angleMotor = new CANSparkMax(angleMotor, MotorType.kBrushless);
-        this.speedMotor = new CANSparkMax(speedMotor, MotorType.kBrushless);
+    public SwerveModule(int angleMotorId, int speedMotorId, int encoder) {
+        this.angleMotor = new CANSparkMax(angleMotorId, MotorType.kBrushless);
+        this.speedMotor = new CANSparkMax(speedMotorId, MotorType.kBrushless);
         pidController = new PIDController(1, 0, 0);
 
         pidController.enableContinuousInput(-1, 1);

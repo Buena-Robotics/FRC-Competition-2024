@@ -12,10 +12,12 @@ import static frc.robot.Constants.Swerve.W;
 
 public class SwerveDriveSubsystem extends SubsystemBase {
     
-    private SwerveModule backRight = new SwerveModule (Motors.BACKRIGHTSTEER, Motors.BACKRIGHTDRIVE, Motors.BACKRIGHTENCODER);
-    private SwerveModule backLeft = new SwerveModule (Motors.BACKLEFTSTEER, Motors.BACKLEFTDRIVE, Motors.BACKLEFTENCODER);
     private SwerveModule frontRight = new SwerveModule (Motors.FRONTRIGHTSTEER, Motors.FRONTRIGHTDRIVE, Motors.FRONTRIGHTENCODER);
     private SwerveModule frontLeft = new SwerveModule (Motors.FRONTLEFTSTEER, Motors.FRONTLEFTDRIVE, Motors.FRONTLEFTENCODER);
+    private SwerveModule backRight = new SwerveModule (Motors.BACKRIGHTSTEER, Motors.BACKRIGHTDRIVE, Motors.BACKRIGHTENCODER);
+    private SwerveModule backLeft = new SwerveModule (Motors.BACKLEFTSTEER, Motors.BACKLEFTDRIVE, Motors.BACKLEFTENCODER);
+
+    public SwerveDriveSubsystem(){}
 
     public void drive (double x1, double y1, double x2) {
         if(x1 < 0.05) x1 = 0;
