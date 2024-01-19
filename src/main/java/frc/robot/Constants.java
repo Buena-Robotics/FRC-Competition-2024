@@ -47,10 +47,13 @@ public final class Constants {
   }
 
   public static class Drive {
+    //Swerve Drive L2
+    //https://www.andymark.com/products/mk4-swerve-modules?Steering%20Encoder=CANCoder&quantity=1&Gear%20Ratio=L2%206.75%3A1&Includes%20Motors=No%20Motors&Motor%20Pinion%20Type=NEO&Assembled=No&Wheel%20Type=Billet%20Wheel
+
     //Distance between right and left wheels
-    public static final double TRACK_WIDTH = Units.inchesToMeters(-1); // 20?
+    public static final double TRACK_WIDTH = Units.inchesToMeters(20); // 20?
     //Distance between front and back wheels
-    public static final double WHEEL_BASE = Units.inchesToMeters(-1); // 20?
+    public static final double WHEEL_BASE = Units.inchesToMeters(20); // 20?
 
     public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
       new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
@@ -59,12 +62,12 @@ public final class Constants {
       new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2)
     );
 
-    public static final double PHYSICAL_MAX_SPEED_METERS_PER_SECOND = -1;
+    public static final double PHYSICAL_MAX_SPEED_METERS_PER_SECOND = Units.feetToMeters(14.5);
 
-    public static final double TELEOP_DRIVE_MAX_ACCELERATION_UNITS_PER_SECOND = -1;
-    public static final double TELEOP_DRIVE_MAX_ANGULAR_ACCELERATION_UNITS_PER_SECOND = -1;
+    public static final double TELEOP_DRIVE_MAX_ACCELERATION_UNITS_PER_SECOND = 3; //?
+    public static final double TELEOP_DRIVE_MAX_ANGULAR_ACCELERATION_UNITS_PER_SECOND = 3; //?
 
-    public static final double TELEOP_DRIVE_MAX_SPEED_METERS_PER_SECOND = -1;
-    public static final double TELEOP_DRIVE_MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = -1;
+    public static final double TELEOP_DRIVE_MAX_SPEED_METERS_PER_SECOND = 5; // ?
+    public static final double TELEOP_DRIVE_MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 4 * Math.PI; // ?
   }
 }

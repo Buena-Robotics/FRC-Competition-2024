@@ -29,9 +29,9 @@ public class RobotContainer {
   public RobotContainer() {
     swerve_drive_subsystem.setDefaultCommand(new SwerveJoystickCmd(
       swerve_drive_subsystem, 
-      () -> -driver_controller.getRawAxis(0), // Y-Axis 
-      () -> driver_controller.getRawAxis(0),  // X-Axis
-      () -> driver_controller.getRawAxis(0),  // Rot-Axis
+      () -> -driver_controller.getLeftY(), // Y-Axis 
+      () -> driver_controller.getLeftX(),  // X-Axis
+      () -> driver_controller.getRightX(),  // Rot-Axis
       () -> !driver_controller.getHID().getAButtonPressed()  // Any button to set field orientation
     ));
     // Configure the trigger bindings

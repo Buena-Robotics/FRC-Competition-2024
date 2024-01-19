@@ -10,7 +10,7 @@ import frc.robot.Constants;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 
 public class SwerveJoystickCmd extends Command {
-    private static final double JOYSTICK_DEADBAND = -1;
+    private static final double JOYSTICK_DEADBAND = 0.05;
 
     private final SwerveDriveSubsystem swerve_drive_subsystem;
 
@@ -28,7 +28,7 @@ public class SwerveJoystickCmd extends Command {
         
         this.field_orientation_function = field_orientation_function;
         
-        this.x_limiter     = new SlewRateLimiter(Constants.Drive.TELEOP_DRIVE_MAX_ACCELERATION_UNITS_PER_SECOND);
+        this.x_limiter    = new SlewRateLimiter(Constants.Drive.TELEOP_DRIVE_MAX_ACCELERATION_UNITS_PER_SECOND);
         this.y_limiter    = new SlewRateLimiter(Constants.Drive.TELEOP_DRIVE_MAX_ACCELERATION_UNITS_PER_SECOND);
         this.turn_limiter = new SlewRateLimiter(Constants.Drive.TELEOP_DRIVE_MAX_ANGULAR_ACCELERATION_UNITS_PER_SECOND);
 

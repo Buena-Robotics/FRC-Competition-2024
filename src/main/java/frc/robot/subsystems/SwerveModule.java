@@ -16,11 +16,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
 public class SwerveModule {
-    private static final double WHEEL_DIAMETER_METERS  = -1; // Units.inchesToMeters(4)
-    private static final double DRIVE_MOTOR_GEAR_RATIO = -1; // 1 / 5.8462
-    private static final double TURN_MOTOR_GEAR_RATIO  = -1; // 1 / 18.0
+    private static final double WHEEL_DIAMETER_METERS  = Units.inchesToMeters(4); // Not measured accurately
+    private static final double DRIVE_MOTOR_GEAR_RATIO = 1 / 6.75; // 1 / 5.8462
+    private static final double TURN_MOTOR_GEAR_RATIO  = 1 / 18.0; // 1 / 18.0
 
-    private static final double PID_TURN_CONTROLLER_P = -1; // 0.5
+    private static final double PID_TURN_CONTROLLER_P = 0.5; // 0.5
 
     private static final double DRIVE_ENCODER_ROTATION_TO_METERS       = DRIVE_MOTOR_GEAR_RATIO * Math.PI * WHEEL_DIAMETER_METERS;
     private static final double DRIVE_ENCODER_RPM_TO_METERS_PER_SECOND = DRIVE_ENCODER_ROTATION_TO_METERS / 60;
