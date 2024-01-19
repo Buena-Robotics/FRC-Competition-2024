@@ -46,28 +46,25 @@ public final class Constants {
     public static final int XBOXCONTROLLERPORT = 0;
   }
 
-  public static class Motors {
-    // Set these later
-    public static final int 
-        FRONTRIGHTDRIVE = 1,
-        FRONTRIGHTSTEER = 2,
-        FRONTLEFTDRIVE = 3,
-        FRONTLEFTSTEER = 4,
-        BACKRIGHTDRIVE = 5,
-        BACKRIGHTSTEER = 6,
-        BACKLEFTDRIVE = 7,
-        BACKLEFTSTEER = 8;
+  public static class Drive {
+    //Distance between right and left wheels
+    public static final double TRACK_WIDTH = Units.inchesToMeters(-1); // 20?
+    //Distance between front and back wheels
+    public static final double WHEEL_BASE = Units.inchesToMeters(-1); // 20?
 
+    public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
+      new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
+      new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
+      new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2),
+      new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2)
+    );
 
-    public static final int 
-        FRONTRIGHTENCODER = 0,
-        FRONTLEFTENCODER = 1,
-        BACKRIGHTENCODER = 2,
-        BACKLEFTENCODER = 3;
-  }
+    public static final double PHYSICAL_MAX_SPEED_METERS_PER_SECOND = -1;
 
-  public static class Swerve {
-    public static final double L = 20;
-    public static final double W = 20;
+    public static final double TELEOP_DRIVE_MAX_ACCELERATION_UNITS_PER_SECOND = -1;
+    public static final double TELEOP_DRIVE_MAX_ANGULAR_ACCELERATION_UNITS_PER_SECOND = -1;
+
+    public static final double TELEOP_DRIVE_MAX_SPEED_METERS_PER_SECOND = -1;
+    public static final double TELEOP_DRIVE_MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = -1;
   }
 }

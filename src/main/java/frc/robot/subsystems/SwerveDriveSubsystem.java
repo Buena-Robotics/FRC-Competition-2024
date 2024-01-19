@@ -1,64 +1,95 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.Motors;
-import frc.robot.utils.ControllerUtils;
 
-import static frc.robot.Constants.Swerve.L;
-import static frc.robot.Constants.Swerve.W;
+import com.kauailabs.navx.frc.AHRS;
 
 
 public class SwerveDriveSubsystem extends SubsystemBase {
-    
-    private SwerveModule frontRight = new SwerveModule (Motors.FRONTRIGHTSTEER, Motors.FRONTRIGHTDRIVE, Motors.FRONTRIGHTENCODER);
-    private SwerveModule frontLeft = new SwerveModule (Motors.FRONTLEFTSTEER, Motors.FRONTLEFTDRIVE, Motors.FRONTLEFTENCODER);
-    private SwerveModule backRight = new SwerveModule (Motors.BACKRIGHTSTEER, Motors.BACKRIGHTDRIVE, Motors.BACKRIGHTENCODER);
-    private SwerveModule backLeft = new SwerveModule (Motors.BACKLEFTSTEER, Motors.BACKLEFTDRIVE, Motors.BACKLEFTENCODER);
+    public static final int // DRIVE_MOTOR_IDS : ODDS
+        FRONT_RIGHT_DRIVE_MOTOR_ID = 1,
+        FRONT_LEFT_DRIVE_MOTOR_ID  = 3,
+        BACK_RIGHT_DRIVE_MOTOR_ID  = 5,
+        BACK_LEFT_DRIVE_MOTOR_ID   = 7;
+    public static final int // TURN_MOTOR_IDS : EVENS
+        FRONT_RIGHT_TURN_MOTOR_ID = 2,
+        FRONT_LEFT_TURN_MOTOR_ID  = 4,
+        BACK_RIGHT_TURN_MOTOR_ID  = 6,
+        BACK_LEFT_TURN_MOTOR_ID   = 8;
+    public static final boolean // DRIVE_MOTER_REVERSED
+        FRONT_RIGHT_DRIVE_MOTER_REVERSED = false,
+        FRONT_LEFT_DRIVE_MOTER_REVERSED  = false,
+        BACK_RIGHT_DRIVE_MOTER_REVERSED  = false,
+        BACK_LEFT_DRIVE_MOTER_REVERSED   = false;
+    public static final boolean // TURN_MOTOR_REVERSED
+        FRONT_RIGHT_TURN_MOTOR_REVERSED = false,
+        FRONT_LEFT_TURN_MOTOR_REVERSED  = false,
+        BACK_RIGHT_TURN_MOTOR_REVERSED  = false,
+        BACK_LEFT_TURN_MOTOR_REVERSED   = false;
+    public static final int // ABSOLUTE_ENCODER_IDS : 0-3
+        FRONT_RIGHT_ABSOLUTE_ENCODER_ID = 0,
+        FRONT_LEFT_ABSOLUTE_ENCODER_ID  = 1,
+        BACK_RIGHT_ABSOLUTE_ENCODER_ID  = 2,
+        BACK_LEFT_ABSOLUTE_ENCODER_ID   = 3;
+    public static final double // ABSOLUTE_ENCODER_OFFSET_RADIANS
+        FRONT_RIGHT_ABSOLUTE_ENCODER_OFFSET_RADIANS = 0.0,
+        FRONT_LEFT_ABSOLUTE_ENCODER_OFFSET_RADIANS  = 0.0,
+        BACK_RIGHT_ABSOLUTE_ENCODER_OFFSET_RADIANS  = 0.0,
+        BACK_LEFT_ABSOLUTE_ENCODER_OFFSET_RADIANS   = 0.0;
+    public static final boolean // ABSOLUTE_ENCODER_REVERSED
+        FRONT_RIGHT_ABSOLUTE_ENCODER_REVERSED = false,
+        FRONT_LEFT_ABSOLUTE_ENCODER_REVERSED  = false,
+        BACK_RIGHT_ABSOLUTE_ENCODER_REVERSED  = false,
+        BACK_LEFT_ABSOLUTE_ENCODER_REVERSED   = false;
 
-    public SwerveDriveSubsystem(){}
+    private final SwerveModule front_right = new SwerveModule (FRONT_RIGHT_DRIVE_MOTOR_ID, FRONT_RIGHT_TURN_MOTOR_ID, FRONT_RIGHT_DRIVE_MOTER_REVERSED, FRONT_RIGHT_TURN_MOTOR_REVERSED, 
+                                                                FRONT_RIGHT_ABSOLUTE_ENCODER_ID, FRONT_RIGHT_ABSOLUTE_ENCODER_OFFSET_RADIANS, FRONT_RIGHT_ABSOLUTE_ENCODER_REVERSED );
+    private final SwerveModule front_left  = new SwerveModule (FRONT_LEFT_DRIVE_MOTOR_ID, FRONT_LEFT_TURN_MOTOR_ID, FRONT_LEFT_DRIVE_MOTER_REVERSED, FRONT_LEFT_TURN_MOTOR_REVERSED, 
+                                                                FRONT_LEFT_ABSOLUTE_ENCODER_ID, FRONT_LEFT_ABSOLUTE_ENCODER_OFFSET_RADIANS, FRONT_LEFT_ABSOLUTE_ENCODER_REVERSED );
+    private final SwerveModule back_right  = new SwerveModule (BACK_RIGHT_DRIVE_MOTOR_ID, BACK_RIGHT_TURN_MOTOR_ID, BACK_RIGHT_DRIVE_MOTER_REVERSED, BACK_RIGHT_TURN_MOTOR_REVERSED,
+                                                                BACK_RIGHT_ABSOLUTE_ENCODER_ID, BACK_RIGHT_ABSOLUTE_ENCODER_OFFSET_RADIANS, BACK_RIGHT_ABSOLUTE_ENCODER_REVERSED);
+    private final SwerveModule back_left   = new SwerveModule (BACK_LEFT_DRIVE_MOTOR_ID, BACK_LEFT_TURN_MOTOR_ID, BACK_LEFT_DRIVE_MOTER_REVERSED, BACK_LEFT_TURN_MOTOR_REVERSED,
+                                                                BACK_LEFT_ABSOLUTE_ENCODER_ID, BACK_LEFT_ABSOLUTE_ENCODER_OFFSET_RADIANS, BACK_LEFT_ABSOLUTE_ENCODER_REVERSED);
 
-    public void drive (double x1, double y1, double x2) {
-        if(x1 < 0.05) x1 = 0;
-        if(y1 < 0.05) y1 = 0;
-        if(x2 < 0.05) x2 = 0;
+    private final AHRS gyro = new AHRS(SPI.Port.kMXP); // TODO : PLUGIN NAVX INTO ROBORIO
 
-
-        double r = Math.sqrt ((L * L) + (W * W));
-        y1 *= -1;
-
-        double a = x1 - x2 * (L / r);
-        double b = x1 + x2 * (L / r);
-        double c = y1 - x2 * (W / r);
-        double d = y1 + x2 * (W / r);
-
-        double backRightSpeed = Math.sqrt ((a * a) + (d * d));
-        double backLeftSpeed = Math.sqrt ((a * a) + (c * c));
-        double frontRightSpeed = Math.sqrt ((b * b) + (d * d));
-        double frontLeftSpeed = Math.sqrt ((b * b) + (c * c));
-
-        double backRightAngle = Math.atan2 (a, d) / Math.PI;
-        double backLeftAngle = Math.atan2 (a, c) / Math.PI;
-        double frontRightAngle = Math.atan2 (b, d) / Math.PI;
-        double frontLeftAngle = Math.atan2 (b, c) / Math.PI;
-
-        // SmartDashboard.putNumber("BackLeft Angle", backLeftAngle);
-        // SmartDashboard.putNumber("BackRight Angle", backRightAngle);
-        // SmartDashboard.putNumber("FrontLeft Angle", frontLeftAngle);
-        // SmartDashboard.putNumber("FrontRight Angle", frontRightAngle);
-        // SmartDashboard.putNumber("BackLeft Speed", backLeftSpeed);
-        // SmartDashboard.putNumber("BackRight Speed", backRightSpeed);
-        // SmartDashboard.putNumber("FrontLeft Speed", frontLeftSpeed);
-        // SmartDashboard.putNumber("FrontRight Speed", frontRightSpeed);
-
-        backRight.drive (backRightSpeed, backRightAngle);
-        backLeft.drive (backLeftSpeed, backLeftAngle);
-        frontRight.drive (frontRightSpeed, frontRightAngle);
-        frontLeft.drive (frontLeftSpeed, frontLeftAngle);
+    public SwerveDriveSubsystem(){
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+                zeroHeading();
+            } catch (Exception e) { }
+        }).start();
     }
 
-    public void arcadeDrive() {
-        drive(ControllerUtils.controller.getLeftX(), ControllerUtils.controller.getLeftY(), ControllerUtils.controller.getRightX());
+    public void zeroHeading(){ gyro.reset(); }
+    public double getHeading(){ return Math.IEEEremainder(gyro.getAngle(), 370); }
+
+    public Rotation2d getRotation2d(){ return Rotation2d.fromDegrees(getHeading()); }
+
+    @Override public void periodic() {
+        SmartDashboard.putNumber("Robot Heading", getHeading());
+    }
+
+    public void stopModules(){
+        front_left.stop();
+        front_right.stop();
+        back_left.stop();
+        back_right.stop();
+    }
+
+    public void setModuleStates(SwerveModuleState[] desired_states){
+        assert desired_states.length == 4 : "desired_states has invalid length";
+        SwerveDriveKinematics.desaturateWheelSpeeds(desired_states, Constants.Drive.PHYSICAL_MAX_SPEED_METERS_PER_SECOND);
+        front_left.setDesiredState (desired_states[0]);
+        front_right.setDesiredState(desired_states[1]);
+        back_left.setDesiredState  (desired_states[2]);
+        back_right.setDesiredState (desired_states[3]);
     }
 }
