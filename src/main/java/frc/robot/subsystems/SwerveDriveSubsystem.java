@@ -23,14 +23,14 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         BACK_LEFT_TURN_MOTOR_ID   = 8;
     public static final boolean // DRIVE_MOTER_REVERSED
         FRONT_RIGHT_DRIVE_MOTER_REVERSED = false,
-        FRONT_LEFT_DRIVE_MOTER_REVERSED  = false,
+        FRONT_LEFT_DRIVE_MOTER_REVERSED  = true,
         BACK_RIGHT_DRIVE_MOTER_REVERSED  = false,
-        BACK_LEFT_DRIVE_MOTER_REVERSED   = false;
+        BACK_LEFT_DRIVE_MOTER_REVERSED   = true;
     public static final boolean // TURN_MOTOR_REVERSED
-        FRONT_RIGHT_TURN_MOTOR_REVERSED = false,
-        FRONT_LEFT_TURN_MOTOR_REVERSED  = false,
-        BACK_RIGHT_TURN_MOTOR_REVERSED  = false,
-        BACK_LEFT_TURN_MOTOR_REVERSED   = false;
+        FRONT_RIGHT_TURN_MOTOR_REVERSED = true,
+        FRONT_LEFT_TURN_MOTOR_REVERSED  = true,
+        BACK_RIGHT_TURN_MOTOR_REVERSED  = true,
+        BACK_LEFT_TURN_MOTOR_REVERSED   = true;
     public static final int // ABSOLUTE_ENCODER_IDS : 0-3
         FRONT_RIGHT_ABSOLUTE_ENCODER_ID = 0,
         FRONT_LEFT_ABSOLUTE_ENCODER_ID  = 1,
@@ -73,7 +73,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     public Rotation2d getRotation2d(){ return Rotation2d.fromDegrees(getHeading()); }
 
     @Override public void periodic() {
-        SmartDashboard.putNumber("Robot Heading", getHeading());
+        // SmartDashboard.putNumber("Robot Heading", getHeading());
     }
 
     public void stopModules(){

@@ -12,7 +12,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
 public class SwerveModule {
@@ -95,7 +94,7 @@ public class SwerveModule {
         state = SwerveModuleState.optimize( state, getState().angle );
         drive_motor.set( state.speedMetersPerSecond / Constants.Drive.PHYSICAL_MAX_SPEED_METERS_PER_SECOND );
         turn_motor.set( turn_controller.calculate( getTurnPosition(), state.angle.getRadians() ) );
-        SmartDashboard.putString("Swerve[" + absolute_encoder.getChannel() + "] state", state.toString());
+        // SmartDashboard.putString("Swerve[" + absolute_encoder.getChannel() + "] state", state.toString());
     }
 
     public void stop(){
