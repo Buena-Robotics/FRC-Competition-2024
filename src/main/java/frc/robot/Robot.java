@@ -55,7 +55,9 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-
+    if(Constants.IO.controller.getAButtonReleased()){
+      Constants.SubSystems.swerve_drive_subsystem.updateAbsoluteEncodersOffset();
+    }
   }
 
   @Override

@@ -12,6 +12,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
 public class SwerveModule {
@@ -82,6 +83,10 @@ public class SwerveModule {
     public void resetEncoders(){
         drive_encoder.setPosition(0);
         turn_encoder.setPosition(getAbsoluteEncoderRadians());
+    }
+
+    public void updateAbsoluteEncoderOffsetToCurrentRotation(){
+        SmartDashboard.putNumber(String.valueOf(absolute_encoder.getChannel()), getAbsoluteEncoderRadians());
     }
 
     public SwerveModuleState getState() { return new SwerveModuleState(getDriveVelocity(), new Rotation2d(getTurnPosition())); }
