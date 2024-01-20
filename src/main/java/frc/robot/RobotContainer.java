@@ -4,13 +4,16 @@
 
 package frc.robot;
 
+import frc.robot.commands.LaunchNote;
 import frc.robot.commands.SwerveJoystickCmd;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 // import frc.robot.commands.Autos;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class RobotContainer {
   private final SwerveDriveSubsystem swerve_drive_subsystem = new SwerveDriveSubsystem();
+  private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
 
   public RobotContainer() {
     configureBindings();
@@ -24,7 +27,8 @@ public class RobotContainer {
       () -> Constants.IO.controller.getRightX(),  // Rot-Axis
       () -> !Constants.IO.controller.getAButtonPressed()  // Any button to set field orientation
     ));
-
+    Constants.IO.commandController.a().whileTrue(shooterSubsystem.intakeCommand());
+    Constants.IO.commandController.b().whileTrue(new LaunchNote(shooterSubsystem));
   }
 
   public Command getAutonomousCommand() {
