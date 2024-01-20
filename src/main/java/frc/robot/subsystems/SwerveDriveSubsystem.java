@@ -3,14 +3,19 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.devices.NavX;
 
 import com.kauailabs.navx.frc.AHRS;
 
 public class SwerveDriveSubsystem extends SubsystemBase {
+    private static SwerveDriveSubsystem instance;
+    public static SwerveDriveSubsystem getInstance(){ if(instance == null) instance = new SwerveDriveSubsystem(); return instance; }
+
     public static final int // DRIVE_MOTOR_IDS : ODDS
         FRONT_RIGHT_DRIVE_MOTOR_ID = 1,
         FRONT_LEFT_DRIVE_MOTOR_ID  = 3,
@@ -56,24 +61,39 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     private final SwerveModule back_left   = new SwerveModule (BACK_LEFT_DRIVE_MOTOR_ID, BACK_LEFT_TURN_MOTOR_ID, BACK_LEFT_DRIVE_MOTER_REVERSED, BACK_LEFT_TURN_MOTOR_REVERSED,
                                                                 BACK_LEFT_ABSOLUTE_ENCODER_ID, BACK_LEFT_ABSOLUTE_ENCODER_OFFSET_RADIANS, BACK_LEFT_ABSOLUTE_ENCODER_REVERSED);
 
-    private final AHRS gyro = new AHRS(SPI.Port.kMXP);
+    // private final AHRS gyro = new AHRS(SPI.Port.kMXP);
+    private final NavX gyro = new NavX(SPI.Port.kMXP);
+
 
     public SwerveDriveSubsystem(){
         new Thread(() -> {
             try {
                 Thread.sleep(1000);
+                long start_time = System.currentTimeMillis();
+                while(gyro.isCalibrating()){ 
+                    if(System.currentTimeMillis() - start_time > 20000)
+                        System.err.println("Nav-X Unable to Calibrate in alloted time of 20 seconds");
+                    break; 
+                }
                 zeroHeading();
             } catch (Exception e) { }
         }).start();
     }
 
     public void zeroHeading(){ gyro.reset(); }
-    public double getHeading(){ return Math.IEEEremainder(gyro.getAngle(), 370); }
+    public double getHeading(){ return Math.IEEEremainder(gyro.getAngle(), 360); }
 
     public Rotation2d getRotation2d(){ return Rotation2d.fromDegrees(getHeading()); }
 
-    @Override public void periodic() {
-        // SmartDashboard.putNumber("Robot Heading", getHeading());
+    @Override public void periodic() { 
+        SmartDashboard.putNumber("Robot Heading", getHeading()); 
+        SmartDashboard.putData(gyro);
+
+    }
+    @Override public void simulationPeriodic(){}
+
+    @Override public void initSendable(SendableBuilder builder) {
+
     }
 
     public void stopModules(){
@@ -90,5 +110,11 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         front_right.setDesiredState(desired_states[1]);
         back_left.setDesiredState  (desired_states[2]);
         back_right.setDesiredState (desired_states[3]);
+
+        SmartDashboard.putString("front_left:", desired_states[0].toString());
+        SmartDashboard.putString("front_right:", desired_states[1].toString());
+        SmartDashboard.putString("back_left:", desired_states[2].toString());
+        SmartDashboard.putString("back_right:", desired_states[3].toString());
+
     }
 }
