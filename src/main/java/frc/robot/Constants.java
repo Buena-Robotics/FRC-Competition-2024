@@ -9,6 +9,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.SwerveDriveSubsystem;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -26,6 +27,10 @@ public final class Constants {
     //Controllers
     public static final CommandXboxController commandController = new CommandXboxController(XBOXCONTROLLERPORT);
     public static final XboxController controller = new XboxController(XBOXCONTROLLERPORT);
+  }
+
+  public static class SubSystems{
+      public static final SwerveDriveSubsystem swerve_drive_subsystem = new SwerveDriveSubsystem();
   }
 
   public static class Drive {

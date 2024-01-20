@@ -1,7 +1,5 @@
 package frc.robot.vendor;
 
-import java.util.Vector;
-
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
