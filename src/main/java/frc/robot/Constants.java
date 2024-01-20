@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -18,32 +19,13 @@ import edu.wpi.first.wpilibj.XboxController;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
-  }
-
-  public static class Controller {
-    //Buttons
-    public static final XboxController.Button A = XboxController.Button.kA
-        ,B = XboxController.Button.kB
-        ,X = XboxController.Button.kX
-        ,Y = XboxController.Button.kY
-        ,LB = XboxController.Button.kLeftBumper
-        ,RB = XboxController.Button.kRightBumper
-        ,LS = XboxController.Button.kLeftStick
-        ,RS = XboxController.Button.kRightStick
-        ,MENU = XboxController.Button.kStart
-        ,NAVIGATION = XboxController.Button.kBack;
-  //Axis
-    public static final XboxController.Axis LS_Y = XboxController.Axis.kLeftY
-        ,LS_X = XboxController.Axis.kLeftX
-        ,RS_Y = XboxController.Axis.kRightY
-        ,RS_X = XboxController.Axis.kRightX
-        ,LT = XboxController.Axis.kLeftTrigger
-        ,RT = XboxController.Axis.kRightTrigger;
-
+  public static class IO {
     //Ports
     public static final int XBOXCONTROLLERPORT = 0;
+
+    //Controllers
+    public static final CommandXboxController commandController = new CommandXboxController(XBOXCONTROLLERPORT);
+    public static final XboxController controller = new XboxController(XBOXCONTROLLERPORT);
   }
 
   public static class Drive {
