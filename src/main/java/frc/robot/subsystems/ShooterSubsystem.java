@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -8,32 +9,39 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ShooterSubsystem extends SubsystemBase {
     
-    public CANSparkMax feedMotor, launchMotor;
-    private final int feedId = 10, launchId = 9;
-    private final int feedCurrentLimit = 80, launchCurrentLimit = 80;
-    public final double launcherSpeed = 1, launchFeederSpeed = 1;
-    public final double intakeLauncherSpeed = -1, intakeFeederSpeed = -.2;
-    public final double launcherDelay = 0.6;
+    private static final int FEED_MOTOR_ID = 10, LAUNCH_MOTOR_ID = 9;
+    private static final int FEED_SMART_CURRENT_LIMIT = 80, LAUNCH_SMART_CURRENT_LIMIT = 80;
+    public static final double FEED_SPEED = 1, LAUNCH_SPEED = 1;
+    public static final double INTAKE_LAUNCH_SPEED = -1, INTAKE_FEED_SPEED = -.2;
+
+    public CANSparkMax feed_motor, launch_motor;
+    public RelativeEncoder feed_motor_encoder, launch_motor_encoder;
 
     public ShooterSubsystem() {
-        feedMotor = new CANSparkMax(feedId, MotorType.kBrushless);
-        launchMotor = new CANSparkMax(launchId, MotorType.kBrushless);
+        feed_motor = new CANSparkMax(FEED_MOTOR_ID, MotorType.kBrushless);
+        launch_motor = new CANSparkMax(LAUNCH_MOTOR_ID, MotorType.kBrushless);
 
-        feedMotor.setSmartCurrentLimit(feedCurrentLimit);
-        launchMotor.setSmartCurrentLimit(launchCurrentLimit);
+        feed_motor_encoder = feed_motor.getEncoder();
+        launch_motor_encoder = launch_motor.getEncoder();
+
+        feed_motor.setSmartCurrentLimit(FEED_SMART_CURRENT_LIMIT);
+        launch_motor.setSmartCurrentLimit(LAUNCH_SMART_CURRENT_LIMIT);
     }
+
+    public double getFeedMotorVelocity(){ return feed_motor_encoder.getVelocity(); }
+    public double getLaunchMotorVelocity(){ return feed_motor_encoder.getVelocity(); }
 
     public Command intakeCommand() {
         return this.startEnd(() -> {
-            feedMotor.set(intakeFeederSpeed);
-            launchMotor.set(intakeLauncherSpeed);
-        }, () -> {
-            stop();
-        });
+            feed_motor.set(INTAKE_FEED_SPEED);
+            launch_motor.set(INTAKE_LAUNCH_SPEED);
+        }, () -> { stop(); });
     }
 
     public void stop() {
-        feedMotor.set(0);
-        launchMotor.set(0);
+        feed_motor.set(0);
+        launch_motor.set(0);
     }
+
+    @Override public void periodic(){}
 }

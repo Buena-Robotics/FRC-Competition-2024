@@ -6,12 +6,11 @@ package frc.robot;
 
 import frc.robot.commands.LaunchNote;
 import frc.robot.commands.SwerveJoystickCmd;
-import frc.robot.subsystems.ShooterSubsystem;
 // import frc.robot.commands.Autos;
 import edu.wpi.first.wpilibj2.command.Command;
+// import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 public class RobotContainer {
-  private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
 
   public RobotContainer() {
     configureBindings();
@@ -23,10 +22,13 @@ public class RobotContainer {
       () -> -Constants.IO.controller.getLeftY(), // Y-Axis 
       () -> Constants.IO.controller.getLeftX(),  // X-Axis
       () -> Constants.IO.controller.getRightX(),  // Rot-Axis
-      () -> !Constants.IO.controller.getBButtonPressed()  // Any button to set field orientation
+      () -> !Constants.IO.controller.getXButtonPressed()  // Any button to set field orientation
     ));
-    Constants.IO.commandController.a().whileTrue(shooterSubsystem.intakeCommand());
-    Constants.IO.commandController.b().whileTrue(new LaunchNote(shooterSubsystem));
+    Constants.IO.commandController.a().whileTrue(Constants.SubSystems.shooter_subsystem.intakeCommand());
+    Constants.IO.commandController.b().whileTrue(new LaunchNote(Constants.SubSystems.shooter_subsystem));
+
+    // Constants.IO.commandController.y().onPress(new InstantCommand(() -> System.out.println("press y")), 20);
+    // Constants.IO.commandController.y().onRelease(new InstantCommand(() -> System.out.println("rel y")), 0);
   }
 
   public Command getAutonomousCommand() {

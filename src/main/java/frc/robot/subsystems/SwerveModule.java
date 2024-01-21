@@ -10,12 +10,13 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
-public class SwerveModule {
+public class SwerveModule implements Sendable {
     private static final double WHEEL_DIAMETER_METERS  = Units.inchesToMeters(4); // Not measured accurately
     private static final double DRIVE_MOTOR_GEAR_RATIO = 1 / 6.75; // 1 / 5.8462
     private static final double TURN_MOTOR_GEAR_RATIO  = 1 / 18.0; // 1 / 18.0
@@ -85,11 +86,11 @@ public class SwerveModule {
         turn_encoder.setPosition(getAbsoluteEncoderRadians());
     }
 
-    public void updateAbsoluteEncoderOffsetToCurrentRotation(){
-        SmartDashboard.putNumber(String.valueOf(absolute_encoder.getChannel()), getAbsoluteEncoderRadians());
-    }
+    public Rotation2d getRotation2d(){ return new Rotation2d(getTurnPosition()); }
+    public double getRotationDegrees() { return getRotation2d().getDegrees(); }
+    public double getRotationRadians() { return getRotation2d().getRadians(); }
 
-    public SwerveModuleState getState() { return new SwerveModuleState(getDriveVelocity(), new Rotation2d(getTurnPosition())); }
+    public SwerveModuleState getState() { return new SwerveModuleState(getDriveVelocity(), getRotation2d()); }
     
     public void setDesiredState(SwerveModuleState state){
         if(Math.abs(state.speedMetersPerSecond) < SET_STATE_SPEED_METERS_PER_SECOND_DEADBAND) {
@@ -99,11 +100,19 @@ public class SwerveModule {
         state = SwerveModuleState.optimize( state, getState().angle );
         drive_motor.set( state.speedMetersPerSecond / Constants.Drive.PHYSICAL_MAX_SPEED_METERS_PER_SECOND );
         turn_motor.set( turn_controller.calculate( getTurnPosition(), state.angle.getRadians() ) );
-        // SmartDashboard.putString("Swerve[" + absolute_encoder.getChannel() + "] state", state.toString());
     }
 
     public void stop(){
         drive_motor.set(0);
         turn_motor.set(0);
+    }
+
+    @Override public void initSendable(SendableBuilder builder){
+        builder.setSmartDashboardType("Swerve Module");
+        builder.publishConstInteger("Channel", absolute_encoder.getChannel());
+        builder.addDoubleProperty("Absolute Encoder Value Rad", this::getAbsoluteEncoderRadians, null);
+        builder.addDoubleProperty("State/Drive Velocity Meters|Sec", this::getDriveVelocity, null);
+        builder.addDoubleProperty("State/Drive Rotation Deg", this::getRotationDegrees, null);
+        builder.addDoubleProperty("State/Drive Velocity Rad", this::getRotationRadians, null);
     }
 }

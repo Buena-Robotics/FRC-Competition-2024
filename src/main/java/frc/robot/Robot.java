@@ -31,8 +31,7 @@ public class Robot extends TimedRobot {
   @Override public void disabledPeriodic() {}
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
-  @Override
-  public void autonomousInit() {
+  @Override public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -42,43 +41,30 @@ public class Robot extends TimedRobot {
   }
 
   /** This function is called periodically during autonomous. */
-  @Override
-  public void autonomousPeriodic() {}
+  @Override public void autonomousPeriodic() {}
 
-  @Override
-  public void teleopInit() {
+  @Override public void teleopInit() {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
   }
 
   /** This function is called periodically during operator control. */
-  @Override
-  public void teleopPeriodic() {
-    if(Constants.IO.controller.getAButtonReleased()){
-      Constants.SubSystems.swerve_drive_subsystem.updateAbsoluteEncodersOffset();
-    }
+  @Override public void teleopPeriodic() {
+
   }
 
-  @Override
-  public void testInit() {
+  @Override public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
   }
 
   /** This function is called periodically during test mode. */
-  @Override
-  public void testPeriodic() {}
+  @Override public void testPeriodic() {}
 
   /** This function is called once when the robot is first started up. */
-  @Override
-  public void simulationInit() {
-
-  }
+  @Override public void simulationInit() {}
 
   /** This function is called periodically whilst in simulation. */
-  @Override
-  public void simulationPeriodic() {
-
-  }
+  @Override public void simulationPeriodic() {}
 }

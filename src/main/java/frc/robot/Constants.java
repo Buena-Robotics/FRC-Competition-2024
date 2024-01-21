@@ -8,29 +8,24 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveDriveSubsystem;
+import frc.robot.vendor.CXboxController;
 
-/**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
- * constants. This class should not be used for any other purpose. All constants should be declared
- * globally (i.e. public static). Do not put anything functional in this class.
- *
- * <p>It is advised to statically import this class (or one of its inner classes) wherever the
- * constants are needed, to reduce verbosity.
- */
 public final class Constants {
   public static class IO {
     //Ports
     public static final int XBOXCONTROLLERPORT = 0;
 
     //Controllers
-    public static final CommandXboxController commandController = new CommandXboxController(XBOXCONTROLLERPORT);
+    public static final CXboxController commandController = new CXboxController(XBOXCONTROLLERPORT);
+
     public static final XboxController controller = new XboxController(XBOXCONTROLLERPORT);
   }
 
   public static class SubSystems{
       public static final SwerveDriveSubsystem swerve_drive_subsystem = new SwerveDriveSubsystem();
+      public static final ShooterSubsystem shooter_subsystem = new ShooterSubsystem();
   }
 
   public static class Drive {
