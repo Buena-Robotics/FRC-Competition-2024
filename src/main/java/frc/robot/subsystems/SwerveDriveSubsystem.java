@@ -81,7 +81,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     public Rotation2d getRotation2d(){ return Rotation2d.fromDegrees(getHeading()); }
 
     @Override public void periodic() { 
-        Meloetta.putNumber("Robot Heading", getHeading()); 
+        Meloetta.putNumber("Rotation Heading", getHeading()); 
         Meloetta.putData("NavX Micro", gyro);
 
         Meloetta.putData("Front Right", front_right);
