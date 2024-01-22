@@ -111,8 +111,7 @@ public class SwerveModule implements Sendable {
         builder.setSmartDashboardType("Swerve Module");
         builder.publishConstInteger("Channel", absolute_encoder.getChannel());
         builder.addDoubleProperty("Absolute Encoder Value Rad", this::getAbsoluteEncoderRadians, null);
-        builder.addDoubleProperty("State/Drive Velocity Meters|Sec", this::getDriveVelocity, null);
-        builder.addDoubleProperty("State/Drive Rotation Deg", this::getRotationDegrees, null);
-        builder.addDoubleProperty("State/Drive Velocity Rad", this::getRotationRadians, null);
+        builder.addDoubleProperty("State/Speed Meters|Sec", this::getDriveVelocity, null);
+        builder.addDoubleProperty("State/Rotation Rad", this::getRotationRadians, null);
     }
 }

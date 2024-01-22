@@ -38,7 +38,6 @@ public class NavX extends AHRS {
         builder.setSmartDashboardType("Gyro");
         builder.publishConstBoolean("Connected?", isConnected());
         builder.addBooleanProperty("Calibrating?", this::isCalibrating, null);
-        builder.addDoubleArrayProperty("Rotation Deg", this::getRotationArrayDegrees, null);
         builder.addDoubleArrayProperty("Rotation Rad", this::getRotationArrayRadians, null);
         builder.addDoubleArrayProperty("Displacement Meters", this::getDisplacementMeters, null);
         builder.addDoubleArrayProperty("Velocity Meters|Sec", this::getVelocityMetersPerSecond, null);
