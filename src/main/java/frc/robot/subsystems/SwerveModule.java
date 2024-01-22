@@ -16,10 +16,12 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.Constants;
 
+// 12.8 / 1;
 public class SwerveModule implements Sendable {
     private static final double WHEEL_DIAMETER_METERS  = Units.inchesToMeters(4); // Not measured accurately
+    //TODO: Check if gear ratios needs to be inverted
     private static final double DRIVE_MOTOR_GEAR_RATIO = 1 / 6.75; // 1 / 5.8462
-    private static final double TURN_MOTOR_GEAR_RATIO  = 1 / 18.0; // 1 / 18.0
+    private static final double TURN_MOTOR_GEAR_RATIO  = 1 / 12.8; // 1 / 18.0
 
     private static final double PID_TURN_CONTROLLER_P = 0.5; // 0.5
 
@@ -69,10 +71,11 @@ public class SwerveModule implements Sendable {
     }
 
     public double getDrivePosition(){ return drive_encoder.getPosition(); }
-    public double getTurnPosition(){ return turn_encoder.getPosition(); }
+    public double getTurnPosition() { return getAbsoluteEncoderRadians(); }
+    // public double getTurnPosition(){ return turn_encoder.getPosition(); }
 
-    public double getDriveVelocity(){ return drive_encoder.getVelocity(); }
-    public double getTurnVelocity(){ return turn_encoder.getVelocity(); }
+    public double getDriveVelocity() { return drive_encoder.getVelocity(); }
+    public double getTurnVelocity()  { return  turn_encoder.getVelocity(); }
 
     public double getAbsoluteEncoderRadians(){ 
         double angle = absolute_encoder.getVoltage() / RobotController.getVoltage5V();

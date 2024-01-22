@@ -13,8 +13,7 @@ public class LaunchNote extends Command {
         shooter.launch_motor.set(ShooterSubsystem.LAUNCH_SPEED);
         shooter.feed_motor.set(ShooterSubsystem.FEED_SPEED);
     }
-    //TODO Check if this still works
-    @Override public boolean isFinished() { return true; } // WAS RETURN FALSE
+    @Override public boolean isFinished() { return false; }
 
     @Override public void end(boolean interrupted) { shooter.stop(); }
 }

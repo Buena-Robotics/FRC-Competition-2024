@@ -44,7 +44,7 @@ public final class Constants {
       new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2)
     );
 
-    public static final double PHYSICAL_MAX_SPEED_METERS_PER_SECOND = Units.feetToMeters(14.5);
+    public static final double PHYSICAL_MAX_SPEED_METERS_PER_SECOND = Units.feetToMeters(6);
 
     public static final double TELEOP_DRIVE_MAX_ACCELERATION_UNITS_PER_SECOND = 3; //?
     public static final double TELEOP_DRIVE_MAX_ANGULAR_ACCELERATION_UNITS_PER_SECOND = 3; //?
