@@ -57,7 +57,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     private final SwerveModule back_left   = new SwerveModule (BACK_LEFT_DRIVE_MOTOR_ID, BACK_LEFT_TURN_MOTOR_ID, BACK_LEFT_DRIVE_MOTER_REVERSED, BACK_LEFT_TURN_MOTOR_REVERSED,
                                                                 BACK_LEFT_ABSOLUTE_ENCODER_ID, BACK_LEFT_ABSOLUTE_ENCODER_OFFSET_RADIANS, BACK_LEFT_ABSOLUTE_ENCODER_REVERSED);
 
-    private final NavX gyro = new NavX(I2C.Port.kOnboard);
+    public final NavX gyro = new NavX(I2C.Port.kOnboard);
 
     public SwerveDriveSubsystem(){
         new Thread(() -> {

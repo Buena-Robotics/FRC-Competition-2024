@@ -18,12 +18,20 @@ public class RobotContainer {
     configureBindings();
   }
 
+  private double getRotationSpeed(){
+    if(Constants.IO.controller.getPOV() == 270) // LEFT
+      return 0.09;
+    else if(Constants.IO.controller.getPOV() == 90) // RIGHT
+      return -0.09;
+    return -Constants.IO.controller.getRightX();
+  }
+
   private void configureBindings() {
     Constants.SubSystems.swerve_drive_subsystem.setDefaultCommand(new SwerveJoystickCmd(
       Constants.SubSystems.swerve_drive_subsystem, 
       () -> -Constants.IO.controller.getLeftY(), // Y-Axis 
       () -> -Constants.IO.controller.getLeftX(),  // X-Axis
-      () -> -Constants.IO.controller.getRightX(),  // Rot-Axis
+      this::getRotationSpeed,  // Rot-Axis
       () -> !Constants.IO.controller.getXButtonPressed()  // Any button to set field orientation
     ));
     Constants.IO.commandController.leftBumper().whileTrue(Constants.SubSystems.shooter_subsystem.intakeCommand());

@@ -14,7 +14,7 @@ public class NavX extends AHRS {
 
     public NavX(I2C.Port serial_port_id){ 
         super(serial_port_id); 
-        this.resetDisplacement(); 
+        this.resetDisplacement();
     }
     
     public boolean isInAir(){ return this.getDisplacementY() > Units.inchesToMeters(MINIMUM_AIR_HEIGHT_INCHES); }
