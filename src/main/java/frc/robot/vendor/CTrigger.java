@@ -50,7 +50,7 @@ import java.util.function.BooleanSupplier;
                     mutex = true;
                     command.schedule();
                     if(has_released) mutex = false;
-                    if(ran) running = false;
+                    if(ran) {running = false; command.cancel();}
                 }
                 if(!ran && has_released) mutex = false; 
             }

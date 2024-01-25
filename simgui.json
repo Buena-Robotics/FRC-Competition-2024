@@ -37,6 +37,12 @@
           }
         },
         "open": true
+      },
+      "photonvision": {
+        "Microsoft_LifeCam_HD-3000": {
+          "open": true
+        },
+        "open": true
       }
     }
   },
@@ -69,6 +75,9 @@
       "Subscribers": {
         "open": true
       },
+      "open": true
+    },
+    "photonvision@1": {
       "open": true
     },
     "visible": true

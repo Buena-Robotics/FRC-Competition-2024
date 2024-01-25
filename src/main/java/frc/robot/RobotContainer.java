@@ -9,8 +9,8 @@ import frc.robot.commands.PrepareLaunch;
 import frc.robot.commands.SwerveJoystickCmd;
 // import frc.robot.commands.Autos;
 import edu.wpi.first.wpilibj2.command.Command;
-// import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer {
 
@@ -31,8 +31,8 @@ public class RobotContainer {
       Constants.SubSystems.swerve_drive_subsystem, 
       () -> -Constants.IO.controller.getLeftY(), // Y-Axis 
       () -> -Constants.IO.controller.getLeftX(),  // X-Axis
-      this::getRotationSpeed,  // Rot-Axis
-      () -> !Constants.IO.controller.getXButtonPressed()  // Any button to set field orientation
+      this::getRotationSpeed  // Rot-Axis
+      // () -> !Constants.IO.controller.getXButtonPressed()  // Any button to set field orientation
     ));
     Constants.IO.commandController.leftBumper().whileTrue(Constants.SubSystems.shooter_subsystem.intakeCommand());
     Constants.IO.commandController.rightBumper().whileTrue(new PrepareLaunch(Constants.SubSystems.shooter_subsystem)
@@ -40,8 +40,7 @@ public class RobotContainer {
                                                               .andThen(new LaunchNote(Constants.SubSystems.shooter_subsystem))
                                                               .handleInterrupt(Constants.SubSystems.shooter_subsystem::stop));
 
-    Constants.IO.commandController.y().onTrue(new InstantCommand(Constants.SubSystems.swerve_drive_subsystem::zeroHeading));
-    // Constants.IO.commandController.y().onRelease(new InstantCommand(() -> System.out.println("rel y")), 0);
+    // Constants.IO.commandController.y().onTrue(new InstantCommand(Constants.SubSystems.swerve_drive_subsystem::zeroHeading));
   }
 
   public Command getAutonomousCommand() {

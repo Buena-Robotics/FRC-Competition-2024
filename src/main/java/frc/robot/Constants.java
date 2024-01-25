@@ -4,8 +4,12 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -31,19 +35,6 @@ public final class Constants {
   public static class Drive {
     //Swerve Drive L2
     //https://www.andymark.com/products/mk4-swerve-modules?Steering%20Encoder=CANCoder&quantity=1&Gear%20Ratio=L2%206.75%3A1&Includes%20Motors=No%20Motors&Motor%20Pinion%20Type=NEO&Assembled=No&Wheel%20Type=Billet%20Wheel
-
-    //Distance between right and left wheels
-    public static final double TRACK_WIDTH = Units.inchesToMeters(20); // 20?
-    //Distance between front and back wheels
-    public static final double WHEEL_BASE = Units.inchesToMeters(20); // 20?
-    
-    //Might have to reorder these :3
-    public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
-      new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),   // Front right
-      new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),  // Front left
-      new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),   // Back right
-      new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2) // Back left
-    );
 
     public static final double PHYSICAL_MAX_SPEED_METERS_PER_SECOND = Units.feetToMeters(3);
 

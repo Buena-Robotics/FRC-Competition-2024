@@ -7,7 +7,9 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
@@ -16,14 +18,12 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.Constants;
 
-// 12.8 / 1;
 public class SwerveModule implements Sendable {
     private static final double WHEEL_DIAMETER_METERS  = Units.inchesToMeters(4); // Not measured accurately
-    //TODO: Check if gear ratios needs to be inverted
-    private static final double DRIVE_MOTOR_GEAR_RATIO = 1 / 6.75; // 1 / 5.8462
-    private static final double TURN_MOTOR_GEAR_RATIO  = 1 / 12.8; // 1 / 18.0
+    private static final double DRIVE_MOTOR_GEAR_RATIO = 1 / 6.75;
+    private static final double TURN_MOTOR_GEAR_RATIO  = 1 / 12.8;
 
-    private static final double PID_TURN_CONTROLLER_P = 0.5; // 0.5
+    private static final double PID_TURN_CONTROLLER_P = 0.5;
 
     private static final double DRIVE_ENCODER_ROTATION_TO_METERS       = DRIVE_MOTOR_GEAR_RATIO * Math.PI * WHEEL_DIAMETER_METERS;
     private static final double DRIVE_ENCODER_RPM_TO_METERS_PER_SECOND = DRIVE_ENCODER_ROTATION_TO_METERS / 60;
@@ -94,6 +94,7 @@ public class SwerveModule implements Sendable {
     public double getRotationRadians() { return getRotation2d().getRadians(); }
 
     public SwerveModuleState getState() { return new SwerveModuleState(getDriveVelocity(), getRotation2d()); }
+    public SwerveModulePosition getPosition() { return new SwerveModulePosition(getDrivePosition(), getRotation2d()); }
     
     public void setDesiredState(SwerveModuleState state){
         if(Math.abs(state.speedMetersPerSecond) < SET_STATE_SPEED_METERS_PER_SECOND_DEADBAND) {
@@ -114,7 +115,8 @@ public class SwerveModule implements Sendable {
         builder.setSmartDashboardType("Swerve Module");
         builder.publishConstInteger("Channel", absolute_encoder.getChannel());
         builder.addDoubleProperty("Absolute Encoder Value Rad", this::getAbsoluteEncoderRadians, null);
-        builder.addDoubleProperty("State/Speed Meters|Sec", this::getDriveVelocity, null);
-        builder.addDoubleProperty("State/Rotation Rad", this::getRotationRadians, null);
+        builder.addDoubleProperty("Drive Speed Meters|Sec", this::getDriveVelocity, null);
+        builder.addDoubleProperty("Turn Speed Meters|Sec", this::getTurnVelocity, null);
+        builder.addDoubleProperty("Rotation Rad", this::getRotationRadians, null);
     }
 }
