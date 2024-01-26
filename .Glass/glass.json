@@ -3,27 +3,52 @@
     "Persistent Values": {
       "open": false
     },
-    "Retained Values": {
-      "open": false
-    },
     "transitory": {
       "SmartDashboard": {
+        "open": true
+      },
+      "photonvision": {
+        "Microsoft_LifeCam_HD-3000": {
+          "open": true
+        },
         "open": true
       }
     },
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/navX-Sensor[4]": "Gyro"
+    },
+    "windows": {
+      "/SmartDashboard/Field": {
+        "Robot": {
+          "arrowSize": 55,
+          "arrowWeight": 2.0,
+          "length": 0.6603999733924866,
+          "style": "Box/Image",
+          "weight": 3.0,
+          "width": 0.6603999733924866
+        },
+        "height": 8.199999809265137,
+        "image": "C:\\Users\\Robotic's club\\Documents\\2024-field.png",
+        "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
+      }
     }
   },
   "NetworkTables Info": {
     "Clients": {
       "open": true
-    },
-    "visible": true
+    }
   },
   "NetworkTables Settings": {
     "mode": "Client (NT4)",
-    "serverTeam": "1726"
+    "serverTeam": "1726",
+    "visible": false
+  },
+  "NetworkTables View": {
+    "visible": false
   }
 }

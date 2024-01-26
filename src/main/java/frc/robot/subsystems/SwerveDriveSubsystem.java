@@ -1,19 +1,37 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.ColorSensorV3;
+
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.utils.TimerUtil;
 import frc.robot.vendor.Meloetta;
 import frc.robot.vendor.NavX;
+
+import java.util.Optional;
+
+import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
 
 public class SwerveDriveSubsystem extends SubsystemBase {
     private static final int // DRIVE_MOTOR_IDS : ODDS
@@ -63,6 +81,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
                                                                 BACK_LEFT_ABSOLUTE_ENCODER_ID, BACK_LEFT_ABSOLUTE_ENCODER_OFFSET_RADIANS, BACK_LEFT_ABSOLUTE_ENCODER_REVERSED);
     //-------------------------
     private final NavX gyro = new NavX(I2C.Port.kOnboard);
+    // private final ColorSensorV3 color_sensor = new ColorSensorV3(I2C.Port.kOnboard);
 
     //Distance between right and left wheels
     private static final double TRACK_WIDTH = Units.inchesToMeters(20);
@@ -90,7 +109,19 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         back_left.getPosition()
     }, new Pose2d(0, 0, new Rotation2d()));
 
+    private AprilTagFieldLayout field_layout;
+    private final PhotonCamera camera;
+    private final Transform3d robot_to_cam;
+    private final PhotonPoseEstimator pose_estimator;
+
     public SwerveDriveSubsystem(){
+        try {
+            field_layout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
+        } catch (Exception e) { System.err.println(e); }
+        
+        camera = new PhotonCamera("Microsoft_LifeCam_HD-3000");
+        robot_to_cam = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0));
+        pose_estimator  = new PhotonPoseEstimator(field_layout, PoseStrategy.LOWEST_AMBIGUITY, camera, robot_to_cam);
         new Thread(() -> {
             try {
                 Thread.sleep(1000);
@@ -111,14 +142,36 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
     public Rotation2d getRotation2d(){ return Rotation2d.fromDegrees(getHeading()); }
 
+    private final Field2d m_field = new Field2d();
     @Override public void periodic() { 
-        Meloetta.putNumber("Rotation Heading", getHeading()); 
-        Meloetta.putData("NavX Micro", gyro);
+        if(field_layout == null) System.out.println("Check That");
+        PhotonPipelineResult result = camera.getLatestResult();
+        if(result.hasTargets()){
+            Optional<EstimatedRobotPose> opt_estimated_pose = pose_estimator.update(result);
+            if(!opt_estimated_pose.isEmpty()){
+                EstimatedRobotPose estimated_pose = opt_estimated_pose.get(); 
+                m_field.setRobotPose(estimated_pose.estimatedPose.toPose2d());
+            }
+        }
+        SmartDashboard.putData("Field", m_field);
 
-        Meloetta.putData("Front Right", front_right);
-        Meloetta.putData("Front Left", front_left);
-        Meloetta.putData("Back Right", back_right);
-        Meloetta.putData("Back Left", back_left);
+
+        // Meloetta.putNumber("Rotation Heading", getHeading()); 
+        // Meloetta.putData("NavX Micro", gyro);
+
+        // Meloetta.putData("Front Right", front_right);
+        // Meloetta.putData("Front Left", front_left);
+        // Meloetta.putData("Back Right", back_right);
+        // Meloetta.putData("Back Left", back_left);
+        // final double bit20 = Math.pow(2, 20);
+        // final double bit11 = Math.pow(2, 11);
+        // Color c = color_sensor.getColor();
+
+        // SmartDashboard.putNumber("Color Sensor Red", c.red * 255);
+        // SmartDashboard.putNumber("Color Sensor Green", c.green * 255);
+        // SmartDashboard.putNumber("Color Sensor Blue", c.blue * 255);
+        // SmartDashboard.putNumber("Color Sensor Ir", (color_sensor.getIR() / bit20) * 255);
+        // SmartDashboard.putNumber("Color Sensor Proximity", (color_sensor.getProximity() / bit11) * 255);
     }
     @Override public void simulationPeriodic(){}
 

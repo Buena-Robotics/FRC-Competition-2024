@@ -10,8 +10,8 @@ import frc.robot.Constants;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 
 public class SwerveJoystickCmd extends Command {
-    private static final double LEFT_JOYSTICK_DEADBAND = 0.09;
-    private static final double RIGHT_JOYSTICK_DEADBAND = 0.07;
+    private static final double LEFT_JOYSTICK_DEADBAND = 0.08;
+    private static final double RIGHT_JOYSTICK_DEADBAND = 0.08;
 
     private final SwerveDriveSubsystem swerve_drive_subsystem;
 

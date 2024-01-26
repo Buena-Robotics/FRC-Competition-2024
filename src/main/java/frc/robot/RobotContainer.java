@@ -20,17 +20,29 @@ public class RobotContainer {
 
   private double getRotationSpeed(){
     if(Constants.IO.controller.getPOV() == 270) // LEFT
-      return 0.09;
+      return 0.06;
     else if(Constants.IO.controller.getPOV() == 90) // RIGHT
-      return -0.09;
+      return -0.06;
     return -Constants.IO.controller.getRightX();
+  }
+
+  private double getForwardSpeed(){
+    if(Constants.IO.controller.getPOV() == 0) // Forward
+      return 0.05;
+    else if(Constants.IO.controller.getPOV() == 180) // Backward
+      return -0.05;
+    return -Constants.IO.controller.getLeftY();
+  }
+
+  private double getSideSpeed(){
+    return -Constants.IO.controller.getLeftX();
   }
 
   private void configureBindings() {
     Constants.SubSystems.swerve_drive_subsystem.setDefaultCommand(new SwerveJoystickCmd(
       Constants.SubSystems.swerve_drive_subsystem, 
-      () -> -Constants.IO.controller.getLeftY(), // Y-Axis 
-      () -> -Constants.IO.controller.getLeftX(),  // X-Axis
+      this::getForwardSpeed, // Y-Axis 
+      this::getSideSpeed,  // X-Axis
       this::getRotationSpeed  // Rot-Axis
       // () -> !Constants.IO.controller.getXButtonPressed()  // Any button to set field orientation
     ));
