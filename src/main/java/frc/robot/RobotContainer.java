@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import frc.robot.commands.CenterSourceCmd;
 import frc.robot.commands.LaunchNote;
 import frc.robot.commands.PrepareLaunch;
 import frc.robot.commands.SwerveJoystickCmd;
@@ -20,17 +21,17 @@ public class RobotContainer {
 
   private double getRotationSpeed(){
     if(Constants.IO.controller.getPOV() == 270) // LEFT
-      return 0.06;
+      return 0.09;
     else if(Constants.IO.controller.getPOV() == 90) // RIGHT
-      return -0.06;
+      return -0.09;
     return -Constants.IO.controller.getRightX();
   }
 
   private double getForwardSpeed(){
     if(Constants.IO.controller.getPOV() == 0) // Forward
-      return 0.05;
+      return 0.09;
     else if(Constants.IO.controller.getPOV() == 180) // Backward
-      return -0.05;
+      return -0.09;
     return -Constants.IO.controller.getLeftY();
   }
 
@@ -51,7 +52,8 @@ public class RobotContainer {
                                                               .withTimeout(1.0)
                                                               .andThen(new LaunchNote(Constants.SubSystems.shooter_subsystem))
                                                               .handleInterrupt(Constants.SubSystems.shooter_subsystem::stop));
-
+    Constants.IO.commandController.x().onTrue(new CenterSourceCmd(Constants.SubSystems.swerve_drive_subsystem));
+    Constants.IO.commandController.y().toggleOnTrue(new InstantCommand(() -> Constants.SubSystems.swerve_drive_subsystem.toggleAprilTags()));
     // Constants.IO.commandController.y().onTrue(new InstantCommand(Constants.SubSystems.swerve_drive_subsystem::zeroHeading));
   }
 

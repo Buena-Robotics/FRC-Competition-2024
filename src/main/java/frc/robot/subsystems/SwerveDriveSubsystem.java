@@ -109,19 +109,28 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         back_left.getPosition()
     }, new Pose2d(0, 0, new Rotation2d()));
 
+    private final Field2d m_field = new Field2d();
     private AprilTagFieldLayout field_layout;
     private final PhotonCamera camera;
     private final Transform3d robot_to_cam;
     private final PhotonPoseEstimator pose_estimator;
+    private boolean april_tag_lock = false;
+    private boolean pose_known = false;
+    private Pose2d robot_pose;
+    private Pose2d target_pose;
 
     public SwerveDriveSubsystem(){
         try {
             field_layout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
         } catch (Exception e) { System.err.println(e); }
         
-        camera = new PhotonCamera("Microsoft_LifeCam_HD-3000");
+        // camera = new PhotonCamera("Microsoft_LifeCam_HD-3000");
+        camera = new PhotonCamera("USB_Camera");
+
         robot_to_cam = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0));
-        pose_estimator  = new PhotonPoseEstimator(field_layout, PoseStrategy.LOWEST_AMBIGUITY, camera, robot_to_cam);
+        pose_estimator  = new PhotonPoseEstimator(field_layout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, robot_to_cam);
+        pose_estimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+
         new Thread(() -> {
             try {
                 Thread.sleep(1000);
@@ -137,41 +146,53 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         }).start();
     }
 
+    public boolean getPoseKnown(){ return pose_known; }
+    public Pose2d getRobotPose(){ return robot_pose; }
+    public Pose2d getTargetPose(){ return target_pose; }
+    public void toggleAprilTags(){ april_tag_lock = !april_tag_lock; }
+
     public void zeroHeading(){ gyro.reset(); System.out.println("zeroed"); }
     public double getHeading(){ return Math.IEEEremainder(gyro.getAngle(), 360); }
 
     public Rotation2d getRotation2d(){ return Rotation2d.fromDegrees(getHeading()); }
 
-    private final Field2d m_field = new Field2d();
     @Override public void periodic() { 
-        if(field_layout == null) System.out.println("Check That");
+        SmartDashboard.putBoolean("April Tag Lock", april_tag_lock);
         PhotonPipelineResult result = camera.getLatestResult();
-        if(result.hasTargets()){
+        if(result.hasTargets() && result.getBestTarget().getPoseAmbiguity() < 0.2 && !april_tag_lock){
+            target_pose = field_layout.getTagPose(result.getBestTarget().getFiducialId()).get().toPose2d();
             Optional<EstimatedRobotPose> opt_estimated_pose = pose_estimator.update(result);
             if(!opt_estimated_pose.isEmpty()){
                 EstimatedRobotPose estimated_pose = opt_estimated_pose.get(); 
-                m_field.setRobotPose(estimated_pose.estimatedPose.toPose2d());
+                Pose2d estimated_pose_2d = estimated_pose.estimatedPose.toPose2d();
+                robot_pose = estimated_pose_2d;
+                m_field.setRobotPose(robot_pose);
+                
+                gyro.setAngleAdjustment(estimated_pose_2d.getRotation().getDegrees() - gyro.getAngle());
+
+                front_right.resetPosition();
+                front_left.resetPosition();
+                back_right.resetPosition();
+                back_left.resetPosition();
+
+                swerve_odometry.resetPosition(gyro.getRotation2d(), new SwerveModulePosition[] {
+                    front_right.getPosition(),
+                    front_left.getPosition(),
+                    back_right.getPosition(),
+                    back_left.getPosition()
+                }, estimated_pose_2d);
+                pose_known = true;
             }
+        } else if(pose_known){
+            robot_pose = swerve_odometry.update(gyro.getRotation2d(), new SwerveModulePosition[] {
+                front_left.getPosition(),
+                front_right.getPosition(),
+                back_left.getPosition(),
+                back_right.getPosition()
+            });
+            m_field.setRobotPose(robot_pose);
         }
         SmartDashboard.putData("Field", m_field);
-
-
-        // Meloetta.putNumber("Rotation Heading", getHeading()); 
-        // Meloetta.putData("NavX Micro", gyro);
-
-        // Meloetta.putData("Front Right", front_right);
-        // Meloetta.putData("Front Left", front_left);
-        // Meloetta.putData("Back Right", back_right);
-        // Meloetta.putData("Back Left", back_left);
-        // final double bit20 = Math.pow(2, 20);
-        // final double bit11 = Math.pow(2, 11);
-        // Color c = color_sensor.getColor();
-
-        // SmartDashboard.putNumber("Color Sensor Red", c.red * 255);
-        // SmartDashboard.putNumber("Color Sensor Green", c.green * 255);
-        // SmartDashboard.putNumber("Color Sensor Blue", c.blue * 255);
-        // SmartDashboard.putNumber("Color Sensor Ir", (color_sensor.getIR() / bit20) * 255);
-        // SmartDashboard.putNumber("Color Sensor Proximity", (color_sensor.getProximity() / bit11) * 255);
     }
     @Override public void simulationPeriodic(){}
 

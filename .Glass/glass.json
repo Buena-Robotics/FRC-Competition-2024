@@ -11,7 +11,9 @@
         "Microsoft_LifeCam_HD-3000": {
           "open": true
         },
-        "open": true
+        "USB_Camera": {
+          "open": true
+        }
       }
     },
     "types": {
@@ -46,9 +48,6 @@
   "NetworkTables Settings": {
     "mode": "Client (NT4)",
     "serverTeam": "1726",
-    "visible": false
-  },
-  "NetworkTables View": {
     "visible": false
   }
 }
