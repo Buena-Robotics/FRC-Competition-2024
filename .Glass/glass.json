@@ -4,7 +4,13 @@
       "open": false
     },
     "transitory": {
+      "Shuffleboard": {
+        "open": true
+      },
       "SmartDashboard": {
+        "Front Right": {
+          "open": true
+        },
         "open": true
       },
       "photonvision": {
@@ -19,35 +25,100 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/Nav-X": "Gyro",
+      "/SmartDashboard/PIDController[5]": "PIDController",
+      "/SmartDashboard/PIDController[6]": "PIDController",
+      "/SmartDashboard/PIDController[7]": "PIDController",
+      "/SmartDashboard/Turn-PID": "PIDController",
+      "/SmartDashboard/X-PID": "PIDController",
+      "/SmartDashboard/Y-PID": "PIDController",
       "/SmartDashboard/navX-Sensor[4]": "Gyro"
     },
     "windows": {
       "/SmartDashboard/Field": {
+        "AprilTags": {
+          "arrowSize": 69,
+          "arrowWeight": 3.0,
+          "length": 0.25,
+          "style": "Hidden",
+          "weight": 1.0,
+          "width": 0.25
+        },
         "Robot": {
-          "arrowSize": 55,
-          "arrowWeight": 2.0,
+          "arrowColor": [
+            0.0,
+            1.0,
+            0.7941174507141113,
+            255.0
+          ],
+          "arrowSize": 28,
+          "arrowWeight": 5.0,
+          "color": [
+            0.642301082611084,
+            0.7967891097068787,
+            0.970588207244873,
+            255.0
+          ],
           "length": 0.6603999733924866,
           "style": "Box/Image",
           "weight": 3.0,
           "width": 0.6603999733924866
         },
-        "height": 8.199999809265137,
+        "Tracking": {
+          "arrows": false,
+          "color": [
+            0.7352938652038574,
+            0.0,
+            1.0,
+            255.0
+          ],
+          "style": "Line",
+          "weight": 2.0
+        },
+        "bottom": 1476,
+        "height": 8.210550308227539,
         "image": "C:\\Users\\Robotic's club\\Documents\\2024-field.png",
+        "left": 150,
+        "right": 2961,
+        "test": {
+          "arrows": false,
+          "color": [
+            0.0,
+            1.0,
+            0.11764693260192871,
+            255.0
+          ],
+          "length": 0.3301999866962433,
+          "weight": 1.0,
+          "width": 0.3301999866962433
+        },
+        "top": 79,
+        "units": "meters",
         "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Turn-PID": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/X-PID": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Y-PID": {
         "window": {
           "visible": true
         }
       }
     }
   },
-  "NetworkTables Info": {
-    "Clients": {
-      "open": true
-    }
-  },
   "NetworkTables Settings": {
     "mode": "Client (NT4)",
-    "serverTeam": "1726",
+    "serverTeam": "localhost",
     "visible": false
   }
 }

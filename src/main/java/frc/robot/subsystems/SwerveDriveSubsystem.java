@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.ColorSensorV3;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -18,11 +16,11 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
+import frc.robot.Constants.FieldPoses;
 import frc.robot.utils.TimerUtil;
-import frc.robot.vendor.Meloetta;
 import frc.robot.vendor.NavX;
 
 import java.util.Optional;
@@ -109,28 +107,33 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         back_left.getPosition()
     }, new Pose2d(0, 0, new Rotation2d()));
 
-    private final Field2d m_field = new Field2d();
-    private AprilTagFieldLayout field_layout;
+    private final Field2d glass_field = new Field2d();
+
+    private final Translation3d robot_to_cam_translation = new Translation3d(Units.inchesToMeters(FieldPoses.ROBOT_LENGTH / 2), 0, 0);
+    private final Rotation3d robot_to_cam_rotation = new Rotation3d(0,Units.degreesToRadians(15),0);
+    private final Transform3d robot_to_cam = new Transform3d(robot_to_cam_translation, robot_to_cam_rotation);
     private final PhotonCamera camera;
-    private final Transform3d robot_to_cam;
     private final PhotonPoseEstimator pose_estimator;
+    private AprilTagFieldLayout field_layout;
     private boolean april_tag_lock = false;
     private boolean pose_known = false;
     private Pose2d robot_pose;
     private Pose2d target_pose;
 
     public SwerveDriveSubsystem(){
-        try {
-            field_layout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
-        } catch (Exception e) { System.err.println(e); }
-        
-        // camera = new PhotonCamera("Microsoft_LifeCam_HD-3000");
-        camera = new PhotonCamera("USB_Camera");
+        SmartDashboard.putData("Field", glass_field);
+        SmartDashboard.putData("Swerve/Nav-X", gyro);
+        SmartDashboard.putData("Swerve/Front Right", front_right);
+        SmartDashboard.putData("Swerve/Front Left" , front_left);
+        SmartDashboard.putData("Swerve/Back Right" , back_right);
+        SmartDashboard.putData("Swerve/Back Left"  , back_left);
 
-        robot_to_cam = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0));
-        pose_estimator  = new PhotonPoseEstimator(field_layout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, robot_to_cam);
+        try { field_layout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile); } catch (Exception e) { System.err.println(e); }
+        initializeGlassFieldTags();
+
+        camera = new PhotonCamera("USB_Camera"); // new PhotonCamera("Microsoft_LifeCam_HD-3000");
+        pose_estimator = new PhotonPoseEstimator(field_layout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, robot_to_cam);
         pose_estimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-
         new Thread(() -> {
             try {
                 Thread.sleep(1000);
@@ -146,53 +149,64 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         }).start();
     }
 
+    private void initializeGlassFieldTags(){
+        Pose2d[] tag_poses = new Pose2d[16];
+        for(int i = 1; i <= 16; i++){
+            tag_poses[i-1] = field_layout.getTagPose(i).get().toPose2d();
+        }
+        glass_field.getObject("AprilTags").setPoses(tag_poses);
+    }
+
+    public Field2d getField2d(){ return glass_field; }
     public boolean getPoseKnown(){ return pose_known; }
-    public Pose2d getRobotPose(){ return robot_pose; }
-    public Pose2d getTargetPose(){ return target_pose; }
+    public Pose2d getRobotPose(){ return Robot.isReal() ? robot_pose : glass_field.getRobotPose(); }
+    public Pose2d getTargetPose(){ return Robot.isReal() ? target_pose : glass_field.getObject("AprilTags").getPoses().get(5); }
     public void toggleAprilTags(){ april_tag_lock = !april_tag_lock; }
 
-    public void zeroHeading(){ gyro.reset(); System.out.println("zeroed"); }
+    public void zeroHeading(){ gyro.reset(); }
     public double getHeading(){ return Math.IEEEremainder(gyro.getAngle(), 360); }
 
     public Rotation2d getRotation2d(){ return Rotation2d.fromDegrees(getHeading()); }
 
     @Override public void periodic() { 
         SmartDashboard.putBoolean("April Tag Lock", april_tag_lock);
-        PhotonPipelineResult result = camera.getLatestResult();
-        if(result.hasTargets() && result.getBestTarget().getPoseAmbiguity() < 0.2 && !april_tag_lock){
-            target_pose = field_layout.getTagPose(result.getBestTarget().getFiducialId()).get().toPose2d();
-            Optional<EstimatedRobotPose> opt_estimated_pose = pose_estimator.update(result);
-            if(!opt_estimated_pose.isEmpty()){
-                EstimatedRobotPose estimated_pose = opt_estimated_pose.get(); 
-                Pose2d estimated_pose_2d = estimated_pose.estimatedPose.toPose2d();
-                robot_pose = estimated_pose_2d;
-                m_field.setRobotPose(robot_pose);
-                
-                gyro.setAngleAdjustment(estimated_pose_2d.getRotation().getDegrees() - gyro.getAngle());
-
-                front_right.resetPosition();
-                front_left.resetPosition();
-                back_right.resetPosition();
-                back_left.resetPosition();
-
-                swerve_odometry.resetPosition(gyro.getRotation2d(), new SwerveModulePosition[] {
-                    front_right.getPosition(),
+        if(camera.isConnected()){
+            PhotonPipelineResult result = camera.getLatestResult();
+            if(result.hasTargets() && result.getBestTarget().getPoseAmbiguity() < 0.2 && !april_tag_lock){
+                target_pose = field_layout.getTagPose(result.getBestTarget().getFiducialId()).get().toPose2d();            
+                Optional<EstimatedRobotPose> opt_estimated_pose = pose_estimator.update(result);
+                if(!opt_estimated_pose.isEmpty()){
+                    EstimatedRobotPose estimated_pose = opt_estimated_pose.get(); 
+                    Pose2d estimated_pose_2d = estimated_pose.estimatedPose.toPose2d();
+                    robot_pose = estimated_pose_2d;
+                    glass_field.setRobotPose(robot_pose);
+                    
+                    gyro.setAngleAdjustment(estimated_pose_2d.getRotation().getDegrees() - gyro.getAngle());
+    
+                    front_right.resetPosition();
+                    front_left.resetPosition();
+                    back_right.resetPosition();
+                    back_left.resetPosition();
+    
+                    swerve_odometry.resetPosition(gyro.getRotation2d(), new SwerveModulePosition[] {
+                        front_right.getPosition(),
+                        front_left.getPosition(),
+                        back_right.getPosition(),
+                        back_left.getPosition()
+                    }, estimated_pose_2d);
+                    pose_known = true;
+                }
+            } else if(pose_known){
+                robot_pose = swerve_odometry.update(gyro.getRotation2d(), new SwerveModulePosition[] {
                     front_left.getPosition(),
-                    back_right.getPosition(),
-                    back_left.getPosition()
-                }, estimated_pose_2d);
-                pose_known = true;
+                    front_right.getPosition(),
+                    back_left.getPosition(),
+                    back_right.getPosition()
+                });
+                glass_field.setRobotPose(robot_pose);
             }
-        } else if(pose_known){
-            robot_pose = swerve_odometry.update(gyro.getRotation2d(), new SwerveModulePosition[] {
-                front_left.getPosition(),
-                front_right.getPosition(),
-                back_left.getPosition(),
-                back_right.getPosition()
-            });
-            m_field.setRobotPose(robot_pose);
         }
-        SmartDashboard.putData("Field", m_field);
+        if(pose_known) glass_field.getObject("RobotToTarget").setPoses(robot_pose, target_pose);
     }
     @Override public void simulationPeriodic(){}
 

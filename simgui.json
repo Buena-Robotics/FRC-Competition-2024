@@ -1,84 +1,74 @@
 {
-  "HALProvider": {
-    "Other Devices": {
-      "navX-Sensor[0]": {
-        "header": {
-          "open": true
-        }
-      }
-    }
-  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
-      "/Meloetta/NavX Micro": "Gyro"
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/Nav-X": "Gyro",
+      "/SmartDashboard/Swerve/Nav-X": "Gyro",
+      "/SmartDashboard/Turn-PID": "PIDController",
+      "/SmartDashboard/X-PID": "PIDController",
+      "/SmartDashboard/Y-PID": "PIDController"
+    },
+    "windows": {
+      "/SmartDashboard/Field": {
+        "bottom": 1476,
+        "height": 8.210550308227539,
+        "left": 150,
+        "right": 2961,
+        "top": 79,
+        "width": 16.541748046875
+      }
     }
   },
   "NetworkTables": {
-    "Persistent Values": {
-      "open": false
-    },
-    "Retained Values": {
-      "open": false
-    },
     "transitory": {
-      "FMSInfo": {
-        "open": true
-      },
       "Meloetta": {
         "Back Left": {
           "State": {
-            "open": true
+            "open": false
           }
         },
         "Front Right": {
           "State": {
-            "open": true
+            "open": false
           }
         },
+        "open": false
+      },
+      "SmartDashboard": {
         "open": true
       },
       "photonvision": {
         "Microsoft_LifeCam_HD-3000": {
-          "open": true
-        },
-        "open": true
+          "open": false
+        }
       }
     }
   },
   "NetworkTables Info": {
-    "Clients": {
-      "open": true
-    },
-    "Connections": {
-      "open": true
-    },
     "First-CGear Client@1": {
       "Publishers": {
-        "open": true
+        "open": false
       },
       "Subscribers": {
-        "open": true
+        "open": false
       },
-      "open": true
-    },
-    "Server": {
-      "Subscribers": {
-        "open": true
-      },
-      "open": true
+      "open": false
     },
     "example client@1": {
       "Publishers": {
-        "open": true
+        "open": false
       },
       "Subscribers": {
-        "open": true
+        "open": false
       },
-      "open": true
+      "open": false
+    },
+    "glass@1": {
+      "open": false
     },
     "photonvision@1": {
-      "open": true
+      "open": false
     },
     "visible": true
   }

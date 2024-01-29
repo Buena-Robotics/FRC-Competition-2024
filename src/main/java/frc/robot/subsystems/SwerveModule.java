@@ -7,7 +7,6 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -71,8 +70,7 @@ public class SwerveModule implements Sendable {
     }
 
     public double getDrivePosition(){ return drive_encoder.getPosition(); }
-    public double getTurnPosition() { return getAbsoluteEncoderRadians(); }
-    // public double getTurnPosition(){ return turn_encoder.getPosition(); }
+    public double getTurnPosition() { return turn_encoder.getPosition(); }
 
     public double getDriveVelocity() { return drive_encoder.getVelocity(); }
     public double getTurnVelocity()  { return  turn_encoder.getVelocity(); }
