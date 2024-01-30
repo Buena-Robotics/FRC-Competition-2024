@@ -66,10 +66,10 @@ public final class Constants {
 
     public static final double PHYSICAL_MAX_SPEED_METERS_PER_SECOND = Units.feetToMeters(14);
 
-    public static final double TELEOP_DRIVE_MAX_ACCELERATION_UNITS_PER_SECOND = 0.5; //?
-    public static final double TELEOP_DRIVE_MAX_ANGULAR_ACCELERATION_UNITS_PER_SECOND = 0.5; //?
+    public static final double TELEOP_DRIVE_MAX_ACCELERATION_UNITS_PER_SECOND = 2; //?
+    public static final double TELEOP_DRIVE_MAX_ANGULAR_ACCELERATION_UNITS_PER_SECOND = 2; //?
 
-    public static final double TELEOP_DRIVE_MAX_SPEED_METERS_PER_SECOND = 1; // ?
+    public static final double TELEOP_DRIVE_MAX_SPEED_METERS_PER_SECOND = 2; // ?
     public static final double TELEOP_DRIVE_MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * Math.PI; // ?
   }
 }

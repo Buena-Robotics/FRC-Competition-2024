@@ -117,8 +117,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     private AprilTagFieldLayout field_layout;
     private boolean april_tag_lock = false;
     private boolean pose_known = false;
-    private Pose2d robot_pose;
-    private Pose2d target_pose;
+    private Pose2d robot_pose = new Pose2d();
+    private Pose2d target_pose = new Pose2d();
 
     public SwerveDriveSubsystem(){
         SmartDashboard.putData("Field", glass_field);
@@ -127,6 +127,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         SmartDashboard.putData("Swerve/Front Left" , front_left);
         SmartDashboard.putData("Swerve/Back Right" , back_right);
         SmartDashboard.putData("Swerve/Back Left"  , back_left);
+        SmartDashboard.putBoolean("April Tag Lock", april_tag_lock);
 
         try { field_layout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile); } catch (Exception e) { System.err.println(e); }
         initializeGlassFieldTags();
@@ -159,7 +160,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
     public Field2d getField2d(){ return glass_field; }
     public boolean getPoseKnown(){ return pose_known; }
-    public Pose2d getRobotPose(){ return Robot.isReal() ? robot_pose : glass_field.getRobotPose(); }
+    public Pose2d getRobotPose(){ return robot_pose; }
+    public void setRobotPose(Pose2d pose){ robot_pose = pose; }
     public Pose2d getTargetPose(){ return Robot.isReal() ? target_pose : glass_field.getObject("AprilTags").getPoses().get(5); }
     public void toggleAprilTags(){ april_tag_lock = !april_tag_lock; }
 
@@ -169,7 +171,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     public Rotation2d getRotation2d(){ return Rotation2d.fromDegrees(getHeading()); }
 
     @Override public void periodic() { 
-        SmartDashboard.putBoolean("April Tag Lock", april_tag_lock);
         if(camera.isConnected()){
             PhotonPipelineResult result = camera.getLatestResult();
             if(result.hasTargets() && result.getBestTarget().getPoseAmbiguity() < 0.2 && !april_tag_lock){

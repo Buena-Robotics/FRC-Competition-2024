@@ -29,6 +29,7 @@
       "/SmartDashboard/PIDController[5]": "PIDController",
       "/SmartDashboard/PIDController[6]": "PIDController",
       "/SmartDashboard/PIDController[7]": "PIDController",
+      "/SmartDashboard/Swerve/Nav-X": "Gyro",
       "/SmartDashboard/Turn-PID": "PIDController",
       "/SmartDashboard/X-PID": "PIDController",
       "/SmartDashboard/Y-PID": "PIDController",
@@ -93,28 +94,21 @@
           "width": 0.3301999866962433
         },
         "top": 79,
+        "trajectory": {
+          "arrows": false,
+          "style": "Track",
+          "width": 0.6600000262260437
+        },
         "units": "meters",
         "width": 16.541748046875,
         "window": {
           "visible": true
         }
-      },
-      "/SmartDashboard/Turn-PID": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/X-PID": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/Y-PID": {
-        "window": {
-          "visible": true
-        }
       }
     }
+  },
+  "NetworkTables Info": {
+    "visible": true
   },
   "NetworkTables Settings": {
     "mode": "Client (NT4)",

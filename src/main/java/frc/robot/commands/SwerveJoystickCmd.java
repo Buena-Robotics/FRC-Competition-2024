@@ -3,10 +3,13 @@ package frc.robot.commands;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 
 public class SwerveJoystickCmd extends Command {
@@ -54,20 +57,16 @@ public class SwerveJoystickCmd extends Command {
         y_speed    = y_limiter.calculate(y_speed) * Constants.Drive.TELEOP_DRIVE_MAX_SPEED_METERS_PER_SECOND;
         turn_speed = turn_limiter.calculate(turn_speed) * Constants.Drive.TELEOP_DRIVE_MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
 
-        // 4. Construct desired chassis speeds
-        // if (field_orientation_function.get()){
-            // Relative to field
-            // chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x_speed, y_speed, turn_speed, swerve_drive_subsystem.getRotation2d());
-        // } else {
-            // Relative to robot
-            // chassis_speeds = new ChassisSpeeds(x_speed, y_speed, turn_speed);
-        // }
-
         ChassisSpeeds chassis_speeds = new ChassisSpeeds(x_speed, y_speed, turn_speed);
 
         SwerveModuleState[] moduleStates = SwerveDriveSubsystem.swerve_kinematics.toSwerveModuleStates(chassis_speeds);
-
+        
         swerve_drive_subsystem.setModuleStates(moduleStates);
+
+        if(Robot.isSimulation()){
+            swerve_drive_subsystem.setRobotPose(swerve_drive_subsystem.getRobotPose().plus(new Transform2d(chassis_speeds.vxMetersPerSecond / 50, chassis_speeds.vyMetersPerSecond / 50, new Rotation2d(chassis_speeds.omegaRadiansPerSecond / 50))));
+            swerve_drive_subsystem.getField2d().setRobotPose(swerve_drive_subsystem.getRobotPose());
+        }
     }
     @Override public void end(boolean interrupted){ swerve_drive_subsystem.stopModules(); }
     @Override public boolean isFinished(){ return false; }
