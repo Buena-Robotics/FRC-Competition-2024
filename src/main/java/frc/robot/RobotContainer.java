@@ -58,7 +58,7 @@ public class RobotContainer {
     ));
     IO.commandController.leftBumper().whileTrue(SubSystems.shooter_subsystem.intakeCommand());
     IO.commandController.rightBumper().whileTrue(new PrepareLaunch(SubSystems.shooter_subsystem)
-                                                      .withTimeout(1.0)
+                                                      .withTimeout(0.5)
                                                       .andThen(new LaunchNote(SubSystems.shooter_subsystem))
                                                       .handleInterrupt(SubSystems.shooter_subsystem::stop));
     IO.commandController.a().onTrue(new InstantCommand(this::showTrajectory));

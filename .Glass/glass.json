@@ -65,6 +65,11 @@
           "weight": 3.0,
           "width": 0.6603999733924866
         },
+        "RobotToTarget": {
+          "arrows": false,
+          "selectable": false,
+          "style": "Line"
+        },
         "Tracking": {
           "arrows": false,
           "color": [
@@ -73,14 +78,12 @@
             1.0,
             255.0
           ],
+          "selectable": false,
           "style": "Line",
           "weight": 2.0
         },
-        "bottom": 1476,
         "height": 8.210550308227539,
         "image": "C:\\Users\\Robotic's club\\Documents\\2024-field.png",
-        "left": 150,
-        "right": 2961,
         "test": {
           "arrows": false,
           "color": [
@@ -93,9 +96,9 @@
           "weight": 1.0,
           "width": 0.3301999866962433
         },
-        "top": 79,
         "trajectory": {
           "arrows": false,
+          "selectable": false,
           "style": "Track",
           "width": 0.6600000262260437
         },
@@ -108,7 +111,9 @@
     }
   },
   "NetworkTables Info": {
-    "visible": true
+    "Connections": {
+      "open": true
+    }
   },
   "NetworkTables Settings": {
     "mode": "Client (NT4)",

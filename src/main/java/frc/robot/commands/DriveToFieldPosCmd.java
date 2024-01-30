@@ -31,9 +31,9 @@ public class DriveToFieldPosCmd extends Command {
     private double y_speed = 0;
     private double turn_speed = 0;
 
-    private final PIDController x_pid_controller    = new PIDController(2, 0.5, 0);
-    private final PIDController y_pid_controller    = new PIDController(2, 0.5, 0);
-    private final PIDController turn_pid_controller = new PIDController(2, 0.02, 0);
+    private final PIDController x_pid_controller    = new PIDController(1, 0.5, 0);
+    private final PIDController y_pid_controller    = new PIDController(1, 0.5, 0);
+    private final PIDController turn_pid_controller = new PIDController(0.4, 0.02, 0);
 
     public DriveToFieldPosCmd(SwerveDriveSubsystem swerve_drive_subsystem, Pose2d target_pose) {
         this.swerve_drive_subsystem = swerve_drive_subsystem; 
@@ -48,16 +48,12 @@ public class DriveToFieldPosCmd extends Command {
         turn_pid_controller.reset();
         turn_pid_controller.enableContinuousInput(-Math.PI, Math.PI);
         x_pid_controller.setIZone(0.1);
-
-        SmartDashboard.putData("X-PID", x_pid_controller);
-        SmartDashboard.putData("Y-PID",y_pid_controller);
-        SmartDashboard.putData("Turn-PID",turn_pid_controller);
     }
     
     public static Vector<Pose2d> getTrajectory(Pose2d target_pose){
-        final PIDController x_pid_controller    = new PIDController(2, 0.5, 0);
-        final PIDController y_pid_controller    = new PIDController(2, 0.5, 0);
-        final PIDController turn_pid_controller = new PIDController(2, 0.02, 0);
+        final PIDController x_pid_controller    = new PIDController(1, 0.5, 0);
+        final PIDController y_pid_controller    = new PIDController(1, 0.5, 0);
+        final PIDController turn_pid_controller = new PIDController(0.25, 0.02, 0);
         x_pid_controller.reset();
         x_pid_controller.setIZone(0.25);
         
@@ -87,11 +83,8 @@ public class DriveToFieldPosCmd extends Command {
             turn_speed = turn_pid_controller.calculate(robot_pose.getRotation().getRadians(), target_pose.getRotation().getRadians());
             
             ChassisSpeeds chassis_speeds;
-            if(Math.abs(target_pose.getRotation().getDegrees() - robot_pose.getRotation().getDegrees()) > DEGREE_AMBIGUITY * 2){
-                chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, turn_speed, Rotation2d.fromDegrees(90));
-            } else{
-                chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x_speed, y_speed, turn_speed, Rotation2d.fromDegrees(90));
-            }
+
+            chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x_speed, y_speed, turn_speed, robot_pose.getRotation());
             Pose2d pose = SubSystems.swerve_drive_subsystem.getRobotPose().plus(new Transform2d(
                 MathUtil.clamp(chassis_speeds.vxMetersPerSecond, -Units.feetToMeters(14.5), Units.feetToMeters(14.5)) / 50, 
                 MathUtil.clamp(chassis_speeds.vyMetersPerSecond, -Units.feetToMeters(14.5), Units.feetToMeters(14.5)) / 50, 
@@ -117,15 +110,9 @@ public class DriveToFieldPosCmd extends Command {
         turn_speed = turn_pid_controller.calculate(robot_pose.getRotation().getRadians(), target_pose.getRotation().getRadians());
         
         ChassisSpeeds chassis_speeds;
-        if(Math.abs(target_pose.getRotation().getDegrees() - robot_pose.getRotation().getDegrees()) > DEGREE_AMBIGUITY * 2){
-            chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, turn_speed, Rotation2d.fromDegrees(90));
-            final SwerveModuleState[] moduleStates = SwerveDriveSubsystem.swerve_kinematics.toSwerveModuleStates(chassis_speeds);
-            swerve_drive_subsystem.setModuleStates(moduleStates);
-        } else{
-            chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x_speed, y_speed, turn_speed, Rotation2d.fromDegrees(90));
-            final SwerveModuleState[] moduleStates = SwerveDriveSubsystem.swerve_kinematics.toSwerveModuleStates(chassis_speeds);
-            swerve_drive_subsystem.setModuleStates(moduleStates);
-        }
+        chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x_speed, y_speed, turn_speed, robot_pose.getRotation());
+        final SwerveModuleState[] moduleStates = SwerveDriveSubsystem.swerve_kinematics.toSwerveModuleStates(chassis_speeds);
+        swerve_drive_subsystem.setModuleStates(moduleStates);
 
 
         SmartDashboard.putNumber("Xspeed", x_speed);

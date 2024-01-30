@@ -34,7 +34,7 @@ public final class Constants {
     public static final double ROBOT_WIDTH  = Units.inchesToMeters(26);
 
     public static final Pose2d
-      ROBOT_BLUE_AMP = new Pose2d(1.84, 7.78, new Rotation2d(Units.degreesToRadians(90)));
+      ROBOT_BLUE_AMP = new Pose2d(1.79, 8.06, new Rotation2d(Units.degreesToRadians(90)));
       // blue_source_inner = new Pose2d(0,0, new Rotation2d(Units.degreesToRadians(-60))),
       // blue_source_center = new Pose2d(0,0, new Rotation2d(Units.degreesToRadians(-60))),
       // blue_source_outer = new Pose2d(0,0, new Rotation2d(Units.degreesToRadians(-60))),
@@ -64,10 +64,10 @@ public final class Constants {
     //Swerve Drive L2
     //https://www.andymark.com/products/mk4-swerve-modules?Steering%20Encoder=CANCoder&quantity=1&Gear%20Ratio=L2%206.75%3A1&Includes%20Motors=No%20Motors&Motor%20Pinion%20Type=NEO&Assembled=No&Wheel%20Type=Billet%20Wheel
 
-    public static final double PHYSICAL_MAX_SPEED_METERS_PER_SECOND = Units.feetToMeters(14);
+    public static final double PHYSICAL_MAX_SPEED_METERS_PER_SECOND = Units.feetToMeters(3);
 
-    public static final double TELEOP_DRIVE_MAX_ACCELERATION_UNITS_PER_SECOND = 2; //?
-    public static final double TELEOP_DRIVE_MAX_ANGULAR_ACCELERATION_UNITS_PER_SECOND = 2; //?
+    public static final double TELEOP_DRIVE_MAX_ACCELERATION_UNITS_PER_SECOND = 2.5; //?
+    public static final double TELEOP_DRIVE_MAX_ANGULAR_ACCELERATION_UNITS_PER_SECOND = 3; //?
 
     public static final double TELEOP_DRIVE_MAX_SPEED_METERS_PER_SECOND = 2; // ?
     public static final double TELEOP_DRIVE_MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * Math.PI; // ?
