@@ -132,7 +132,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         try { field_layout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile); } catch (Exception e) { System.err.println(e); }
         initializeGlassFieldTags();
 
-        camera = new PhotonCamera("USB_Camera"); // new PhotonCamera("Microsoft_LifeCam_HD-3000");
+        camera = new PhotonCamera("Microsoft_LifeCam_HD-3000"); // new PhotonCamera("Microsoft_LifeCam_HD-3000");
         pose_estimator = new PhotonPoseEstimator(field_layout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, robot_to_cam);
         pose_estimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
         new Thread(() -> {
