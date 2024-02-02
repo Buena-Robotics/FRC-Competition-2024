@@ -11,6 +11,12 @@
         "Front Right": {
           "open": true
         },
+        "Swerve": {
+          "Nav-X": {
+            "open": true
+          },
+          "open": true
+        },
         "open": true
       },
       "photonvision": {
@@ -113,7 +119,8 @@
   "NetworkTables Info": {
     "Connections": {
       "open": true
-    }
+    },
+    "visible": true
   },
   "NetworkTables Settings": {
     "mode": "Client (NT4)",
