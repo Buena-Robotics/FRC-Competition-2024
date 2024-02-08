@@ -38,7 +38,15 @@
     }
   },
   "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    },
     "transitory": {
+      "LiveWindow": {
+        ".status": {
+          "open": true
+        }
+      },
       "Meloetta": {
         "Back Left": {
           "State": {
@@ -52,13 +60,11 @@
         },
         "open": false
       },
-      "SmartDashboard": {
-        "open": true
-      },
       "photonvision": {
         "Microsoft_LifeCam_HD-3000": {
-          "open": false
-        }
+          "open": true
+        },
+        "open": true
       }
     }
   },

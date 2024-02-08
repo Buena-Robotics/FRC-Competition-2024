@@ -2,12 +2,11 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkBase.FaultID;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -21,7 +20,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public static final double INTAKE_LAUNCH_SPEED = -1; 
     public static final double INTAKE_FEED_SPEED = -.2;
 
-    private static final int BORE_ENCODER_CHANNEL = -1;
+    private static final int BORE_ENCODER_CHANNEL = 0;
 
     public final CANSparkMax feed_motor = new CANSparkMax(FEED_MOTOR_ID, MotorType.kBrushless);;
     public final CANSparkMax launch_motor = new CANSparkMax(LAUNCH_MOTOR_ID, MotorType.kBrushless);
@@ -29,6 +28,8 @@ public class ShooterSubsystem extends SubsystemBase {
     public final RelativeEncoder launch_motor_encoder;
 
     public final DutyCycleEncoder bore_encoder = new DutyCycleEncoder(BORE_ENCODER_CHANNEL);
+
+    private double position_before_clearing_for_note_arm = 0;
 
     public ShooterSubsystem() {
         feed_motor_encoder = feed_motor.getEncoder();
@@ -40,6 +41,7 @@ public class ShooterSubsystem extends SubsystemBase {
         bore_encoder.setPositionOffset(-1);
         bore_encoder.setDistancePerRotation(-1);
         bore_encoder.setDistancePerRotation(-1);
+        bore_encoder.reset();
     }
 
     public double getFeedMotorVelocity(){ return feed_motor_encoder.getVelocity(); }
@@ -59,7 +61,23 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public double getAngleDegrees(){ return bore_encoder.getAbsolutePosition(); }
 
-    @Override public void periodic(){}
+    public Command moveToTop(){
+        position_before_clearing_for_note_arm = getAngleDegrees();
+        return moveToPosition(1);
+    }
+    public Command resetPosition(){
+        return moveToPosition(position_before_clearing_for_note_arm);
+    }
+    public Command moveToPosition(double position){
+        return new Command(){
+            @Override public void execute(){}
+            @Override public boolean isFinished() { return true; }
+        };
+    }
+
+    @Override public void periodic(){
+        SmartDashboard.putNumber("Shooter/Absolute Position", getAngleDegrees());
+    }
 
     @Override public void initSendable(SendableBuilder builder) {
 

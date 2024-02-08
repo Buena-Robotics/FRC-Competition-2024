@@ -98,6 +98,9 @@ public class DriveToFieldPosCmd extends Command {
             trajectory.add(pose);
         }
         SubSystems.swerve_drive_subsystem.setRobotPose(start_robot_pose);
+        x_pid_controller.close();
+        y_pid_controller.close();
+        turn_pid_controller.close();
         return trajectory;
     }
 
