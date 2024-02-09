@@ -38,9 +38,9 @@ public class ShooterSubsystem extends SubsystemBase {
         feed_motor.setSmartCurrentLimit(FEED_SMART_CURRENT_LIMIT);
         launch_motor.setSmartCurrentLimit(LAUNCH_SMART_CURRENT_LIMIT);
 
-        bore_encoder.setPositionOffset(-1);
-        bore_encoder.setDistancePerRotation(-1);
-        bore_encoder.setDistancePerRotation(-1);
+        // bore_encoder.setPositionOffset(-1);
+        // bore_encoder.setDistancePerRotation(-1);
+        // bore_encoder.setDistancePerRotation(-1);
         bore_encoder.reset();
     }
 
@@ -77,6 +77,9 @@ public class ShooterSubsystem extends SubsystemBase {
 
     @Override public void periodic(){
         SmartDashboard.putNumber("Shooter/Absolute Position", getAngleDegrees());
+        SmartDashboard.putNumber("Shooter/Distance", bore_encoder.getDistance());
+        SmartDashboard.putNumber("Shooter/DPR", bore_encoder.getDistancePerRotation());
+        SmartDashboard.putBoolean("Shooter/Connected", bore_encoder.isConnected());
     }
 
     @Override public void initSendable(SendableBuilder builder) {

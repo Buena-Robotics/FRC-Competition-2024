@@ -11,11 +11,22 @@
         "Front Right": {
           "open": true
         },
+        "Shooter": {
+          "open": true
+        },
         "Swerve": {
-          "Nav-X": {
+          "Back Left": {
             "open": true
           },
-          "open": true
+          "Back Right": {
+            "open": true
+          },
+          "Front Left": {
+            "open": true
+          },
+          "Front Right": {
+            "open": true
+          }
         },
         "open": true
       },

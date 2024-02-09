@@ -8,8 +8,8 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class PnuematicsSubsystem extends SubsystemBase{
-    private Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
-    private PneumaticHub pneumaticsHub = new PneumaticHub();
+    // private Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
+    // private PneumaticHub pneumaticsHub = new PneumaticHub();
     
     public PnuematicsSubsystem(){
         

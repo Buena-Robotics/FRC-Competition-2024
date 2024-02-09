@@ -13,7 +13,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -58,10 +58,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         BACK_RIGHT_ABSOLUTE_ENCODER_ID  = 2,
         BACK_LEFT_ABSOLUTE_ENCODER_ID   = 3;
     private static final double // ABSOLUTE_ENCODER_OFFSET_RADIANS
-        FRONT_RIGHT_ABSOLUTE_ENCODER_OFFSET_RADIANS = 0.975905,
-        FRONT_LEFT_ABSOLUTE_ENCODER_OFFSET_RADIANS  = 2.845395,
-        BACK_RIGHT_ABSOLUTE_ENCODER_OFFSET_RADIANS  = 2.04,
-        BACK_LEFT_ABSOLUTE_ENCODER_OFFSET_RADIANS   = 5.131805;
+        FRONT_RIGHT_ABSOLUTE_ENCODER_OFFSET_RADIANS = 4.071693,
+        FRONT_LEFT_ABSOLUTE_ENCODER_OFFSET_RADIANS  = 5.996429,
+        BACK_RIGHT_ABSOLUTE_ENCODER_OFFSET_RADIANS  = 5.274043,
+        BACK_LEFT_ABSOLUTE_ENCODER_OFFSET_RADIANS   = 1.978168;
     private static final boolean // ABSOLUTE_ENCODER_REVERSED
         FRONT_RIGHT_ABSOLUTE_ENCODER_REVERSED = false,
         FRONT_LEFT_ABSOLUTE_ENCODER_REVERSED  = false,
@@ -78,25 +78,25 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     private final SwerveModule back_left   = new SwerveModule (BACK_LEFT_DRIVE_MOTOR_ID, BACK_LEFT_TURN_MOTOR_ID, BACK_LEFT_DRIVE_MOTER_REVERSED, BACK_LEFT_TURN_MOTOR_REVERSED,
                                                                 BACK_LEFT_ABSOLUTE_ENCODER_ID, BACK_LEFT_ABSOLUTE_ENCODER_OFFSET_RADIANS, BACK_LEFT_ABSOLUTE_ENCODER_REVERSED);
     //-------------------------
-    private final NavX gyro = new NavX(I2C.Port.kOnboard);
+    private final NavX gyro = new NavX(edu.wpi.first.wpilibj.SerialPort.Port.kUSB2);
     // private final ColorSensorV3 color_sensor = new ColorSensorV3(I2C.Port.kOnboard);
 
     //Distance between right and left wheels
-    private static final double TRACK_WIDTH = Units.inchesToMeters(20);
+    private static final double TRACK_WIDTH_CENTER = Units.inchesToMeters(10.75);
     //Distance between front and back wheels
-    private static final double WHEEL_BASE = Units.inchesToMeters(20);
+    private static final double WHEEL_BASE_CENTER = Units.inchesToMeters(10.75);
 
-    private static final Translation2d front_right_position = new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2);
-    private static final Translation2d front_left_position = new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2);
-    private static final Translation2d back_right_position = new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2);
-    private static final Translation2d back_left_position = new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2);
+    private static final Translation2d front_left_position =  new Translation2d(WHEEL_BASE_CENTER, TRACK_WIDTH_CENTER / 2);
+    private static final Translation2d front_right_position = new Translation2d(WHEEL_BASE_CENTER / 2, -TRACK_WIDTH_CENTER / 2);
+    private static final Translation2d back_left_position =   new Translation2d(-WHEEL_BASE_CENTER / 2, TRACK_WIDTH_CENTER / 2);
+    private static final Translation2d back_right_position =  new Translation2d(-WHEEL_BASE_CENTER / 2, -TRACK_WIDTH_CENTER / 2);
 
     //Might have to reorder these :3
     public static final SwerveDriveKinematics swerve_kinematics = new SwerveDriveKinematics(
+        front_left_position,
       front_right_position,
-      front_left_position,
-      back_right_position,
-      back_left_position
+      back_left_position,
+      back_right_position
     );
     SwerveDriveOdometry swerve_odometry = new SwerveDriveOdometry(
       swerve_kinematics, gyro.getRotation2d(),

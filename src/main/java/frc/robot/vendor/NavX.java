@@ -7,12 +7,12 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.SerialPort;
 
 public class NavX extends AHRS {
     private static final int MINIMUM_AIR_HEIGHT_INCHES = 4;
 
-    public NavX(I2C.Port serial_port_id){ 
+    public NavX(SerialPort.Port serial_port_id){ 
         super(serial_port_id); 
         this.resetDisplacement();
     }

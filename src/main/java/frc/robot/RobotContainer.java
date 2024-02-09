@@ -20,22 +20,22 @@ public class RobotContainer {
 
   private double getRotationSpeed(){
     if(IO.controller.getPOV() == 270) // LEFT
-      return 0.09;
-    else if(IO.controller.getPOV() == 90) // RIGHT
       return -0.09;
-    return -IO.controller.getRightX();
+    else if(IO.controller.getPOV() == 90) // RIGHT
+      return 0.09;
+    return IO.controller.getRightX();
   }
 
   private double getForwardSpeed(){
     if(IO.controller.getPOV() == 0) // Forward
-      return 0.09;
-    else if(IO.controller.getPOV() == 180) // Backward
       return -0.09;
-    return -IO.controller.getLeftY();
+    else if(IO.controller.getPOV() == 180) // Backward
+      return 0.09;
+    return IO.controller.getLeftY();
   }
 
   private double getSideSpeed(){
-    return -IO.controller.getLeftX();
+    return IO.controller.getLeftX();
   }
 
   // private void showTrajectory(){
