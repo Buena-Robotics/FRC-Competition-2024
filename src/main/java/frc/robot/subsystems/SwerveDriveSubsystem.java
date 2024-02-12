@@ -94,9 +94,9 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     //Might have to reorder these :3
     public static final SwerveDriveKinematics swerve_kinematics = new SwerveDriveKinematics(
         front_left_position,
-      front_right_position,
-      back_left_position,
-      back_right_position
+        front_right_position,
+        back_left_position,
+        back_right_position
     );
     SwerveDriveOdometry swerve_odometry = new SwerveDriveOdometry(
       swerve_kinematics, gyro.getRotation2d(),
