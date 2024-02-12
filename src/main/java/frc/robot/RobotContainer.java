@@ -7,6 +7,7 @@ package frc.robot;
 import frc.robot.Constants.IO;
 import frc.robot.Constants.SubSystems;
 import frc.robot.commands.LaunchNote;
+import frc.robot.commands.MoveArmCommand;
 import frc.robot.commands.PrepareLaunch;
 import frc.robot.commands.SwerveJoystickCmd;
 
@@ -38,6 +39,13 @@ public class RobotContainer {
     return IO.controller.getLeftX();
   }
 
+  private double getClimberSpeed() {
+    if (IO.commandController.getLeftCTriggerAxis() > 0.01) 
+      return -IO.commandController.getLeftCTriggerAxis();
+
+    return IO.commandController.getRightCTriggerAxis();
+  }
+
   // private void showTrajectory(){
   //   Vector<Pose2d> trajectory = DriveToFieldPosCmd.getTrajectory(FieldPoses.ROBOT_BLUE_AMP);
   //   SubSystems.swerve_drive_subsystem.getField2d().getObject("trajectory").setPoses(trajectory);;
@@ -60,6 +68,8 @@ public class RobotContainer {
     // IO.commandController.y().toggleOnTrue(new InstantCommand(SubSystems.swerve_drive_subsystem::toggleAprilTags));
     IO.commandController.a().onTrue(SubSystems.note_arm_subsystem.grabNoteFullCommand());
     IO.commandController.b().onTrue(SubSystems.note_arm_subsystem.releaseNoteFullCommand());
+
+    IO.commandController.rightCTrigger().whileTrue(new MoveArmCommand(SubSystems.climb_subsystem, getClimberSpeed()));
   }
 
   public Command getAutonomousCommand() {

@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.NoteArmSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveDriveSubsystem;
@@ -28,6 +29,7 @@ public final class Constants {
       public static final SwerveDriveSubsystem swerve_drive_subsystem = new SwerveDriveSubsystem();
       public static final ShooterSubsystem shooter_subsystem = new ShooterSubsystem();
       public static final NoteArmSubsystem note_arm_subsystem = new NoteArmSubsystem();
+      public static final ClimbSubsystem climb_subsystem = new ClimbSubsystem();
   }
 
   public static class FieldPoses {
