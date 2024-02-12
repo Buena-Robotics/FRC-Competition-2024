@@ -7,10 +7,12 @@ public class MoveArmCommand extends Command {
     
     private ClimbSubsystem climber;
     private double speed;
+    private boolean shooting;
 
-    public MoveArmCommand(ClimbSubsystem climber, double speed) {
+    public MoveArmCommand(ClimbSubsystem climber, double speed, boolean shooting) {
         this.climber = climber;
         this.speed = speed;
+        this.shooting = shooting;
     }
 
     @Override
@@ -27,7 +29,7 @@ public class MoveArmCommand extends Command {
 
      @Override
      public void execute() {
-         climber.moveArm(speed, true);
+         climber.moveArm(speed, true, shooting);
          super.execute();
      }
 }

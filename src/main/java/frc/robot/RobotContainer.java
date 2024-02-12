@@ -46,6 +46,10 @@ public class RobotContainer {
     return IO.commandController.getRightCTriggerAxis();
   }
 
+  private boolean isShooting() {
+    return !IO.controller.getXButton();
+  }
+
   // private void showTrajectory(){
   //   Vector<Pose2d> trajectory = DriveToFieldPosCmd.getTrajectory(FieldPoses.ROBOT_BLUE_AMP);
   //   SubSystems.swerve_drive_subsystem.getField2d().getObject("trajectory").setPoses(trajectory);;
@@ -69,7 +73,7 @@ public class RobotContainer {
     IO.commandController.a().onTrue(SubSystems.note_arm_subsystem.grabNoteFullCommand());
     IO.commandController.b().onTrue(SubSystems.note_arm_subsystem.releaseNoteFullCommand());
 
-    IO.commandController.rightCTrigger().whileTrue(new MoveArmCommand(SubSystems.climb_subsystem, getClimberSpeed()));
+    IO.commandController.rightCTrigger().whileTrue(new MoveArmCommand(SubSystems.climb_subsystem, getClimberSpeed(), isShooting()));
   }
 
   public Command getAutonomousCommand() {
