@@ -76,10 +76,10 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     @Override public void periodic(){
+        SmartDashboard.putBoolean("Shooter/Connected", bore_encoder.isConnected());
         SmartDashboard.putNumber("Shooter/Absolute Position", getAngleDegrees());
         SmartDashboard.putNumber("Shooter/Distance", bore_encoder.getDistance());
         SmartDashboard.putNumber("Shooter/DPR", bore_encoder.getDistancePerRotation());
-        SmartDashboard.putBoolean("Shooter/Connected", bore_encoder.isConnected());
     }
 
     @Override public void initSendable(SendableBuilder builder) {
