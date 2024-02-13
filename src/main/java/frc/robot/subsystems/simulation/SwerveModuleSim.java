@@ -1,7 +1,7 @@
 package frc.robot.subsystems.simulation;
 
 import frc.robot.Constants.Drive;
-import frc.robot.subsystems.SwerveModule;
+import frc.robot.subsystems.SwerveModuleIO;
 
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
@@ -13,7 +13,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 
-public class SwerveModuleSim extends SwerveModule {
+public class SwerveModuleSim extends SwerveModuleIO {
     private final CANSparkMax drive_motor;
     private final CANSparkMax turn_motor;
 

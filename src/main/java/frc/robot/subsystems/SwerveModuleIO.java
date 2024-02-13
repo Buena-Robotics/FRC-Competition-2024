@@ -12,7 +12,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.RobotController;
 
-public abstract class SwerveModule implements Sendable {
+public abstract class SwerveModuleIO implements Sendable {
     protected static final double WHEEL_DIAMETER_METERS  = Units.inchesToMeters(4);
     protected static final double DRIVE_MOTOR_GEAR_RATIO = 1 / 6.75;
     protected static final double TURN_MOTOR_GEAR_RATIO  = 1 / 12.8;
@@ -27,7 +27,7 @@ public abstract class SwerveModule implements Sendable {
     protected final double absolute_encoder_offset_radians;
     protected final PIDController turn_controller;
 
-    protected SwerveModule(int absolute_encoder_id, double absolute_encoder_offset_radians){
+    protected SwerveModuleIO(int absolute_encoder_id, double absolute_encoder_offset_radians){
         this.turn_controller = new PIDController(PID_TURN_CONTROLLER_P, 0, 0);
         this.turn_controller.enableContinuousInput(-Math.PI, Math.PI);
 

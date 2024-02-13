@@ -5,17 +5,17 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import frc.robot.Constants.Drive;
-import frc.robot.subsystems.SwerveModule;
+import frc.robot.subsystems.SwerveModuleIO;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
-public class SwerveModuleIO extends SwerveModule {
+public class SwerveModule extends SwerveModuleIO {
     private final CANSparkMax drive_motor;
     private final CANSparkMax turn_motor;
 
     private final RelativeEncoder drive_encoder;
     private final RelativeEncoder turn_encoder;
 
-    public SwerveModuleIO(int drive_motor_id, int turn_motor_id, int absolute_encoder_id, double absolute_encoder_offset_radians) {
+    public SwerveModule(int drive_motor_id, int turn_motor_id, int absolute_encoder_id, double absolute_encoder_offset_radians) {
         super(absolute_encoder_id, absolute_encoder_offset_radians);
 
         this.drive_motor = new CANSparkMax(drive_motor_id, MotorType.kBrushless);

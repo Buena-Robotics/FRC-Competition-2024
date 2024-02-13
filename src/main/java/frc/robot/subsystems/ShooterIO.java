@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public abstract class Shooter extends SubsystemBase {
+public abstract class ShooterIO extends SubsystemBase {
     protected static final int FEED_MOTOR_ID = 10;
     protected static final int FEED_SMART_CURRENT_LIMIT = 80; 
     protected static final int LAUNCH_MOTOR_ID = 9;
@@ -28,7 +28,7 @@ public abstract class Shooter extends SubsystemBase {
 
     public final DutyCycleEncoder bore_encoder = new DutyCycleEncoder(BORE_ENCODER_CHANNEL);
 
-    public Shooter() {
+    public ShooterIO() {
         feed_motor_encoder = feed_motor.getEncoder();
         launch_motor_encoder = launch_motor.getEncoder();
 

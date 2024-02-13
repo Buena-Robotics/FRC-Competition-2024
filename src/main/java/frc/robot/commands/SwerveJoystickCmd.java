@@ -8,19 +8,19 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Robot;
-import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.SwerveDriveIO;
 
 public class SwerveJoystickCmd extends Command {
     private static final double LEFT_JOYSTICK_DEADBAND = 0.1;
     private static final double RIGHT_JOYSTICK_DEADBAND = 0.1;
 
-    private final SwerveDrive swerve_drive;
+    private final SwerveDriveIO swerve_drive;
 
     private final Supplier<Double>  x_speed_function, y_speed_function, turn_speed_function;
 
     private final SlewRateLimiter x_limiter, y_limiter, turn_limiter;
 
-    public SwerveJoystickCmd(SwerveDrive swerve_drive, Supplier<Double> x_speed_function, Supplier<Double> y_speed_function, Supplier<Double> turn_speed_function){
+    public SwerveJoystickCmd(SwerveDriveIO swerve_drive, Supplier<Double> x_speed_function, Supplier<Double> y_speed_function, Supplier<Double> turn_speed_function){
         this.swerve_drive = swerve_drive;
         
         this.x_speed_function    = x_speed_function;

@@ -4,7 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.SwerveDriveIO;
 
 import java.util.List;
 
@@ -13,8 +13,8 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 
-public class SwerveDriveIO extends SwerveDrive {
-    public SwerveDriveIO(){
+public class SwerveDrive extends SwerveDriveIO {
+    public SwerveDrive(){
         super();
     }
 

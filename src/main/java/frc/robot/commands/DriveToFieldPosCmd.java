@@ -14,14 +14,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Drive;
 import frc.robot.Constants.SubSystems;
-import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.SwerveDriveIO;
 
 public class DriveToFieldPosCmd extends Command {
     private final static double X_METERS_AMBIGUITY = Units.inchesToMeters(4);
     private final static double Y_METERS_AMBIGUITY = Units.inchesToMeters(4);
     private final static double DEGREE_AMBIGUITY = 3;
 
-    private final SwerveDrive swerve_drive;
+    private final SwerveDriveIO swerve_drive;
     private final Pose2d target_pose;
     
     private Pose2d robot_pose;
@@ -34,7 +34,7 @@ public class DriveToFieldPosCmd extends Command {
     private final PIDController y_pid_controller    = new PIDController(1, 0.5, 0);
     private final PIDController turn_pid_controller = new PIDController(0.4, 0.02, 0);
 
-    public DriveToFieldPosCmd(SwerveDrive swerve_drive, Pose2d target_pose) {
+    public DriveToFieldPosCmd(SwerveDriveIO swerve_drive, Pose2d target_pose) {
         this.swerve_drive = swerve_drive; 
         this.target_pose = target_pose;
 

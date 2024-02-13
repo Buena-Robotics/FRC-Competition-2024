@@ -28,13 +28,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
-import frc.robot.subsystems.robot.SwerveModuleIO;
+import frc.robot.subsystems.robot.SwerveModule;
 import frc.robot.subsystems.simulation.SwerveModuleSim;
 import frc.robot.Constants.FieldPoses;
 import frc.robot.devices.NavX;
 import frc.robot.utils.TimerUtil;
 
-public abstract class SwerveDrive extends SubsystemBase {
+public abstract class SwerveDriveIO extends SubsystemBase {
     protected static final int // DRIVE_MOTOR_IDS : ODDS
         FRONT_RIGHT_DRIVE_MOTOR_ID = 1,
         FRONT_LEFT_DRIVE_MOTOR_ID  = 3,
@@ -70,10 +70,10 @@ public abstract class SwerveDrive extends SubsystemBase {
     protected static final Transform3d CAMERA_TO_ROBOT = new Transform3d(CAMERA_TO_ROBOT_TRANSLATION, CAMERA_TO_ROBOT_ROTATION);
 
     protected final NavX gyro = new NavX(NAVX_PORT);
-    protected final SwerveModule front_right;
-    protected final SwerveModule front_left;
-    protected final SwerveModule back_right;
-    protected final SwerveModule back_left;
+    protected final SwerveModuleIO front_right;
+    protected final SwerveModuleIO front_left;
+    protected final SwerveModuleIO back_right;
+    protected final SwerveModuleIO back_left;
 
     protected final SwerveDriveKinematics swerve_kinematics = new SwerveDriveKinematics(
         FRONT_RIGHT_POSITION,
@@ -93,12 +93,12 @@ public abstract class SwerveDrive extends SubsystemBase {
     protected Pose2d trajectory_target_pose = new Pose2d();
     protected ArrayList<Pose2d> tracked_target_poses = new ArrayList<Pose2d>();
 
-    protected SwerveDrive(){
+    protected SwerveDriveIO(){
         if(Robot.isReal()){
-            front_right = new SwerveModuleIO (FRONT_RIGHT_DRIVE_MOTOR_ID, FRONT_RIGHT_TURN_MOTOR_ID, FRONT_RIGHT_ABSOLUTE_ENCODER_ID, FRONT_RIGHT_ABSOLUTE_ENCODER_OFFSET_RADIANS);
-            front_left  = new SwerveModuleIO (FRONT_LEFT_DRIVE_MOTOR_ID, FRONT_LEFT_TURN_MOTOR_ID, FRONT_LEFT_ABSOLUTE_ENCODER_ID, FRONT_LEFT_ABSOLUTE_ENCODER_OFFSET_RADIANS);
-            back_right  = new SwerveModuleIO (BACK_RIGHT_DRIVE_MOTOR_ID, BACK_RIGHT_TURN_MOTOR_ID, BACK_RIGHT_ABSOLUTE_ENCODER_ID, BACK_RIGHT_ABSOLUTE_ENCODER_OFFSET_RADIANS);
-            back_left   = new SwerveModuleIO (BACK_LEFT_DRIVE_MOTOR_ID, BACK_LEFT_TURN_MOTOR_ID, BACK_LEFT_ABSOLUTE_ENCODER_ID, BACK_LEFT_ABSOLUTE_ENCODER_OFFSET_RADIANS);
+            front_right = new SwerveModule (FRONT_RIGHT_DRIVE_MOTOR_ID, FRONT_RIGHT_TURN_MOTOR_ID, FRONT_RIGHT_ABSOLUTE_ENCODER_ID, FRONT_RIGHT_ABSOLUTE_ENCODER_OFFSET_RADIANS);
+            front_left  = new SwerveModule (FRONT_LEFT_DRIVE_MOTOR_ID, FRONT_LEFT_TURN_MOTOR_ID, FRONT_LEFT_ABSOLUTE_ENCODER_ID, FRONT_LEFT_ABSOLUTE_ENCODER_OFFSET_RADIANS);
+            back_right  = new SwerveModule (BACK_RIGHT_DRIVE_MOTOR_ID, BACK_RIGHT_TURN_MOTOR_ID, BACK_RIGHT_ABSOLUTE_ENCODER_ID, BACK_RIGHT_ABSOLUTE_ENCODER_OFFSET_RADIANS);
+            back_left   = new SwerveModule (BACK_LEFT_DRIVE_MOTOR_ID, BACK_LEFT_TURN_MOTOR_ID, BACK_LEFT_ABSOLUTE_ENCODER_ID, BACK_LEFT_ABSOLUTE_ENCODER_OFFSET_RADIANS);
         } else{
             front_right = new SwerveModuleSim (FRONT_RIGHT_DRIVE_MOTOR_ID, FRONT_RIGHT_TURN_MOTOR_ID, FRONT_RIGHT_ABSOLUTE_ENCODER_ID, FRONT_RIGHT_ABSOLUTE_ENCODER_OFFSET_RADIANS);
             front_left  = new SwerveModuleSim (FRONT_LEFT_DRIVE_MOTOR_ID, FRONT_LEFT_TURN_MOTOR_ID, FRONT_LEFT_ABSOLUTE_ENCODER_ID, FRONT_LEFT_ABSOLUTE_ENCODER_OFFSET_RADIANS);

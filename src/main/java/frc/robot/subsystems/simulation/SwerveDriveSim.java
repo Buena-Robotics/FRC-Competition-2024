@@ -8,7 +8,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.SwerveDriveIO;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +23,7 @@ import org.photonvision.targeting.MultiTargetPNPResult;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-public class SwerveDriveSim extends SwerveDrive {
+public class SwerveDriveSim extends SwerveDriveIO {
     VisionSystemSim visionSim = new VisionSystemSim("main");
     SimCameraProperties cameraProp = new SimCameraProperties();
     PhotonCameraSim cameraSim = new PhotonCameraSim(photon_camera, cameraProp);
