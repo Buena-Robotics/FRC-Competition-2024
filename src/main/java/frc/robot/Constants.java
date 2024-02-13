@@ -29,7 +29,7 @@ public final class Constants {
       public static final SwerveDriveSubsystem swerve_drive_subsystem = new SwerveDriveSubsystem();
       public static final ShooterSubsystem shooter_subsystem = new ShooterSubsystem();
       public static final NoteArmSubsystem note_arm_subsystem = new NoteArmSubsystem();
-      public static final ClimbSubsystem climb_subsystem = new ClimbSubsystem();
+      // public static final ClimbSubsystem climb_subsystem = new ClimbSubsystem();
   }
 
   public static class FieldPoses {

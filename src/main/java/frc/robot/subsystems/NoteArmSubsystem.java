@@ -81,7 +81,8 @@ public class NoteArmSubsystem extends SubsystemBase {
 
 
     @Override public void periodic() {
-        if(!isClawOpen() && !isArmUp() && isArmOut() && noteDetected()) closeClaw();
+        if(color_sensor.isConnected())
+            if(!isClawOpen() && !isArmUp() && isArmOut() && noteDetected()) closeClaw();
     }
 
     public Command grabNoteCommand()  { return this.runOnce(() -> { closeClaw(); }); }

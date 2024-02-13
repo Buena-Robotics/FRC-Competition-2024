@@ -70,10 +70,10 @@ public class RobotContainer {
     // IO.commandController.a().onTrue(new InstantCommand(this::showTrajectory));
     // IO.commandController.x().onTrue(new DriveToFieldPosCmd(SubSystems.swerve_drive_subsystem, FieldPoses.ROBOT_BLUE_AMP));
     // IO.commandController.y().toggleOnTrue(new InstantCommand(SubSystems.swerve_drive_subsystem::toggleAprilTags));
-    IO.commandController.a().onTrue(SubSystems.note_arm_subsystem.grabNoteFullCommand());
-    IO.commandController.b().onTrue(SubSystems.note_arm_subsystem.releaseNoteFullCommand());
+    IO.commandController.a().onTrue(SubSystems.note_arm_subsystem.grabNoteCommand());
+    IO.commandController.b().onTrue(SubSystems.note_arm_subsystem.releaseNoteCommand());
 
-    IO.commandController.rightCTrigger().whileTrue(new MoveArmCommand(SubSystems.climb_subsystem, getClimberSpeed(), isShooting()));
+    // IO.commandController.rightCTrigger().whileTrue(new MoveArmCommand(SubSystems.climb_subsystem, getClimberSpeed(), isShooting()));
   }
 
   public Command getAutonomousCommand() {
