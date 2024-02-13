@@ -1,21 +1,15 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.simulation;
 
 import com.revrobotics.ColorSensorV3;
-import com.revrobotics.ColorSensorV3.ColorSensorMeasurementRate;
-import com.revrobotics.ColorSensorV3.ColorSensorResolution;
-import com.revrobotics.ColorSensorV3.GainFactor;
-import com.revrobotics.ColorSensorV3.LEDCurrent;
-import com.revrobotics.ColorSensorV3.LEDPulseFrequency;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class NoteArmSubsystem extends SubsystemBase {
+public class NoteArmSim extends SubsystemBase {
     private static final PneumaticsModuleType PNEUMATICS_MODULE_TYPE = PneumaticsModuleType.REVPH;
     private static final int CLAW_SOLENOID_FORWARD_CHANNEL    = -1;
     private static final int CLAW_SOLENOID_REVERSE_CHANNEL    = -1;
@@ -30,7 +24,7 @@ public class NoteArmSubsystem extends SubsystemBase {
     private final DoubleSolenoid arm_out_solenoid = new DoubleSolenoid(PNEUMATICS_MODULE_TYPE, ARM_OUT_SOLENOID_FORWARD_CHANNEL, ARM_OUT_SOLENOID_REVERSE_CHANNEL);
     private final ColorSensorV3 color_sensor = new ColorSensorV3(COLOR_SENSOR_PORT);
 
-    public NoteArmSubsystem(){
+    public NoteArmSim(){
         // color_sensor.configureColorSensor(
         //     ColorSensorResolution.kColorSensorRes13bit, 
         //     ColorSensorMeasurementRate.kColorRate25ms, 

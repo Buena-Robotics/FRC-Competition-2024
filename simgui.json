@@ -1,15 +1,28 @@
 {
   "HALProvider": {
     "Other Devices": {
-      "SPARK MAX [1]": {
+      "CANSparkMax[8] - RelativeEncoder": {
         "header": {
           "open": true
         }
+      }
+    },
+    "PowerDistributions": {
+      "1": {
+        "PowerDistribution[1]": {
+          "open": true
+        }
+      }
+    },
+    "RoboRIO": {
+      "5V Rail": {
+        "open": true
       },
-      "SPARK MAX [2]": {
-        "header": {
-          "open": true
-        }
+      "6V Rail": {
+        "open": true
+      },
+      "RoboRIO Input": {
+        "open": true
       }
     }
   },
@@ -18,8 +31,10 @@
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/Nav-X": "Gyro",
+      "/SmartDashboard/Swerve Drive/NavX": "Gyro",
       "/SmartDashboard/Swerve/Nav-X": "Gyro",
       "/SmartDashboard/Turn-PID": "PIDController",
+      "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
       "/SmartDashboard/X-PID": "PIDController",
       "/SmartDashboard/Y-PID": "PIDController"
     },
@@ -34,10 +49,65 @@
         "window": {
           "visible": true
         }
+      },
+      "/SmartDashboard/VisionSystemSim-main/Sim Field": {
+        "bottom": 1476,
+        "cameras": {
+          "arrowColor": [
+            0.8668541312217712,
+            0.9558823704719543,
+            0.8668541312217712,
+            255.0
+          ],
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            255.0
+          ]
+        },
+        "height": 8.210550308227539,
+        "left": 150,
+        "right": 2961,
+        "top": 79,
+        "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
       }
     }
   },
   "NetworkTables": {
+    "SmartDashboard": {
+      "Swerve Drive": {
+        "Front Right": {
+          "open": true
+        },
+        "open": true
+      },
+      "SwerveDriveSim": {
+        "Back Left": {
+          "open": true
+        },
+        "Back Right": {
+          "open": true
+        },
+        "open": true
+      },
+      "VisionSystemSim-main": {
+        "Sim Field": {
+          "open": true
+        }
+      },
+      "open": true
+    },
+    "combined": true,
+    "photonvision": {
+      "Microsoft_LifeCam_HD-3000": {
+        "open": true
+      }
+    },
+    "timestamp": true,
     "transitory": {
       "Meloetta": {
         "Back Left": {
@@ -53,11 +123,14 @@
         "open": false
       },
       "SmartDashboard": {
+        "SwerveDriveSim": {
+          "open": true
+        },
         "open": true
       },
       "photonvision": {
         "Microsoft_LifeCam_HD-3000": {
-          "open": false
+          "open": true
         }
       }
     }

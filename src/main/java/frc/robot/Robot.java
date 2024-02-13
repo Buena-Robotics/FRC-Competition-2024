@@ -4,17 +4,56 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.TimedRobot;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Scanner;
+
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
+import com.revrobotics.REVPhysicsSim;
+
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-public class Robot extends TimedRobot {
-  private Command m_autonomousCommand;
-
-  private RobotContainer m_robotContainer;
+public class Robot extends LoggedRobot {
+  public static final PowerDistribution power_distribution = new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+  private final RobotContainer robot_container = new RobotContainer();
+  private Command autonomous_command;
 
   @Override public void robotInit() {
-    m_robotContainer = new RobotContainer();
+    final Scanner scanner = new Scanner(System.in);
+    final String scanned_title = scanner.nextLine(); 
+    scanner.close();
+
+    final String date_pattern = "HH:mm:ss : dd-MM-yyyy";
+    final SimpleDateFormat date_format = new SimpleDateFormat(date_pattern);
+    final Calendar calender = Calendar.getInstance();
+
+    final String metadata_date = date_format.format(calender.getTime());
+    final String metadata_title = scanned_title != "" ? scanned_title : "Build - ";
+    
+    Logger.recordMetadata("Title", metadata_title); // Set a metadata value
+    Logger.recordMetadata("Date", metadata_date); // Set a metadata value
+    
+    if (isReal()) {
+        Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+        Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+    } else {
+        setUseTiming(false); // Run as fast as possible
+        String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+        Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
+        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+    }
+
+    Logger.start();
   }
 
   @Override public void robotPeriodic() {
@@ -26,24 +65,22 @@ public class Robot extends TimedRobot {
   @Override public void disabledPeriodic() {}
 
   @Override public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    autonomous_command = robot_container.getAutonomousCommand();
 
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
+    if (autonomous_command != null) {
+      autonomous_command.schedule();
     }
   }
 
   @Override public void autonomousPeriodic() {}
 
   @Override public void teleopInit() {
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+    if (autonomous_command != null) {
+      autonomous_command.cancel();
     }
   }
 
-  @Override public void teleopPeriodic() {
-
-  }
+  @Override public void teleopPeriodic() {}
 
   @Override public void testInit() {
     CommandScheduler.getInstance().cancelAll();
@@ -53,5 +90,7 @@ public class Robot extends TimedRobot {
 
   @Override public void simulationInit() {}
 
-  @Override public void simulationPeriodic() {}
+  @Override public void simulationPeriodic() {
+    REVPhysicsSim.getInstance().run();
+  }
 }

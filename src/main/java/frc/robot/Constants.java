@@ -8,8 +8,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.SwerveDriveSubsystem;
+import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.robot.ShooterIO;
+import frc.robot.subsystems.robot.SwerveDriveIO;
+import frc.robot.subsystems.simulation.ShooterSim;
+import frc.robot.subsystems.simulation.SwerveDriveSim;
 import frc.robot.vendor.CXboxController;
 
 public final class Constants {
@@ -24,8 +28,8 @@ public final class Constants {
   }
 
   public static class SubSystems{
-      public static final SwerveDriveSubsystem swerve_drive_subsystem = new SwerveDriveSubsystem();
-      public static final ShooterSubsystem shooter_subsystem = new ShooterSubsystem();
+      public static final SwerveDrive swerve_drive = Robot.isReal() ? new SwerveDriveIO() : new SwerveDriveSim();
+      public static final Shooter shooter = Robot.isReal() ? new ShooterIO() : new ShooterSim();
   }
 
   public static class FieldPoses {

@@ -1,27 +1,25 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkBase.FaultID;
-import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class ShooterSubsystem extends SubsystemBase {
-    private static final int FEED_MOTOR_ID = 10;
-    private static final int LAUNCH_MOTOR_ID = 9;
-    private static final int FEED_SMART_CURRENT_LIMIT = 80; 
-    private static final int LAUNCH_SMART_CURRENT_LIMIT = 80;
+public abstract class Shooter extends SubsystemBase {
+    protected static final int FEED_MOTOR_ID = 10;
+    protected static final int FEED_SMART_CURRENT_LIMIT = 80; 
+    protected static final int LAUNCH_MOTOR_ID = 9;
+    protected static final int LAUNCH_SMART_CURRENT_LIMIT = 80;
+    protected static final int BORE_ENCODER_CHANNEL = 0;
+
     public static final double FEED_SPEED = 1;
     public static final double LAUNCH_SPEED = 1;
     public static final double INTAKE_LAUNCH_SPEED = -1; 
     public static final double INTAKE_FEED_SPEED = -.2;
-
-    private static final int BORE_ENCODER_CHANNEL = -1;
 
     public final CANSparkMax feed_motor = new CANSparkMax(FEED_MOTOR_ID, MotorType.kBrushless);;
     public final CANSparkMax launch_motor = new CANSparkMax(LAUNCH_MOTOR_ID, MotorType.kBrushless);
@@ -30,7 +28,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public final DutyCycleEncoder bore_encoder = new DutyCycleEncoder(BORE_ENCODER_CHANNEL);
 
-    public ShooterSubsystem() {
+    public Shooter() {
         feed_motor_encoder = feed_motor.getEncoder();
         launch_motor_encoder = launch_motor.getEncoder();
 
@@ -58,8 +56,6 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public double getAngleDegrees(){ return bore_encoder.getAbsolutePosition(); }
-
-    @Override public void periodic(){}
 
     @Override public void initSendable(SendableBuilder builder) {
 

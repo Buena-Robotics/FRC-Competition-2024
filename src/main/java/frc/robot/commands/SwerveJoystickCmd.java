@@ -3,28 +3,25 @@ package frc.robot.commands;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Robot;
-import frc.robot.subsystems.SwerveDriveSubsystem;
+import frc.robot.subsystems.SwerveDrive;
 
 public class SwerveJoystickCmd extends Command {
-    private static final double LEFT_JOYSTICK_DEADBAND = 0.08;
-    private static final double RIGHT_JOYSTICK_DEADBAND = 0.08;
+    private static final double LEFT_JOYSTICK_DEADBAND = 0.1;
+    private static final double RIGHT_JOYSTICK_DEADBAND = 0.1;
 
-    private final SwerveDriveSubsystem swerve_drive_subsystem;
+    private final SwerveDrive swerve_drive;
 
     private final Supplier<Double>  x_speed_function, y_speed_function, turn_speed_function;
-    // private final Supplier<Boolean> field_orientation_function;
 
     private final SlewRateLimiter x_limiter, y_limiter, turn_limiter;
 
-    public SwerveJoystickCmd(SwerveDriveSubsystem swerve_drive_subsystem, Supplier<Double> x_speed_function, Supplier<Double> y_speed_function, Supplier<Double> turn_speed_function){
-        this.swerve_drive_subsystem = swerve_drive_subsystem;
+    public SwerveJoystickCmd(SwerveDrive swerve_drive, Supplier<Double> x_speed_function, Supplier<Double> y_speed_function, Supplier<Double> turn_speed_function){
+        this.swerve_drive = swerve_drive;
         
         this.x_speed_function    = x_speed_function;
         this.y_speed_function    = y_speed_function;
@@ -36,8 +33,7 @@ public class SwerveJoystickCmd extends Command {
         this.y_limiter    = new SlewRateLimiter(Constants.Drive.TELEOP_DRIVE_MAX_ACCELERATION_UNITS_PER_SECOND);
         this.turn_limiter = new SlewRateLimiter(Constants.Drive.TELEOP_DRIVE_MAX_ANGULAR_ACCELERATION_UNITS_PER_SECOND);
         
-
-        addRequirements(swerve_drive_subsystem);
+        addRequirements(swerve_drive);
     }
 
     @Override public void initialize(){}
@@ -59,15 +55,13 @@ public class SwerveJoystickCmd extends Command {
 
         ChassisSpeeds chassis_speeds = new ChassisSpeeds(x_speed, y_speed, turn_speed);
 
-        SwerveModuleState[] moduleStates = SwerveDriveSubsystem.swerve_kinematics.toSwerveModuleStates(chassis_speeds);
+        SwerveModuleState[] moduleStates = swerve_drive.getKinematics().toSwerveModuleStates(chassis_speeds);
         
-        swerve_drive_subsystem.setModuleStates(moduleStates);
+        swerve_drive.setModuleStates(moduleStates);
 
-        if(Robot.isSimulation()){
-            swerve_drive_subsystem.setRobotPose(swerve_drive_subsystem.getRobotPose().plus(new Transform2d(chassis_speeds.vxMetersPerSecond / 50, chassis_speeds.vyMetersPerSecond / 50, new Rotation2d(chassis_speeds.omegaRadiansPerSecond / 50))));
-            swerve_drive_subsystem.getField2d().setRobotPose(swerve_drive_subsystem.getRobotPose());
-        }
+        if(Robot.isSimulation())
+            swerve_drive.getGyro().setAngleAdjustment(swerve_drive.getHeading() - chassis_speeds.omegaRadiansPerSecond);;
     }
-    @Override public void end(boolean interrupted){ swerve_drive_subsystem.stopModules(); }
+    @Override public void end(boolean interrupted){ swerve_drive.stopModules(); }
     @Override public boolean isFinished(){ return false; }
 }

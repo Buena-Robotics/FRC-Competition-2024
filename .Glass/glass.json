@@ -17,6 +17,15 @@
           },
           "open": true
         },
+        "VisionSystemSim-main": {
+          "Sim Field": {
+            "double[]##v_/SmartDashboard/VisionSystemSim-main/Sim Field/Robot": {
+              "open": true
+            },
+            "open": true
+          },
+          "open": true
+        },
         "open": true
       },
       "photonvision": {
@@ -35,8 +44,10 @@
       "/SmartDashboard/PIDController[5]": "PIDController",
       "/SmartDashboard/PIDController[6]": "PIDController",
       "/SmartDashboard/PIDController[7]": "PIDController",
+      "/SmartDashboard/Swerve Drive/NavX": "Gyro",
       "/SmartDashboard/Swerve/Nav-X": "Gyro",
       "/SmartDashboard/Turn-PID": "PIDController",
+      "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
       "/SmartDashboard/X-PID": "PIDController",
       "/SmartDashboard/Y-PID": "PIDController",
       "/SmartDashboard/navX-Sensor[4]": "Gyro"
@@ -88,8 +99,11 @@
           "style": "Line",
           "weight": 2.0
         },
+        "bottom": 1476,
         "height": 8.210550308227539,
         "image": "C:\\Users\\Robotic's club\\Documents\\2024-field.png",
+        "left": 150,
+        "right": 2961,
         "test": {
           "arrows": false,
           "color": [
@@ -102,6 +116,7 @@
           "weight": 1.0,
           "width": 0.3301999866962433
         },
+        "top": 79,
         "trajectory": {
           "arrows": false,
           "selectable": false,
@@ -109,6 +124,17 @@
           "width": 0.6600000262260437
         },
         "units": "meters",
+        "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/VisionSystemSim-main/Sim Field": {
+        "bottom": 1476,
+        "height": 8.210550308227539,
+        "left": 150,
+        "right": 2961,
+        "top": 79,
         "width": 16.541748046875,
         "window": {
           "visible": true

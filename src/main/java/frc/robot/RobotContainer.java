@@ -46,24 +46,23 @@ public class RobotContainer {
 
   private void showTrajectory(){
     Vector<Pose2d> trajectory = DriveToFieldPosCmd.getTrajectory(FieldPoses.ROBOT_BLUE_AMP);
-    SubSystems.swerve_drive_subsystem.getField2d().getObject("trajectory").setPoses(trajectory);;
+    SubSystems.swerve_drive.getField2d().getObject("trajectory").setPoses(trajectory);;
   }
 
   private void configureBindings() {
-    SubSystems.swerve_drive_subsystem.setDefaultCommand(new SwerveJoystickCmd(
-      SubSystems.swerve_drive_subsystem, 
+    SubSystems.swerve_drive.setDefaultCommand(new SwerveJoystickCmd(
+      SubSystems.swerve_drive, 
       this::getForwardSpeed, // Y-Axis 
       this::getSideSpeed,  // X-Axis
       this::getRotationSpeed  // Rot-Axis
     ));
-    IO.commandController.leftBumper().whileTrue(SubSystems.shooter_subsystem.intakeCommand());
-    IO.commandController.rightBumper().whileTrue(new PrepareLaunch(SubSystems.shooter_subsystem)
+    IO.commandController.leftBumper().whileTrue(SubSystems.shooter.intakeCommand());
+    IO.commandController.rightBumper().whileTrue(new PrepareLaunch(SubSystems.shooter)
                                                       .withTimeout(0.5)
-                                                      .andThen(new LaunchNote(SubSystems.shooter_subsystem))
-                                                      .handleInterrupt(SubSystems.shooter_subsystem::stop));
+                                                      .andThen(new LaunchNote(SubSystems.shooter))
+                                                      .handleInterrupt(SubSystems.shooter::stop));
     IO.commandController.a().onTrue(new InstantCommand(this::showTrajectory));
-    IO.commandController.x().onTrue(new DriveToFieldPosCmd(SubSystems.swerve_drive_subsystem, FieldPoses.ROBOT_BLUE_AMP));
-    IO.commandController.y().toggleOnTrue(new InstantCommand(SubSystems.swerve_drive_subsystem::toggleAprilTags));
+    IO.commandController.x().onTrue(new DriveToFieldPosCmd(SubSystems.swerve_drive, FieldPoses.ROBOT_BLUE_AMP));
   }
 
   public Command getAutonomousCommand() {
