@@ -5,8 +5,10 @@ import com.revrobotics.ColorSensorV3;
 import java.awt.Color;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,15 +31,19 @@ public class NoteArmSubsystem extends SubsystemBase {
     private static final int NOTE_VALUE_THRESHOLD       = 80;
     private static final double DELAY = 0.5;
 
-    private final DoubleSolenoid claw_solenoid    = new DoubleSolenoid(PNEUMATICS_MODULE_TYPE, CLAW_SOLENOID_FORWARD_CHANNEL, CLAW_SOLENOID_REVERSE_CHANNEL);
-    private final DoubleSolenoid arm_up_solenoid  = new DoubleSolenoid(PNEUMATICS_MODULE_TYPE, ARM_UP_SOLENOID_FORWARD_CHANNEL, ARM_UP_SOLENOID_REVERSE_CHANNEL);
-    private final DoubleSolenoid arm_out_solenoid = new DoubleSolenoid(PNEUMATICS_MODULE_TYPE, ARM_OUT_SOLENOID_FORWARD_CHANNEL, ARM_OUT_SOLENOID_REVERSE_CHANNEL);
+    private final PneumaticHub hub = new PneumaticHub(11);
+    private final DoubleSolenoid claw_solenoid    = new DoubleSolenoid(11, PNEUMATICS_MODULE_TYPE, CLAW_SOLENOID_FORWARD_CHANNEL, CLAW_SOLENOID_REVERSE_CHANNEL);
+    private final DoubleSolenoid arm_up_solenoid  = new DoubleSolenoid(11, PNEUMATICS_MODULE_TYPE, ARM_UP_SOLENOID_FORWARD_CHANNEL, ARM_UP_SOLENOID_REVERSE_CHANNEL);
+    private final DoubleSolenoid arm_out_solenoid = new DoubleSolenoid(11, PNEUMATICS_MODULE_TYPE, ARM_OUT_SOLENOID_FORWARD_CHANNEL, ARM_OUT_SOLENOID_REVERSE_CHANNEL);
     private final ColorSensorV3 color_sensor      = new ColorSensorV3(COLOR_SENSOR_PORT);
+    private final Compressor compressor = new Compressor(11, PNEUMATICS_MODULE_TYPE);
 
     public NoteArmSubsystem(){
         claw_solenoid.set(Value.kOff);
         arm_up_solenoid.set(Value.kOff);
         arm_out_solenoid.set(Value.kOff);
+        hub.enableCompressorDigital();
+        compressor.enableDigital();
     }
 
     public boolean isClawOpen(){ return claw_solenoid.get() == Value.kForward; }
@@ -81,8 +87,10 @@ public class NoteArmSubsystem extends SubsystemBase {
 
 
     @Override public void periodic() {
-        if(color_sensor.isConnected())
-            if(!isClawOpen() && !isArmUp() && isArmOut() && noteDetected()) closeClaw();
+        if(noteDetected()) closeClaw();
+
+        // if(color_sensor.isConnected())
+            // if(!isClawOpen() && !isArmUp() && isArmOut() && noteDetected()) closeClaw();
     }
 
     public Command grabNoteCommand()  { return this.runOnce(() -> { closeClaw(); }); }

@@ -11,9 +11,6 @@
         "Front Right": {
           "open": true
         },
-        "Shooter": {
-          "open": true
-        },
         "Swerve": {
           "Back Left": {
             "open": true
@@ -26,7 +23,8 @@
           },
           "Front Right": {
             "open": true
-          }
+          },
+          "open": true
         },
         "open": true
       },

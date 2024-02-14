@@ -12,6 +12,7 @@ import frc.robot.commands.PrepareLaunch;
 import frc.robot.commands.SwerveJoystickCmd;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 public class RobotContainer {
 
@@ -70,8 +71,8 @@ public class RobotContainer {
     // IO.commandController.a().onTrue(new InstantCommand(this::showTrajectory));
     // IO.commandController.x().onTrue(new DriveToFieldPosCmd(SubSystems.swerve_drive_subsystem, FieldPoses.ROBOT_BLUE_AMP));
     // IO.commandController.y().toggleOnTrue(new InstantCommand(SubSystems.swerve_drive_subsystem::toggleAprilTags));
-    IO.commandController.a().onTrue(SubSystems.note_arm_subsystem.grabNoteCommand());
-    IO.commandController.b().onTrue(SubSystems.note_arm_subsystem.releaseNoteCommand());
+    IO.commandController.a().onTrue(new InstantCommand(SubSystems.note_arm_subsystem::openClaw));
+    IO.commandController.b().onTrue(new InstantCommand(SubSystems.note_arm_subsystem::closeClaw));
 
     // IO.commandController.rightCTrigger().whileTrue(new MoveArmCommand(SubSystems.climb_subsystem, getClimberSpeed(), isShooting()));
   }
