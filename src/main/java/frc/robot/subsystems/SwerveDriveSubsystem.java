@@ -13,15 +13,14 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.Constants.FieldPoses;
+import frc.robot.subsystems.drive.NavX;
 import frc.robot.utils.TimerUtil;
-import frc.robot.vendor.NavX;
 
 import java.util.Optional;
 
@@ -109,7 +108,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
     private final Field2d glass_field = new Field2d();
 
-    private final Translation3d robot_to_cam_translation = new Translation3d(Units.inchesToMeters(FieldPoses.ROBOT_LENGTH / 2), 0, 0);
+    private final Translation3d robot_to_cam_translation = new Translation3d(Units.inchesToMeters(2), 0, 0);
     private final Rotation3d robot_to_cam_rotation = new Rotation3d(0,Units.degreesToRadians(15),0);
     private final Transform3d robot_to_cam = new Transform3d(robot_to_cam_translation, robot_to_cam_rotation);
     private final PhotonCamera camera;
@@ -220,7 +219,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
     public void setModuleStates(SwerveModuleState[] desired_states){
         assert desired_states.length == 4 : "desired_states has invalid length";
-        SwerveDriveKinematics.desaturateWheelSpeeds(desired_states, Constants.Drive.PHYSICAL_MAX_SPEED_METERS_PER_SECOND);
+        // SwerveDriveKinematics.desaturateWheelSpeeds(desired_states, Constants.Drive.PHYSICAL_MAX_SPEED_METERS_PER_SECOND);
         front_left.setDesiredState (desired_states[0]);
         front_right.setDesiredState(desired_states[1]);
         back_left.setDesiredState  (desired_states[2]);

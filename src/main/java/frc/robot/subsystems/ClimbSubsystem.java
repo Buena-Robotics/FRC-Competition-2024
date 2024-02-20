@@ -12,9 +12,8 @@ public class ClimbSubsystem extends SubsystemBase {
     private final int WINCH_MOTOR_ID = 0;
     private final int BORE_ENCODER_CHANNEL = 0;
 
-    public final CANSparkMax winchMotor = new CANSparkMax(WINCH_MOTOR_ID, MotorType.kBrushless);
-    public final DutyCycleEncoder boreEncoder = new DutyCycleEncoder(BORE_ENCODER_CHANNEL);
-
+    private final CANSparkMax winchMotor = new CANSparkMax(WINCH_MOTOR_ID, MotorType.kBrushless);
+    private final DutyCycleEncoder boreEncoder = new DutyCycleEncoder(BORE_ENCODER_CHANNEL);
 
     public boolean armLocked = false;
 

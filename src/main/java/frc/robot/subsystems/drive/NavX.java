@@ -1,22 +1,33 @@
-package frc.robot.vendor;
+package frc.robot.subsystems.drive;
 
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.SerialPort;
+import frc.robot.Robot;
 
 public class NavX extends AHRS {
     private static final int MINIMUM_AIR_HEIGHT_INCHES = 4;
+
+    private Rotation2d simulation_rotation = new Rotation2d();
 
     public NavX(SerialPort.Port serial_port_id){ 
         super(serial_port_id); 
         this.resetDisplacement();
     }
     
+    public void updateSimulationAngle(Rotation2d rotation){
+        if(Robot.isSimulation()) {
+            simulation_rotation = simulation_rotation.plus(rotation);
+            this.setAngleAdjustment(simulation_rotation.getDegrees() * 2); 
+        }
+    }
+
     public boolean isInAir(){ return this.getDisplacementY() > Units.inchesToMeters(MINIMUM_AIR_HEIGHT_INCHES); }
 
     public double getRollRadians() { return Units.degreesToRadians(getRoll());  }

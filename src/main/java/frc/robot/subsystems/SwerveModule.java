@@ -16,6 +16,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.Constants;
+import frc.robot.subsystems.drive.SwerveDrive;
 
 public class SwerveModule implements Sendable {
     private static final double WHEEL_DIAMETER_METERS  = Units.inchesToMeters(4); // Not measured accurately
@@ -102,7 +103,7 @@ public class SwerveModule implements Sendable {
             return;
         }
         state = SwerveModuleState.optimize( state, getState().angle );
-        drive_motor.set( state.speedMetersPerSecond / Constants.Drive.PHYSICAL_MAX_SPEED_METERS_PER_SECOND );
+        drive_motor.set( state.speedMetersPerSecond / SwerveDrive.PHYSICAL_MAX_SPEED_METERS_PER_SECOND );
         turn_motor.set( turn_controller.calculate( getTurnPosition(), state.angle.getRadians() ) );
     }
 
