@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ClimbSubsystem extends SubsystemBase {
     
-    private final int WINCH_MOTOR_ID = 0;
+    private final int WINCH_MOTOR_ID = 12;
     private final int BORE_ENCODER_CHANNEL = 0;
 
     public final CANSparkMax winchMotor = new CANSparkMax(WINCH_MOTOR_ID, MotorType.kBrushless);
@@ -23,7 +23,7 @@ public class ClimbSubsystem extends SubsystemBase {
     }
 
     public void moveArm(double speed, boolean lock, boolean shooting) {
-        unlockArm();
+        // unlockArm();
 
         winchMotor.set(speed);
 

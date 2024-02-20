@@ -40,10 +40,10 @@ public class RobotContainer {
   }
 
   private double getClimberSpeed() {
-    if (IO.commandController.getLeftCTriggerAxis() > 0.01) 
-      return -IO.commandController.getLeftCTriggerAxis();
+    if (IO.controller.getLeftTriggerAxis() > 0.01) 
+      return -IO.controller.getLeftTriggerAxis();
 
-    return IO.commandController.getRightCTriggerAxis();
+    return IO.controller.getRightTriggerAxis();
   }
 
   private boolean isShooting() {
@@ -70,10 +70,12 @@ public class RobotContainer {
     // IO.commandController.a().onTrue(new InstantCommand(this::showTrajectory));
     // IO.commandController.x().onTrue(new DriveToFieldPosCmd(SubSystems.swerve_drive_subsystem, FieldPoses.ROBOT_BLUE_AMP));
     // IO.commandController.y().toggleOnTrue(new InstantCommand(SubSystems.swerve_drive_subsystem::toggleAprilTags));
-    IO.commandController.a().onTrue(SubSystems.note_arm_subsystem.grabNoteFullCommand());
-    IO.commandController.b().onTrue(SubSystems.note_arm_subsystem.releaseNoteFullCommand());
+    // IO.commandController.a().onTrue(SubSystems.note_arm_subsystem.grabNoteFullCommand());
+    // IO.commandController.b().onTrue(SubSystems.note_arm_subsystem.releaseNoteFullCommand());
 
-    IO.commandController.rightCTrigger().whileTrue(new MoveArmCommand(SubSystems.climb_subsystem, getClimberSpeed(), isShooting()));
+    IO.commandController.rightCTrigger().whileTrue(new MoveArmCommand(SubSystems.climb_subsystem, this::getClimberSpeed, isShooting()));
+    IO.commandController.leftCTrigger().whileTrue(new MoveArmCommand(SubSystems.climb_subsystem, this::getClimberSpeed, isShooting()));
+
   }
 
   public Command getAutonomousCommand() {

@@ -1,6 +1,9 @@
 package frc.robot.commands;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.IO;
 import frc.robot.subsystems.ClimbSubsystem;
 
 public class MoveArmCommand extends Command {
@@ -9,9 +12,9 @@ public class MoveArmCommand extends Command {
     private double speed;
     private boolean shooting;
 
-    public MoveArmCommand(ClimbSubsystem climber, double speed, boolean shooting) {
+    public MoveArmCommand(ClimbSubsystem climber, Supplier<Double> speed, boolean shooting) {
         this.climber = climber;
-        this.speed = speed;
+        this.speed = speed.get();
         this.shooting = shooting;
     }
 
@@ -29,7 +32,15 @@ public class MoveArmCommand extends Command {
 
      @Override
      public void execute() {
-         climber.moveArm(speed, true, shooting);
+         climber.moveArm(getClimberSpeed(), true, shooting);
+         System.out.println(speed);
          super.execute();
      }
+
+     private double getClimberSpeed() {
+    if (IO.controller.getLeftTriggerAxis() > 0.01) 
+      return -IO.controller.getLeftTriggerAxis();
+
+    return IO.controller.getRightTriggerAxis();
+  }
 }
