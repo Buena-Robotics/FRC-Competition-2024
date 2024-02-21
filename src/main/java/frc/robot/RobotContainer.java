@@ -22,10 +22,10 @@ public class RobotContainer {
 
     private double getRotationSpeed(){
         if(IO.controller.getPOV() == 270) // LEFT
-            return -0.09;
-        else if(IO.controller.getPOV() == 90) // RIGHT
             return 0.09;
-        return IO.controller.getRightX();
+        else if(IO.controller.getPOV() == 90) // RIGHT
+            return -0.09;
+        return -IO.controller.getRightX();
     }
 
     private double getForwardSpeed(){
@@ -41,9 +41,9 @@ public class RobotContainer {
     }
 
     private double getClimberSpeed() {
-        if (IO.commandController.getLeftCTriggerAxis() > 0.01) 
-            return -IO.commandController.getLeftCTriggerAxis();
-        return IO.commandController.getRightCTriggerAxis();
+        if (IO.controller.getLeftTriggerAxis() > 0.01) 
+            return -IO.controller.getLeftTriggerAxis();
+        return IO.controller.getRightTriggerAxis();
     }
 
     private boolean isShooting() {
@@ -62,6 +62,7 @@ public class RobotContainer {
             this::getSideSpeed,  // X-Axis
             this::getRotationSpeed  // Rot-Axis
         ));
+        SubSystems.climb_subsystem.setDefaultCommand(new MoveArmCommand(SubSystems.climb_subsystem, this::getClimberSpeed, isShooting()));
         IO.commandController.leftBumper().whileTrue(SubSystems.shooter.intakeCommand());
         IO.commandController.rightBumper().whileTrue(new PrepareLaunch(SubSystems.shooter)
                                                         .withTimeout(0.5)
@@ -72,6 +73,9 @@ public class RobotContainer {
         // IO.commandController.y().toggleOnTrue(new InstantCommand(SubSystems.swerve_drive_subsystem::toggleAprilTags));
         IO.commandController.a().onTrue(new InstantCommand(SubSystems.note_arm::openClaw));
         IO.commandController.b().onTrue(new InstantCommand(SubSystems.note_arm::closeClaw));
+
+        IO.commandController.x().onTrue(SubSystems.note_arm.grabNoteFullCommand());
+        IO.commandController.y().onTrue(SubSystems.note_arm.releaseNoteFullCommand());
 
         // IO.commandController.rightCTrigger().whileTrue(new MoveArmCommand(SubSystems.climb_subsystem, getClimberSpeed(), isShooting()));
     }

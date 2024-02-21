@@ -81,9 +81,9 @@ public class SwerveDrive extends SubsystemBase {
             navx.reset();
             navx.resetDisplacement();
         }).start();
-        for(int i = 0; i < 4; i++)
-            SmartDashboard.putData(module_names[i], modules[i]);
-        FieldVisualizer.getField().getObject("Test").setPose(new Pose2d());
+        // for(int i = 0; i < 4; i++)
+            // SmartDashboard.putData(module_names[i], modules[i]);
+        // FieldVisualizer.getField().getObject("Test").setPose(new Pose2d());
     }
 
     @Override public void periodic(){

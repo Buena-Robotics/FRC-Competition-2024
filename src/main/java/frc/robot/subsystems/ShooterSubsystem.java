@@ -20,14 +20,14 @@ public class ShooterSubsystem extends SubsystemBase {
     public static final double INTAKE_LAUNCH_SPEED = -1; 
     public static final double INTAKE_FEED_SPEED = -.2;
 
-    private static final int BORE_ENCODER_CHANNEL = 0;
+    // private static final int BORE_ENCODER_CHANNEL = 0;
 
     public final CANSparkMax feed_motor = new CANSparkMax(FEED_MOTOR_ID, MotorType.kBrushless);;
     public final CANSparkMax launch_motor = new CANSparkMax(LAUNCH_MOTOR_ID, MotorType.kBrushless);
     public final RelativeEncoder feed_motor_encoder;
     public final RelativeEncoder launch_motor_encoder;
 
-    public final DutyCycleEncoder bore_encoder = new DutyCycleEncoder(BORE_ENCODER_CHANNEL);
+    // public final DutyCycleEncoder bore_encoder = new DutyCycleEncoder(BORE_ENCODER_CHANNEL);
 
     private double position_before_clearing_for_note_arm = 0;
 
@@ -41,7 +41,7 @@ public class ShooterSubsystem extends SubsystemBase {
         // bore_encoder.setPositionOffset(-1);
         // bore_encoder.setDistancePerRotation(-1);
         // bore_encoder.setDistancePerRotation(-1);
-        bore_encoder.reset();
+        // bore_encoder.reset();
     }
 
     public double getFeedMotorVelocity(){ return feed_motor_encoder.getVelocity(); }
@@ -59,10 +59,10 @@ public class ShooterSubsystem extends SubsystemBase {
         launch_motor.set(0);
     }
 
-    public double getAngleDegrees(){ return bore_encoder.getAbsolutePosition(); }
+    // public double getAngleDegrees(){ return bore_encoder.getAbsolutePosition(); }
 
     public Command moveToTop(){
-        position_before_clearing_for_note_arm = getAngleDegrees();
+        // position_before_clearing_for_note_arm = getAngleDegrees();
         return moveToPosition(1);
     }
     public Command resetPosition(){
@@ -76,10 +76,10 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     @Override public void periodic(){
-        SmartDashboard.putBoolean("Shooter/Connected", bore_encoder.isConnected());
-        SmartDashboard.putNumber("Shooter/Absolute Position", getAngleDegrees());
-        SmartDashboard.putNumber("Shooter/Distance", bore_encoder.getDistance());
-        SmartDashboard.putNumber("Shooter/DPR", bore_encoder.getDistancePerRotation());
+        // SmartDashboard.putBoolean("Shooter/Connected", bore_encoder.isConnected());
+        // SmartDashboard.putNumber("Shooter/Absolute Position", getAngleDegrees());
+        // SmartDashboard.putNumber("Shooter/Distance", bore_encoder.getDistance());
+        // SmartDashboard.putNumber("Shooter/DPR", bore_encoder.getDistancePerRotation());
     }
 
     @Override public void initSendable(SendableBuilder builder) {

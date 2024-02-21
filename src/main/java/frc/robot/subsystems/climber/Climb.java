@@ -2,6 +2,7 @@ package frc.robot.subsystems.climber;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,11 +20,13 @@ public class Climb extends SubsystemBase {
         SmartDashboard.putData("Climb", mechanism);
     }
 
+    
+
     @Override public void periodic() {
         shooter_arm_rotation = shooter_arm_rotation.plus(Rotation2d.fromDegrees(Constants.IO.controller.getLeftTriggerAxis()));
         shooter_arm_rotation = shooter_arm_rotation.minus(Rotation2d.fromDegrees(Constants.IO.controller.getRightTriggerAxis()));
 
-        shooter_arm_rotation = Rotation2d.fromDegrees(MathUtil.clamp(shooter_arm_rotation.getDegrees(), 0, 95)); 
+        shooter_arm_rotation = Rotation2d.fromDegrees(MathUtil.clamp(shooter_arm_rotation.getDegrees(), 0, 95));
 
         shooter_arm_rotation = shooter_arm_rotation.plus(Rotation2d.fromDegrees(0.6));
 

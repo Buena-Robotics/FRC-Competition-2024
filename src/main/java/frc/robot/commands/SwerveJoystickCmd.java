@@ -66,8 +66,8 @@ public class SwerveJoystickCmd extends Command {
 
         turn_speed = Math.abs(turn_speed) > right_joystick_deadband.get() ? turn_speed : 0.0;
 
-        x_speed *= Math.abs(x_speed);
-        y_speed *= Math.abs(y_speed);
+        x_speed *= Math.abs(Math.pow(x_speed,3));
+        y_speed *= Math.abs(Math.pow(y_speed,3));
         turn_speed *= Math.abs(Math.pow(turn_speed,2));
 
         x_speed *= SwerveDrive.TELEOP_DRIVE_MAX_SPEED_METERS_PER_SECOND;

@@ -14,6 +14,11 @@
         "DoubleSolenoid[11,0]": {
           "open": true
         },
+        "NoteArm": {
+          "double[]##v_/SmartDashboard/NoteArm/ColorDetectingHSV": {
+            "open": true
+          }
+        },
         "Swerve": {
           "Back Left": {
             "open": true
@@ -26,8 +31,7 @@
           },
           "Front Right": {
             "open": true
-          },
-          "open": true
+          }
         },
         "Tunable": {
           "Drive": {
@@ -74,7 +78,7 @@
         "AprilTags": {
           "arrowSize": 69,
           "arrowWeight": 3.0,
-          "image": "C:\\dev\\FRC\\Competition-2024\\.Glass\\res\\tag-blue.png",
+          "image": "C:\\FRC-NERDS\\FRC-Competition-2024\\FRC-2024\\.Glass\\res\\tag-blue.png",
           "length": 0.30480000376701355,
           "selectable": false,
           "style": "Box/Image",
@@ -109,7 +113,7 @@
         },
         "SwerveModules": {
           "arrows": false,
-          "image": "C:\\dev\\FRC\\Competition-2024\\.Glass\\res\\swerve_module.png",
+          "image": "C:\\FRC-NERDS\\FRC-Competition-2024\\FRC-2024\\.Glass\\res\\swerve_module.png",
           "length": 0.20319999754428864,
           "selectable": false,
           "width": 0.20319999754428864
@@ -143,10 +147,8 @@
           "style": "Line",
           "weight": 2.0
         },
-        "bottom": 1476,
-        "height": 8.210550308227539,
-        "left": 150,
-        "right": 2961,
+        "height": 8.013679504394531,
+        "image": "C:\\Users\\Robotic's club\\Documents\\2024-field.png",
         "test": {
           "arrows": false,
           "color": [
@@ -159,14 +161,13 @@
           "weight": 1.0,
           "width": 0.3301999866962433
         },
-        "top": 79,
         "trajectory": {
           "arrows": false,
           "selectable": false,
           "style": "Track",
           "width": 0.6600000262260437
         },
-        "units": "meters",
+        "units": "inches",
         "width": 16.541748046875,
         "window": {
           "visible": true
