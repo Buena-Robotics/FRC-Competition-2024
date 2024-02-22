@@ -34,8 +34,8 @@ public class SwerveJoystickCmd extends Command {
         
         this.turret_turn_feedback = new PIDController(5, 0, 0.1);
         this.turret_turn_feedback.enableContinuousInput(-Math.PI, Math.PI);
-        this.aim_assist_x_feedback = new PIDController(1.5, 0, 0);
-        this.aim_assist_y_feedback = new PIDController(1.5, 0, 0);
+        this.aim_assist_x_feedback = new PIDController(0.75, 0, 0);
+        this.aim_assist_y_feedback = new PIDController(0.75, 0, 0);
         this.x_speed_function    = x_speed_function;
         this.y_speed_function    = y_speed_function;
         this.turn_speed_function = turn_speed_function;
@@ -114,7 +114,7 @@ public class SwerveJoystickCmd extends Command {
                 chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(chassis_speeds, swerve_drive.getPose().getRotation());
             }
         }
-        SwerveModuleState[] module_states = swerve_drive.getKinamatics().toSwerveModuleStates(chassis_speeds);
+        SwerveModuleState[] module_states = swerve_drive.getKinematics().toSwerveModuleStates(chassis_speeds);
         swerve_drive.setModuleStates(module_states);
     }
     @Override public void end(boolean interrupted){ swerve_drive.stopModules(); }

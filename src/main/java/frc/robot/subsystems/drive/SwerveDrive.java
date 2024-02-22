@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.Constants.SubSystems;
 import frc.robot.utils.FieldVisualizer;
@@ -32,9 +33,9 @@ public class SwerveDrive extends SubsystemBase {
     public static final TunableNumber max_angular_acceleration_per_second = new TunableNumber("Drive/MaxDriveAngularAcceleration", Math.PI / 2);
     
     private static final double CENTER_TO_MODULE = Units.inchesToMeters(10.75);
-    private static final Matrix<N3, N1> POSITION_STD_DEV = VecBuilder.fill(0.1, 0.1, 0.1);
-    private static final Matrix<N3, N1> VISION_STD_DEV   = VecBuilder.fill(1, 1, 10);
-    private static final Matrix<N3, N1> VISION_FIRST_STD_DEV   = VecBuilder.fill(0, 0, 0);
+    private static final Matrix<N3, N1> POSITION_STD_DEV = VecBuilder.fill(0.01, 0.01, 1000);
+    private static final Matrix<N3, N1> VISION_STD_DEV   = VecBuilder.fill(1, 1, 100000);
+    private static final Matrix<N3, N1> VISION_FIRST_STD_DEV   = VecBuilder.fill(0.5, 0.5, 0.1);
     private static final int MAX_NAVX_CALIBRATION_TIME_MS = 20 * 1000;
 
     private static final String[] module_names = { "Front Right", "Front Left", "Back Right", "Back Left" };
@@ -56,6 +57,7 @@ public class SwerveDrive extends SubsystemBase {
     private final SwerveDrivePoseEstimator pose_estimator;
 
     private Pose2d robot_pose = new Pose2d();
+    private boolean found_pose = false;
 
     public SwerveDrive(){
         modules = new SwerveModule[4];
@@ -88,8 +90,10 @@ public class SwerveDrive extends SubsystemBase {
 
     @Override public void periodic(){
         for (SwerveModule module : modules) module.periodic();
+        SubSystems.vision._periodic();
         for (var vision_measurement : SubSystems.vision.getVisionMeasurements()){
-            if(robot_pose.equals(new Pose2d())) {
+            if(!found_pose) {
+                found_pose = true;
                 navx.setAngleAdjustment(vision_measurement.pose.getRotation().getDegrees() - navx.getAngle());
                 pose_estimator.addVisionMeasurement(vision_measurement.pose, vision_measurement.timestamp, VISION_FIRST_STD_DEV);
             }
@@ -110,10 +114,12 @@ public class SwerveDrive extends SubsystemBase {
             robot_pose.transformBy(new Transform2d(back_right_position, modules[2].getAngle())),
             robot_pose.transformBy(new Transform2d(back_left_position, modules[3].getAngle()))
             );
+        
+        // FieldVisualizer.getField().getObject("Cameras").setPoses(SubSystems.vision.getAllRobotToCameraPoses(robot_pose));
     }
 
     public Pose2d getPose(){ return robot_pose; }
-    public SwerveDriveKinematics getKinamatics(){ return kinematics; }
+    public SwerveDriveKinematics getKinematics(){ return kinematics; }
 
     public void stopModules(){ 
         for(int i = 0; i < 4; i++) modules[i].stop(); 

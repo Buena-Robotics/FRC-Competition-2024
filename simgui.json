@@ -11,29 +11,67 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
-      "/SmartDashboard/Climb": "Mechanism2d",
       "/SmartDashboard/Field": "Field2d",
-      "/SmartDashboard/NoteArm": "Mechanism2d",
-      "/SmartDashboard/NoteArmMechanism": "Mechanism2d"
+      "/SmartDashboard/VisionSystemSim-VisionSim/Sim Field": "Field2d"
     },
     "windows": {
-      "/SmartDashboard/Climb": {
+      "/SmartDashboard/Field": {
+        "AprilTags": {
+          "arrows": false,
+          "image": "C:\\dev\\FRC\\Competition-2024\\.Glass\\res\\tag-blue.png",
+          "length": 0.30480000376701355,
+          "selectable": false,
+          "width": 0.30480000376701355
+        },
+        "Robot": {
+          "arrowColor": [
+            0.18627452850341797,
+            0.856401264667511,
+            1.0,
+            255.0
+          ],
+          "arrowSize": 36,
+          "arrowWeight": 3.0,
+          "color": [
+            0.5145135521888733,
+            0.6544201970100403,
+            0.9901960492134094,
+            255.0
+          ],
+          "length": 0.7365999817848206,
+          "selectable": false,
+          "weight": 3.0,
+          "width": 0.7365999817848206
+        },
+        "SwerveModules": {
+          "arrows": false,
+          "image": "C:\\dev\\FRC\\Competition-2024\\.Glass\\res\\swerve_module.png",
+          "length": 0.20319999754428864,
+          "selectable": false,
+          "width": 0.20319999754428864
+        },
+        "Trajectory": {
+          "arrows": false,
+          "style": "Line"
+        },
+        "bottom": 1476,
+        "height": 8.210550308227539,
+        "left": 150,
+        "right": 2961,
+        "top": 79,
+        "units": "inches",
+        "width": 16.541748046875,
         "window": {
           "visible": true
         }
       },
-      "/SmartDashboard/Field": {
+      "/SmartDashboard/VisionSystemSim-VisionSim/Sim Field": {
         "bottom": 1476,
         "height": 8.210550308227539,
         "left": 150,
         "right": 2961,
         "top": 79,
         "width": 16.541748046875,
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/NoteArm": {
         "window": {
           "visible": true
         }
@@ -41,172 +79,113 @@
     }
   },
   "NetworkTables": {
-    "Persistent Values": {
-      "open": false
-    },
     "transitory": {
-      "Shuffleboard": {
-        "open": true
-      },
       "SmartDashboard": {
         "Swerve": {
           "Back Left": {
-            "open": true
+            "open": false
           },
           "Back Right": {
-            "open": true
+            "open": false
           },
           "Front Left": {
-            "open": true
+            "open": false
           },
           "Front Right": {
-            "open": true
+            "open": false
           },
-          "open": true
+          "open": false
         },
         "Tunable": {
           "Drive": {
             "Joystick": {
-              "open": true
-            },
-            "open": true
-          },
-          "open": true
+              "open": false
+            }
+          }
         },
         "open": true
       },
       "photonvision": {
-        "Microsoft_LifeCam_HD-3000": {
-          "open": true
-        },
         "USB_Camera": {
-          "open": true
+          "open": false
         }
       }
     },
     "types": {
-      "/FMSInfo": "FMSInfo",
-      "/SmartDashboard/Field": "Field2d",
-      "/SmartDashboard/Nav-X": "Gyro",
-      "/SmartDashboard/PIDController[5]": "PIDController",
-      "/SmartDashboard/PIDController[6]": "PIDController",
-      "/SmartDashboard/PIDController[7]": "PIDController",
-      "/SmartDashboard/Swerve/Nav-X": "Gyro",
-      "/SmartDashboard/Turn-PID": "PIDController",
-      "/SmartDashboard/X-PID": "PIDController",
-      "/SmartDashboard/Y-PID": "PIDController",
-      "/SmartDashboard/navX-Sensor[4]": "Gyro"
+      "/FMSInfo": "",
+      "/SmartDashboard/Field": "",
+      "/SmartDashboard/Nav-X": "",
+      "/SmartDashboard/PIDController[5]": "",
+      "/SmartDashboard/PIDController[6]": "",
+      "/SmartDashboard/PIDController[7]": "",
+      "/SmartDashboard/Swerve/Nav-X": "",
+      "/SmartDashboard/Turn-PID": "",
+      "/SmartDashboard/X-PID": "",
+      "/SmartDashboard/Y-PID": "",
+      "/SmartDashboard/navX-Sensor[4]": ""
     },
     "windows": {
       "/SmartDashboard/Field": {
         "AprilTags": {
-          "arrowSize": 69,
-          "arrowWeight": 3.0,
-          "length": 0.25,
-          "style": "Hidden",
-          "weight": 1.0,
-          "width": 0.25
+          "arrowSize": 0,
+          "arrowWeight": 0.0,
+          "length": 0.0,
+          "style": "",
+          "weight": 0.0,
+          "width": 0.0
         },
         "Robot": {
-          "arrowColor": [
-            0.0,
-            1.0,
-            0.7941174507141113,
-            255.0
-          ],
-          "arrowSize": 33,
-          "arrowWeight": 5.0,
-          "color": [
-            0.642301082611084,
-            0.7967891097068787,
-            0.970588207244873,
-            255.0
-          ],
-          "length": 0.7365999817848206,
-          "style": "Box/Image",
-          "weight": 3.0,
-          "width": 0.7365999817848206
+          "arrowSize": 0,
+          "arrowWeight": 0.0,
+          "length": 0.0,
+          "style": "",
+          "weight": 0.0,
+          "width": 0.0
         },
         "RobotToTarget": {
           "arrows": false,
           "selectable": false,
-          "style": "Line"
+          "style": ""
         },
         "SwerveModules": {
-          "image": "C:\\dev\\FRC\\Competition-2024\\.Glass\\res\\swerve_module.png",
-          "length": 0.20319999754428864,
-          "width": 0.20319999754428864
+          "image": "",
+          "length": 0.0,
+          "width": 0.0
         },
         "Tracking": {
           "arrows": false,
-          "color": [
-            0.7352938652038574,
-            0.0,
-            1.0,
-            255.0
-          ],
           "selectable": false,
-          "style": "Line",
-          "weight": 2.0
+          "style": "",
+          "weight": 0.0
         },
-        "bottom": 1476,
-        "height": 8.210550308227539,
-        "left": 150,
-        "right": 2961,
+        "bottom": 0,
+        "height": 0.0,
+        "left": 0,
+        "right": 0,
         "test": {
           "arrows": false,
-          "color": [
-            0.0,
-            1.0,
-            0.11764693260192871,
-            255.0
-          ],
-          "length": 0.3301999866962433,
-          "weight": 1.0,
-          "width": 0.3301999866962433
+          "length": 0.0,
+          "weight": 0.0,
+          "width": 0.0
         },
-        "top": 79,
+        "top": 0,
         "trajectory": {
           "arrows": false,
           "selectable": false,
-          "style": "Track",
-          "width": 0.6600000262260437
+          "style": "",
+          "width": 0.0
         },
-        "units": "inches",
-        "width": 16.541748046875,
+        "units": "",
+        "width": 0.0,
         "window": {
-          "visible": true
+          "visible": false
         }
       }
     }
-  },
-  "NetworkTables Info": {
-    "Connections": {
-      "open": true
-    },
-    "visible": true
   },
   "NetworkTables Settings": {
-    "mode": "Client (NT4)",
-    "serverTeam": "localhost",
+    "mode": "",
+    "serverTeam": "",
     "visible": false
-  },
-  "Plot": {
-    "Plot <0>": {
-      "plots": [
-        {
-          "backgroundColor": [
-            0.0,
-            0.0,
-            0.0,
-            0.8500000238418579
-          ],
-          "height": 338
-        }
-      ],
-      "window": {
-        "visible": false
-      }
-    }
   }
 }

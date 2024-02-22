@@ -29,6 +29,7 @@ public class Robot extends LoggedRobot {
     @Override public void disabledPeriodic() {}
 
     @Override public void autonomousInit() {
+        System.out.println("auto");
         m_autonomousCommand = robot_container.getAutonomousCommand();
 
         if (m_autonomousCommand != null)

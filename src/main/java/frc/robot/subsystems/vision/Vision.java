@@ -1,6 +1,7 @@
 package frc.robot.subsystems.vision;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.PhotonCamera;
@@ -11,8 +12,14 @@ import org.photonvision.estimation.TargetModel;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.SubSystems;
 import frc.robot.utils.FieldVisualizer;
 
 public abstract class Vision extends SubsystemBase {
@@ -34,33 +41,63 @@ public abstract class Vision extends SubsystemBase {
             this.photon_pose_estimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
             this.photon_pose_estimator.setTagModel(TargetModel.kAprilTag36h11);
         }
+        public Transform2d getTransform2d(){
+            Transform3d robot_to_camera_3d = this.photon_pose_estimator.getRobotToCameraTransform();
+            Translation2d translation2d = robot_to_camera_3d.getTranslation().toTranslation2d();
+            Rotation2d rotation2d = robot_to_camera_3d.getRotation().toRotation2d();
+            Transform2d robot_to_camera_2d = new Transform2d(translation2d, rotation2d);
+            return robot_to_camera_2d;
+        }
     }
 
-    private final ArrayList<VisionCamera> cameras = new ArrayList<VisionCamera>();
-    private final ArrayList<TimestampedVisionMeasurement> vision_measurements = new ArrayList<TimestampedVisionMeasurement>();
+    protected final ArrayList<VisionCamera> cameras = new ArrayList<VisionCamera>();
+    protected final ArrayList<TimestampedVisionMeasurement> vision_measurements = new ArrayList<TimestampedVisionMeasurement>();
 
     public Vision(){
         FieldVisualizer.setAprilTags(field_layout);
-        cameras.add(new VisionCamera("Microsoft_LifeCam_HD-3000", new Transform3d()));
+        cameras.add(new VisionCamera("Microsoft_LifeCam_HD-3000", 
+            new Transform3d(
+                Units.inchesToMeters(13),
+                Units.inchesToMeters(0),
+                Units.inchesToMeters(34),
+                new Rotation3d(0,Units.degreesToRadians(-28),0))));
     }
 
     protected abstract Optional<TimestampedVisionMeasurement> getVisionMeasurement(VisionCamera camera);
 
-    @Override public void periodic() {
-        vision_measurements.clear();
+    public void _periodic() {
         for(VisionCamera camera : cameras){
             if(camera.photon_camera.isConnected()){
                 var optional_vision_measurements = getVisionMeasurement(camera);
                 if(optional_vision_measurements.isPresent())
                     vision_measurements.add(optional_vision_measurements.get());
             }
-        }        
+        }
     }
 
     public boolean hasVision(){
         for(var camera : cameras) if(camera.photon_camera.isConnected()) return true;
         return false;
     }
+    public ArrayList<TimestampedVisionMeasurement> getVisionMeasurements(){ 
+        var clone = new ArrayList<TimestampedVisionMeasurement>();
+        clone.addAll(vision_measurements);
+        vision_measurements.clear();
+        return clone;
+    };
+    public final ArrayList<VisionCamera> getCameras(){ return cameras; }
     public void addCameras(VisionCamera... cameras){ for(var camera : cameras) this.cameras.add(camera); }
-    public ArrayList<TimestampedVisionMeasurement> getVisionMeasurements(){ return vision_measurements; };
+    public List<Transform2d> getAllRobotToCameraTransforms(){
+        List<Transform2d> transforms = new ArrayList<Transform2d>();
+        for(VisionCamera camera : cameras)
+            transforms.add(camera.getTransform2d());
+        return transforms;
+    }
+    public List<Pose2d> getAllRobotToCameraPoses(Pose2d robot_pose){
+        List<Transform2d> transforms = getAllRobotToCameraTransforms();
+        List<Pose2d> poses = new ArrayList<Pose2d>(transforms.size());
+        for(Transform2d transform : transforms)
+            poses.add(robot_pose.transformBy(transform));
+        return poses;
+    }
 }

@@ -4,6 +4,9 @@ package frc.robot.subsystems.notearm;
 import java.awt.Color;
 
 import com.revrobotics.ColorSensorV3;
+import com.revrobotics.ColorSensorV3.ColorSensorResolution;
+import com.revrobotics.ColorSensorV3.ProximitySensorMeasurementRate;
+import com.revrobotics.ColorSensorV3.ProximitySensorResolution;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -41,6 +44,8 @@ public class NoteArm extends SubsystemBase {
     private final ColorSensorV3 color_sensor      = new ColorSensorV3(COLOR_SENSOR_PORT);
     
     public NoteArm(){
+        // color_sensor.configureColorSensor(ColorSensorResolution.k, null, null);
+        // color_sensor.configureProximitySensor(ProximitySensorResolution.kProxRes11bit, ProximitySensorMeasurementRate.);
         claw_solenoid.set(Value.kOff);
         arm_up_solenoid.set(Value.kOff);
         arm_out_solenoid.set(Value.kOff);
@@ -67,20 +72,20 @@ public class NoteArm extends SubsystemBase {
         final double PROXIMITY_VALUE_PER_MM = MAX_DETECTING_DISTANCE_MM / (double)PROXIMITY_SENSOR_MAX_VALUE; 
         final int proximity_11bit = 2047 - color_sensor.getProximity();
 
-        SmartDashboard.putNumber("NoteArm/MMFromObject", proximity_11bit);
-        SmartDashboard.putNumber("NoteArm/CMFromObject", proximity_11bit / 60);
+        SmartDashboard.putNumber("NoteArm/MMFromObject", (double)proximity_11bit);
+        SmartDashboard.putNumber("NoteArm/CMFromObject", (double)proximity_11bit / 600);
         return 100 - (proximity_11bit * PROXIMITY_VALUE_PER_MM);
     }
 
-    static final double _20BIT_TO_8BIT_SCALE_FACTOR = Math.pow(2.0, 8.0) / Math.pow(2.0, 20.0); 
-    private int _20bitTo8bit(int value20bit){ return (int)(255 / (value20bit + 0.01)); }
+    static final double _20BIT_TO_8BIT_SCALE_FACTOR = 4096; 
+    private int _20bitTo8bit(int value20bit){ return (int)(value20bit / _20BIT_TO_8BIT_SCALE_FACTOR); }
     private int getColorSensorRed8bit()  { return _20bitTo8bit(color_sensor.getRed()); }
     private int getColorSensorGreen8bit(){ return _20bitTo8bit(color_sensor.getGreen()); }
     private int getColorSensorBlue8bit() { return _20bitTo8bit(color_sensor.getBlue()); }
 
     public boolean detectingNoteColor(){
         final float[] HSV = Color.RGBtoHSB(getColorSensorRed8bit(), getColorSensorGreen8bit(), getColorSensorBlue8bit(), null);
-        SmartDashboard.putNumberArray("NoteArm/ColorDetectingHSV", new Double[]{(double)getColorSensorRed8bit(), (double)HSV[1], (double)HSV[2]});
+        SmartDashboard.putNumberArray("NoteArm/ColorDetectingHSV", new Double[]{(double)getColorSensorRed8bit(), (double)getColorSensorGreen8bit(), (double)getColorSensorBlue8bit()});
         if(HSV[0] < NOTE_HUE_LOWER_THRESHOLD || HSV[0] > NOTE_HUE_UPPER_THRESHOLD)
             if(HSV[1] > NOTE_SATURATION_THRESHOLD && HSV[2] > NOTE_VALUE_THRESHOLD) return true;
         return false;

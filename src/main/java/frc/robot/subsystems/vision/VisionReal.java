@@ -11,6 +11,10 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 
 public class VisionReal extends Vision {
+    public VisionReal(){
+        super();
+    }
+
     private TimestampedVisionMeasurement getVisionMeasurementMultiTarget(VisionCamera camera, PhotonPipelineResult pipeline_result, double result_timestamp){
         final MultiTargetPNPResult multitag_result = pipeline_result.getMultiTagResult();
         final List<Integer> fiducial_ids = multitag_result.fiducialIDsUsed;
@@ -18,7 +22,6 @@ public class VisionReal extends Vision {
         final Pose3d camera_pose = new Pose3d(field_to_camera.getTranslation(), field_to_camera.getRotation());
         final Pose3d vision_measurement = camera_pose.transformBy(camera.photon_pose_estimator.getRobotToCameraTransform());
         final TimestampedVisionMeasurement timestamped_vision_measurement = new TimestampedVisionMeasurement(vision_measurement.toPose2d(), result_timestamp);
-
         for(int fiducial_id : fiducial_ids)
             camera.tracked_target_poses.add(field_layout.getTagPose(fiducial_id).get().toPose2d());
         return timestamped_vision_measurement;

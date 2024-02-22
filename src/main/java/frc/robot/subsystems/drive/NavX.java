@@ -23,7 +23,7 @@ public class NavX extends AHRS {
     
     public void updateSimulationAngle(Rotation2d rotation){
         if(Robot.isSimulation()) {
-            simulation_rotation = simulation_rotation.plus(rotation);
+            simulation_rotation = simulation_rotation.minus(rotation);
             this.setAngleAdjustment(simulation_rotation.getDegrees() * 2); 
         }
     }
