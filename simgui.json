@@ -18,7 +18,6 @@
       "/SmartDashboard/Field": {
         "AprilTags": {
           "arrows": false,
-          "image": "C:\\dev\\FRC\\Competition-2024\\.Glass\\res\\tag-blue.png",
           "length": 0.30480000376701355,
           "selectable": false,
           "width": 0.30480000376701355
@@ -45,7 +44,6 @@
         },
         "SwerveModules": {
           "arrows": false,
-          "image": "C:\\dev\\FRC\\Competition-2024\\.Glass\\res\\swerve_module.png",
           "length": 0.20319999754428864,
           "selectable": false,
           "width": 0.20319999754428864
@@ -71,10 +69,7 @@
         "left": 150,
         "right": 2961,
         "top": 79,
-        "width": 16.541748046875,
-        "window": {
-          "visible": true
-        }
+        "width": 16.541748046875
       }
     }
   },
@@ -182,6 +177,9 @@
         }
       }
     }
+  },
+  "NetworkTables Info": {
+    "visible": true
   },
   "NetworkTables Settings": {
     "mode": "",

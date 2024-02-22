@@ -31,29 +31,16 @@ public class ClimbSubsystem extends SubsystemBase {
     public boolean armLocked = false;
     //1/2 inch hex shaft
     // private static final double WINCH_ENCODER_ROTATION_TO_METERS = 64/1 * Math.PI * Units.inchesToMeters(27.5) * 2;
-    private static final double WINCH_ENCODER_ROTATION_TO_RADIANS = 1/64;
 
     public ClimbSubsystem() {
         winch_motor.setIdleMode(IdleMode.kBrake);
-        winch_encoder.setPosition(0);
-        winch_encoder.setPositionConversionFactor(1/64);
+        // winch_encoder.setPosition(getBoreAngleDegrees());
+        winch_encoder.setPositionConversionFactor(0.0104357967249);
     }
 
-    private void drive(Measure<Voltage> volts){}
-    private void log(SysIdRoutineLog sysid_log){}
-
-    private final Mechanism mechanism = new Mechanism(this::drive, this::log, this);
-    private final SysIdRoutine.Config config = new SysIdRoutine.Config();
-    private final SysIdRoutine routine = new SysIdRoutine(config, mechanism);
-
-    public Command sysIdQuasistaticForward(){ return routine.quasistatic(Direction.kForward); }
-    public Command sysIdQuasistaticReverse(){ return routine.quasistatic(Direction.kReverse); }
-    public Command sysIdDynamicForward(){ return routine.dynamic(Direction.kForward); }
-    public Command sysIdDynamicReverse(){ return routine.dynamic(Direction.kReverse); }
-
     @Override public void periodic() {
-        SmartDashboard.putNumber("arm_encoder", getAngleDegrees());
-        SmartDashboard.putNumber("winch_encoder", winch_encoder.getPosition());
+        SmartDashboard.putNumber("arm_encoder", getBoreAngleDegrees());
+        SmartDashboard.putNumber("winch_encoder", getWinchAngleDegrees());
     }
 
     public void moveArm(double speed, boolean lock, boolean shooting) {
@@ -65,13 +52,16 @@ public class ClimbSubsystem extends SubsystemBase {
     }
 
     public void moveArmToPosition(ArmPosition position) {
-        if (getAngleDegrees() < position.getEncoderPos()) {
+        if (getBoreAngleDegrees() < position.getEncoderPos()) {
             moveArm(0.5, true, true);
         }
     }
 
-    public double getAngleDegrees() {
-        return (bore_encoder.getAbsolutePosition()) * (90); 
+    public double getBoreAngleDegrees() {
+        return 369 * (bore_encoder.getAbsolutePosition() - 0.146338);
+    }
+    public double getWinchAngleDegrees(){
+        return winch_encoder.getPosition();
     }
 
 

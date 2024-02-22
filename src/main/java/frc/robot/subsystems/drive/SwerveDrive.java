@@ -52,7 +52,7 @@ public class SwerveDrive extends SubsystemBase {
         back_left_position
     );
 
-    private final NavX navx = new NavX(edu.wpi.first.wpilibj.SerialPort.Port.kUSB2);
+    private final NavX navx = new NavX(edu.wpi.first.wpilibj.SerialPort.Port.kUSB);
     private final SwerveModule[] modules;
     private final SwerveDrivePoseEstimator pose_estimator;
 

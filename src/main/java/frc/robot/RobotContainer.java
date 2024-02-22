@@ -80,19 +80,20 @@ public class RobotContainer {
         ));
         SubSystems.climb_subsystem.setDefaultCommand(new MoveArmCommand(SubSystems.climb_subsystem, this::getClimberSpeed, isShooting()));
         IO.commandController.leftBumper().whileTrue(SubSystems.shooter.intakeCommand());
+
         IO.commandController.rightBumper().whileTrue(new PrepareLaunch(SubSystems.shooter)
-                                                        .withTimeout(0.5)
+                                                        .withTimeout(1)
                                                         .andThen(new LaunchNote(SubSystems.shooter))
                                                         .handleInterrupt(SubSystems.shooter::stop));
         // IO.commandController.a().onTrue(new InstantCommand(this::showTrajectory));
         // IO.commandController.x().onTrue(new DriveToFieldPosCmd(SubSystems.swerve_drive_subsystem, FieldPoses.ROBOT_BLUE_AMP));
         // IO.commandController.y().toggleOnTrue(new InstantCommand(SubSystems.swerve_drive_subsystem::toggleAprilTags));
 
-        // IO.commandController.a().onTrue(new InstantCommand(SubSystems.note_arm::openClaw));
-        // IO.commandController.b().onTrue(new InstantCommand(SubSystems.note_arm::closeClaw));
+        IO.commandController.a().onTrue(new InstantCommand(SubSystems.note_arm::openClaw));
+        IO.commandController.b().onTrue(new InstantCommand(SubSystems.note_arm::closeClaw));
 
-        // IO.commandController.x().onTrue(SubSystems.note_arm.grabNoteFullCommand());
-        // IO.commandController.y().onTrue(SubSystems.note_arm.releaseNoteFullCommand());
+        IO.commandController.x().onTrue(SubSystems.note_arm.grabNoteFullCommand());
+        IO.commandController.y().onTrue(SubSystems.note_arm.releaseNoteFullCommand());
 
 
         // IO.commandController.rightCTrigger().whileTrue(new MoveArmCommand(SubSystems.climb_subsystem, getClimberSpeed(), isShooting()));

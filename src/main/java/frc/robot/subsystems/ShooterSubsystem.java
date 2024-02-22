@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -35,6 +36,9 @@ public class ShooterSubsystem extends SubsystemBase {
         feed_motor_encoder = feed_motor.getEncoder();
         launch_motor_encoder = launch_motor.getEncoder();
 
+        feed_motor.setIdleMode(IdleMode.kBrake);
+        launch_motor.setIdleMode(IdleMode.kBrake);
+
         feed_motor.setSmartCurrentLimit(FEED_SMART_CURRENT_LIMIT);
         launch_motor.setSmartCurrentLimit(LAUNCH_SMART_CURRENT_LIMIT);
 
@@ -42,6 +46,9 @@ public class ShooterSubsystem extends SubsystemBase {
         // bore_encoder.setDistancePerRotation(-1);
         // bore_encoder.setDistancePerRotation(-1);
         // bore_encoder.reset();
+
+        //39.544994
+        //65.796393
     }
 
     public double getFeedMotorVelocity(){ return feed_motor_encoder.getVelocity(); }
@@ -76,6 +83,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     @Override public void periodic(){
+        SmartDashboard.putNumber("Shooter/ShootingVelocity", launch_motor_encoder.getVelocity());
         // SmartDashboard.putBoolean("Shooter/Connected", bore_encoder.isConnected());
         // SmartDashboard.putNumber("Shooter/Absolute Position", getAngleDegrees());
         // SmartDashboard.putNumber("Shooter/Distance", bore_encoder.getDistance());
