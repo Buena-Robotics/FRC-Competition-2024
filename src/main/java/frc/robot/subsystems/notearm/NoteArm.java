@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.utils.TunableNumber;
 
 public class NoteArm extends SubsystemBase {
     private static final PneumaticsModuleType PNEUMATICS_MODULE_TYPE = PneumaticsModuleType.REVPH;
@@ -124,7 +125,7 @@ public class NoteArm extends SubsystemBase {
             .andThen(new WaitCommand(DELAY))
             .andThen(pushArmOutCommand());
     }
-
+    private TunableNumber delay = new TunableNumber("NoteArmDelay", 0);
     public Command releaseNoteFullCommand(){
         // if(isClawOpen() || !isArmUp() || !isArmOut()) return this.runOnce(() -> {});
         return releaseNoteCommand()
@@ -132,7 +133,7 @@ public class NoteArm extends SubsystemBase {
             .andThen(pullArmInCommand())
             .andThen(new WaitCommand(DELAY))
             .andThen(pullArmDownCommand())
-            .andThen(new WaitCommand(DELAY))
+            .andThen(new WaitCommand(0.05))
             .andThen(pushArmOutCommand());
     }
 }

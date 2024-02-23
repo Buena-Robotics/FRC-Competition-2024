@@ -33,13 +33,13 @@ public class SwerveDrive extends SubsystemBase {
     public static final TunableNumber max_angular_acceleration_per_second = new TunableNumber("Drive/MaxDriveAngularAcceleration", Math.PI / 2);
     
     private static final double CENTER_TO_MODULE = Units.inchesToMeters(10.75);
-    private static final Matrix<N3, N1> POSITION_STD_DEV = VecBuilder.fill(0.01, 0.01, 1000);
+    private static final Matrix<N3, N1> POSITION_STD_DEV = VecBuilder.fill(0.01, 0.01, 0.1);
     private static final Matrix<N3, N1> VISION_STD_DEV   = VecBuilder.fill(1, 1, 100000);
     private static final Matrix<N3, N1> VISION_FIRST_STD_DEV   = VecBuilder.fill(0.5, 0.5, 0.1);
     private static final int MAX_NAVX_CALIBRATION_TIME_MS = 20 * 1000;
-
+//0.150466
     private static final String[] module_names = { "Front Right", "Front Left", "Back Right", "Back Left" };
-    private static final double[] abs_encoder_offsets = { 0.975905, 2.845395, 2.04, 5.131805 };
+    private static final double[] abs_encoder_offsets = { 4.071693, 2.830042 + Math.PI, 5.274043, 1.992770 + Math.PI };
     
     private static final Translation2d front_right_position = new Translation2d(CENTER_TO_MODULE,  -CENTER_TO_MODULE); // (+, -)
     private static final Translation2d front_left_position  = new Translation2d(CENTER_TO_MODULE,   CENTER_TO_MODULE); // (+, +)
@@ -56,13 +56,13 @@ public class SwerveDrive extends SubsystemBase {
     private final SwerveModule[] modules;
     private final SwerveDrivePoseEstimator pose_estimator;
 
-    private Pose2d robot_pose = new Pose2d();
+    private Pose2d robot_pose = new Pose2d(1.567501, 5.380708, Rotation2d.fromDegrees(180));
     private boolean found_pose = false;
 
     public SwerveDrive(){
         modules = new SwerveModule[4];
         for(int i = 0; i < 4; i++)
-            if(Robot.isReal()) modules[i] = new SwerveModuleReal(module_names[i], i*2 + 1, i*2 + 2, i, new Rotation2d(abs_encoder_offsets[i]));
+            if(Robot.isReal()) modules[i] = new SwerveModuleReal(module_names[i], i*2 + 1, i*2 + 2, i, abs_encoder_offsets[i]);
             else modules[i] = new SwerveModuleSim(module_names[i], i);
         
         pose_estimator = new SwerveDrivePoseEstimator(kinematics, navx.getRotation2d(),
@@ -83,8 +83,8 @@ public class SwerveDrive extends SubsystemBase {
             navx.reset();
             navx.resetDisplacement();
         }).start();
-        // for(int i = 0; i < 4; i++)
-            // SmartDashboard.putData(module_names[i], modules[i]);
+        for(int i = 0; i < 4; i++)
+            SmartDashboard.putData(module_names[i], modules[i]);
         // FieldVisualizer.getField().getObject("Test").setPose(new Pose2d());
     }
 

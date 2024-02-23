@@ -119,6 +119,7 @@ public abstract class SwerveModule implements Sendable {
 
     @Override public void initSendable(SendableBuilder builder){
         builder.setSmartDashboardType("Swerve Module");
+        builder.addStringProperty("abs encoder", this::sState, null);
         builder.addStringProperty("state", this::sState, null);
         builder.addStringProperty("position", this::sPos, null);
     }

@@ -10,6 +10,7 @@ import frc.robot.commands.LaunchNote;
 import frc.robot.commands.MoveArmCommand;
 import frc.robot.commands.PrepareLaunch;
 import frc.robot.commands.SwerveJoystickCmd;
+import frc.robot.subsystems.ClimbSubsystem.ArmPosition;
 import frc.robot.subsystems.drive.SwerveDrive;
 import frc.robot.utils.FieldVisualizer;
 
@@ -41,7 +42,7 @@ public class RobotContainer {
             return 0.09;
         else if(IO.controller.getPOV() == 90) // RIGHT
             return -0.09;
-        return -IO.controller.getRightX();
+        return IO.controller.getRightX();
     }
 
     private double getForwardSpeed(){
@@ -49,11 +50,11 @@ public class RobotContainer {
             return -0.09;
         else if(IO.controller.getPOV() == 180) // Backward
             return 0.09;
-        return -IO.controller.getLeftY();
+        return IO.controller.getLeftY();
     }
 
     private double getSideSpeed(){
-        return -IO.controller.getLeftX();
+        return IO.controller.getLeftX();
     }
 
     private double getClimberSpeed() {
@@ -94,6 +95,11 @@ public class RobotContainer {
 
         IO.commandController.x().onTrue(SubSystems.note_arm.grabNoteFullCommand());
         IO.commandController.y().onTrue(SubSystems.note_arm.releaseNoteFullCommand());
+
+        IO.dpadUp.onTrue(SubSystems.climb_subsystem.moveArmToPosition(ArmPosition.UP));
+        IO.dpadDown.onTrue(SubSystems.climb_subsystem.moveArmToPosition(ArmPosition.DOWN));
+        IO.dpadLeft.onTrue(SubSystems.climb_subsystem.moveArmToPosition(ArmPosition.SPEAKER_CLOSE));
+        IO.dpadRight.onTrue(SubSystems.climb_subsystem.moveArmToPosition(ArmPosition.SPEAKER_STAGE));
 
 
         // IO.commandController.rightCTrigger().whileTrue(new MoveArmCommand(SubSystems.climb_subsystem, getClimberSpeed(), isShooting()));

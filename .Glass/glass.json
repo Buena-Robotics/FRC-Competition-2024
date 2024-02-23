@@ -37,11 +37,12 @@
           "Drive": {
             "Joystick": {
               "open": true
-            },
+            }
+          },
+          "SModule": {
             "open": true
           }
-        },
-        "open": true
+        }
       },
       "photonvision": {
         "Microsoft_LifeCam_HD-3000": {
@@ -49,7 +50,8 @@
         },
         "USB_Camera": {
           "open": true
-        }
+        },
+        "open": true
       }
     },
     "types": {

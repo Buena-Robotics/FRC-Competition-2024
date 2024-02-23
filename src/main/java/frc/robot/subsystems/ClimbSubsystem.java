@@ -7,6 +7,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
@@ -35,7 +36,7 @@ public class ClimbSubsystem extends SubsystemBase {
     public ClimbSubsystem() {
         winch_motor.setIdleMode(IdleMode.kBrake);
         // winch_encoder.setPosition(getBoreAngleDegrees());
-        winch_encoder.setPositionConversionFactor(0.0104357967249);
+        winch_encoder.setPositionConversionFactor(3.0 / 320.0);
     }
 
     @Override public void periodic() {
@@ -51,10 +52,40 @@ public class ClimbSubsystem extends SubsystemBase {
         // if (lock) lockArm(shooting);
     }
 
-    public void moveArmToPosition(ArmPosition position) {
-        if (getBoreAngleDegrees() < position.getEncoderPos()) {
-            moveArm(0.5, true, true);
-        }
+    public double getSetpointVoltage(double setpoint){
+        double measurement = getBoreAngleDegrees();
+        if(measurement - setpoint < 0)
+            return Math.sqrt(-measurement + setpoint);
+        else
+            return -Math.sqrt(measurement - setpoint);
+    }
+    public void runSetpoint(double setpoint){
+        double voltage = MathUtil.clamp(getSetpointVoltage(setpoint), -12, 12);
+        // double voltage = MathUtil.clamp(getSetpointVoltage(setpoint), -12, 12);
+        winch_motor.setVoltage(voltage);
+    }
+
+    public Command moveArmToPosition(ArmPosition position) {
+        return new Command() {
+            private final double setpoint = position.getPosDegrees();
+            private double measurement = getBoreAngleDegrees();
+
+            @Override public void execute() {
+                runSetpoint(setpoint);
+                this.measurement = getBoreAngleDegrees();
+            }
+            @Override public void end(boolean interrupted) {
+                winch_motor.setVoltage(0);
+            }
+            @Override public boolean isFinished() {
+                return Math.abs(measurement - setpoint) < 3;
+            }
+        };
+        // double setpoint = position.getPosDegrees();
+        // runSetpoint(setpoint);
+        // double measurement = getBoreAngleDegrees();
+        // if(Math.abs(measurement - setpoint) < 5)
+        //     winch_motor.setVoltage(0);
     }
 
     public double getBoreAngleDegrees() {
@@ -73,20 +104,20 @@ public class ClimbSubsystem extends SubsystemBase {
         winch_motor.setIdleMode(IdleMode.kCoast);
     }
 
-    enum ArmPosition {
-        DOWN(0), 
-        SPEAKER_CLOSE(0), 
-        SPEAKER_STAGE(0), 
+    public enum ArmPosition {
+        DOWN(64.127554), 
+        SPEAKER_CLOSE(38.472514),
+        SPEAKER_STAGE(49.373346),
         UP(0);
 
-        double encoderPos;
+        double degrees;
 
-        private ArmPosition(double encoderPos) {
-            this.encoderPos = encoderPos;
+        private ArmPosition(double degrees) {
+            this.degrees = degrees;
         }
 
-        public double getEncoderPos() {
-            return encoderPos;
+        public double getPosDegrees() {
+            return degrees;
         };
     }
 }

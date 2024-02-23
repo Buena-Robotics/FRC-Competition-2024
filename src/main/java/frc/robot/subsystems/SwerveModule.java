@@ -76,6 +76,10 @@ public class SwerveModule implements Sendable {
     public double getDriveVelocity() { return drive_encoder.getVelocity(); }
     public double getTurnVelocity()  { return  turn_encoder.getVelocity(); }
 
+    public double getAbsoluteEncoderValue(){
+        return absolute_encoder.getVoltage() / RobotController.getVoltage5V();
+    }
+
     public double getAbsoluteEncoderRadians(){ 
         double angle = absolute_encoder.getVoltage() / RobotController.getVoltage5V();
         angle *= 2.0 * Math.PI;
@@ -115,7 +119,7 @@ public class SwerveModule implements Sendable {
     @Override public void initSendable(SendableBuilder builder){
         builder.setSmartDashboardType("Swerve Module");
         builder.publishConstInteger("Channel", absolute_encoder.getChannel());
-        builder.addDoubleProperty("Absolute Encoder Value Rad", this::getAbsoluteEncoderRadians, null);
+        builder.addDoubleProperty("Absolute Encoder", this::getAbsoluteEncoderValue, null);
         builder.addDoubleProperty("Drive Speed Meters|Sec", this::getDriveVelocity, null);
         builder.addDoubleProperty("Turn Speed Meters|Sec", this::getTurnVelocity, null);
         builder.addDoubleProperty("Rotation Rad", this::getRotationRadians, null);
