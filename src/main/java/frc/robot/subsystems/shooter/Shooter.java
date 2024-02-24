@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.shooter;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
@@ -6,12 +6,11 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class ShooterSubsystem extends SubsystemBase {
+public class Shooter extends SubsystemBase {
     private static final int FEED_MOTOR_ID = 10;
     private static final int LAUNCH_MOTOR_ID = 9;
     private static final int FEED_SMART_CURRENT_LIMIT = 80; 
@@ -32,7 +31,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private double position_before_clearing_for_note_arm = 0;
 
-    public ShooterSubsystem() {
+    public Shooter() {
         feed_motor_encoder = feed_motor.getEncoder();
         launch_motor_encoder = launch_motor.getEncoder();
 

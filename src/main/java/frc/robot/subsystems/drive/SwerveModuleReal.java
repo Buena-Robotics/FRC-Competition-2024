@@ -8,19 +8,13 @@ import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
-import frc.robot.Constants.IO;
 import frc.robot.utils.SparkMaxUtils;
-import frc.robot.utils.TunableNumber;
 
 public class SwerveModuleReal extends SwerveModule {
-    private final double DRIVE_ENCODER_REDUCTION = 1; // (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
-    private final double TURN_ENCODER_REDUCTION = 1;//150.0 / 7.0;
-
     private final CANSparkMax drive_motor;
     private final CANSparkMax turn_motor;
     private final RelativeEncoder drive_encoder;
@@ -35,10 +29,12 @@ public class SwerveModuleReal extends SwerveModule {
         this.turn_motor =  new CANSparkMax(turn_motor_id,  MotorType.kBrushless);
 
         this.drive_encoder = drive_motor.getEncoder();
+        this.drive_encoder.setPosition(0.0);
         this.drive_encoder.setPositionConversionFactor(DRIVE_ENCODER_ROTATION_TO_METERS);
         this.drive_encoder.setVelocityConversionFactor(DRIVE_ENCODER_RPM_TO_METERS_PER_SECOND);
         
         this.turn_encoder = turn_motor.getEncoder();
+        this.turn_encoder.setPosition(getAbsoluteEncoderRadians());
         this.turn_encoder.setPositionConversionFactor(TURN_ENCODER_ROTATION_TO_RADIANS);
         this.turn_encoder.setVelocityConversionFactor(TURN_ENCODER_RPM_TO_RADIANS_PER_SECOND);
 
@@ -48,16 +44,6 @@ public class SwerveModuleReal extends SwerveModule {
         this.drive_motor.enableVoltageCompensation(12.0);
         this.turn_motor.enableVoltageCompensation(12.0);
         
-        this.drive_encoder.setPosition(0.0);
-        this.drive_encoder.setVelocityConversionFactor(DRIVE_ENCODER_RPM_TO_METERS_PER_SECOND);
-        this.drive_encoder.setMeasurementPeriod(10);
-        this.drive_encoder.setAverageDepth(2);
-    
-        this.turn_encoder.setPosition(getAbsoluteEncoderRadians());
-        this.turn_encoder.setVelocityConversionFactor(TURN_ENCODER_RPM_TO_RADIANS_PER_SECOND);
-        this.turn_encoder.setMeasurementPeriod(10);
-        this.turn_encoder.setAverageDepth(2);
-
         checkConnections();
     }
 

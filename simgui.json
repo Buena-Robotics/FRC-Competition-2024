@@ -11,16 +11,33 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Climb": "Mechanism2d",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/VisionSystemSim-VisionSim/Sim Field": "Field2d"
     },
     "windows": {
+      "/SmartDashboard/Climb": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/Field": {
         "AprilTags": {
           "arrows": false,
+          "image": "C:\\dev\\FRC\\Competition-2024\\.Glass\\res\\tag-blue.png",
           "length": 0.30480000376701355,
           "selectable": false,
           "width": 0.30480000376701355
+        },
+        "Cameras": {
+          "arrowColor": [
+            255.0,
+            0.0,
+            0.0,
+            255.0
+          ],
+          "arrowSize": 22,
+          "style": "Hidden"
         },
         "Robot": {
           "arrowColor": [
@@ -44,6 +61,7 @@
         },
         "SwerveModules": {
           "arrows": false,
+          "image": "C:\\dev\\FRC\\Competition-2024\\.Glass\\res\\swerve_module.png",
           "length": 0.20319999754428864,
           "selectable": false,
           "width": 0.20319999754428864
@@ -74,8 +92,22 @@
     }
   },
   "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    },
     "transitory": {
       "SmartDashboard": {
+        "Climb": {
+          "open": true
+        },
+        "NoteArm": {
+          "double[]##v_/SmartDashboard/NoteArm/ColorHSV": {
+            "open": true
+          }
+        },
+        "Shooter": {
+          "open": true
+        },
         "Swerve": {
           "Back Left": {
             "open": false
@@ -177,9 +209,6 @@
         }
       }
     }
-  },
-  "NetworkTables Info": {
-    "visible": true
   },
   "NetworkTables Settings": {
     "mode": "",

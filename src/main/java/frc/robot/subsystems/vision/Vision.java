@@ -19,7 +19,6 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.SubSystems;
 import frc.robot.utils.FieldVisualizer;
 
 public abstract class Vision extends SubsystemBase {
@@ -57,10 +56,10 @@ public abstract class Vision extends SubsystemBase {
         FieldVisualizer.setAprilTags(field_layout);
         cameras.add(new VisionCamera("Microsoft_LifeCam_HD-3000", 
             new Transform3d(
-                Units.inchesToMeters(13),
-                Units.inchesToMeters(0),
-                Units.inchesToMeters(34),
-                new Rotation3d(0,Units.degreesToRadians(-28),0))));
+                Units.inchesToMeters(14.5),
+                Units.inchesToMeters(14.5),
+                Units.inchesToMeters(69/4.0),
+                new Rotation3d(0,Units.degreesToRadians(-30),0))));
     }
 
     protected abstract Optional<TimestampedVisionMeasurement> getVisionMeasurement(VisionCamera camera);

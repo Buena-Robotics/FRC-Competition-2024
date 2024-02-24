@@ -8,7 +8,6 @@ import org.opencv.core.Point;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
@@ -22,9 +21,9 @@ public final class FieldConstants {
         }
     } 
 
-    private static final double NOTE_SIZE    = Units.inchesToMeters(13);
-    private static final double ROBOT_LENGTH = Units.inchesToMeters(26);
-    private static final double ROBOT_WIDTH  = Units.inchesToMeters(26);
+    // private static final double NOTE_SIZE    = Units.inchesToMeters(13);
+    // private static final double ROBOT_LENGTH = Units.inchesToMeters(26);
+    // private static final double ROBOT_WIDTH  = Units.inchesToMeters(26);
     // private static final Pose2d
     //     NOTE_BLUE_TOP             = new Pose2d(2.887, 7.010, new Rotation2d()),
     //     NOTE_BLUE_CENTER          = new Pose2d(2.887, 5.560, new Rotation2d()),

@@ -13,11 +13,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.Constants.SubSystems;
 import frc.robot.utils.FieldVisualizer;
@@ -34,10 +32,9 @@ public class SwerveDrive extends SubsystemBase {
     
     private static final double CENTER_TO_MODULE = Units.inchesToMeters(10.75);
     private static final Matrix<N3, N1> POSITION_STD_DEV = VecBuilder.fill(0.01, 0.01, 0.1);
-    private static final Matrix<N3, N1> VISION_STD_DEV   = VecBuilder.fill(1, 1, 100000);
+    private static final Matrix<N3, N1> VISION_STD_DEV   = VecBuilder.fill(1, 1, 100);
     private static final Matrix<N3, N1> VISION_FIRST_STD_DEV   = VecBuilder.fill(0.5, 0.5, 0.1);
     private static final int MAX_NAVX_CALIBRATION_TIME_MS = 20 * 1000;
-//0.150466
     private static final String[] module_names = { "Front Right", "Front Left", "Back Right", "Back Left" };
     private static final double[] abs_encoder_offsets = { 4.071693, 2.830042 + Math.PI, 5.274043, 1.992770 + Math.PI };
     
@@ -83,8 +80,8 @@ public class SwerveDrive extends SubsystemBase {
             navx.reset();
             navx.resetDisplacement();
         }).start();
-        for(int i = 0; i < 4; i++)
-            SmartDashboard.putData(module_names[i], modules[i]);
+        // for(int i = 0; i < 4; i++)
+            // SmartDashboard.putData(module_names[i], modules[i]);
         // FieldVisualizer.getField().getObject("Test").setPose(new Pose2d());
     }
 
@@ -115,7 +112,7 @@ public class SwerveDrive extends SubsystemBase {
             robot_pose.transformBy(new Transform2d(back_left_position, modules[3].getAngle()))
             );
         
-        // FieldVisualizer.getField().getObject("Cameras").setPoses(SubSystems.vision.getAllRobotToCameraPoses(robot_pose));
+        FieldVisualizer.getField().getObject("Cameras").setPoses(SubSystems.vision.getAllRobotToCameraPoses(robot_pose));
     }
 
     public Pose2d getPose(){ return robot_pose; }

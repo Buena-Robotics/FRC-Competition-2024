@@ -1,35 +1,114 @@
 package frc.robot.subsystems.climber;
 
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color8Bit;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 
 public class Climb extends SubsystemBase {
-    private Mechanism2d mechanism = new Mechanism2d(60, 60);
-    private Rotation2d shooter_arm_rotation = Rotation2d.fromDegrees(95);
-    private MechanismLigament2d shooter_arm_joint = new MechanismLigament2d("arm", 35, shooter_arm_rotation.getDegrees(), 4, new Color8Bit("#802020"));
+    protected static final double WINCH_ENCODER_GEAR_RATIO = 1/64.0;
+    protected static final double WINCH_ENCODER_CONVERSION_FACTOR = WINCH_ENCODER_GEAR_RATIO * 360;
+    private final int WINCH_MOTOR_ID = 12;
+    private final int BORE_ENCODER_CHANNEL = 0;
 
-    public Climb(){
-        mechanism.getRoot("root", 10, 10).append(shooter_arm_joint);
-        SmartDashboard.putData("Climb", mechanism);
-    }
+    private final CANSparkMax winch_motor = new CANSparkMax(WINCH_MOTOR_ID, MotorType.kBrushless);
+    private final RelativeEncoder winch_encoder = winch_motor.getEncoder();
+    private final DutyCycleEncoder bore_encoder = new DutyCycleEncoder(BORE_ENCODER_CHANNEL);
 
     
+    public boolean armLocked = false;
+
+    public Climb() {
+        winch_motor.setIdleMode(IdleMode.kBrake);
+        winch_encoder.setPosition(getBoreAngleDegrees() / WINCH_ENCODER_CONVERSION_FACTOR);
+        winch_encoder.setPositionConversionFactor(WINCH_ENCODER_CONVERSION_FACTOR);
+    }
 
     @Override public void periodic() {
-        shooter_arm_rotation = shooter_arm_rotation.plus(Rotation2d.fromDegrees(Constants.IO.controller.getLeftTriggerAxis()));
-        shooter_arm_rotation = shooter_arm_rotation.minus(Rotation2d.fromDegrees(Constants.IO.controller.getRightTriggerAxis()));
+        SmartDashboard.putNumber("arm_encoder", getBoreAngleDegrees());
+        SmartDashboard.putNumber("winch_encoder", getWinchAngleDegrees());
+    }
 
-        shooter_arm_rotation = Rotation2d.fromDegrees(MathUtil.clamp(shooter_arm_rotation.getDegrees(), 0, 95));
+    public void moveArm(double speed, boolean lock, boolean shooting) {
+        // unlockArm();
+        // if(speed < 0 && Units.radiansToDegrees(winch_encoder.getPosition()) <= 5);
+        winch_motor.set(speed);
 
-        shooter_arm_rotation = shooter_arm_rotation.plus(Rotation2d.fromDegrees(0.6));
+        // if (lock) lockArm(shooting);
+    }
 
-        shooter_arm_joint.setAngle(shooter_arm_rotation);
-    }    
+    public double getSetpointVoltage(double setpoint){
+        double measurement = getBoreAngleDegrees();
+        if(measurement - setpoint < 0)
+            return Math.sqrt(-measurement + setpoint);
+        else
+            return -Math.sqrt(measurement - setpoint);
+    }
+    public void runSetpoint(double setpoint){
+        double voltage = MathUtil.clamp(getSetpointVoltage(setpoint), -12, 12);
+        // double voltage = MathUtil.clamp(getSetpointVoltage(setpoint), -12, 12);
+        winch_motor.setVoltage(voltage);
+    }
+
+    public Command moveArmToPosition(ArmPosition position) {
+        return new Command() {
+            private final double setpoint = position.getPosDegrees();
+            private double measurement = getBoreAngleDegrees();
+
+            @Override public void execute() {
+                runSetpoint(setpoint);
+                this.measurement = getBoreAngleDegrees();
+            }
+            @Override public void end(boolean interrupted) {
+                winch_motor.setVoltage(0);
+            }
+            @Override public boolean isFinished() {
+                return Math.abs(measurement - setpoint) < 3;
+            }
+        };
+        // double setpoint = position.getPosDegrees();
+        // runSetpoint(setpoint);
+        // double measurement = getBoreAngleDegrees();
+        // if(Math.abs(measurement - setpoint) < 5)
+        //     winch_motor.setVoltage(0);
+    }
+
+    public double getBoreAngleDegrees() {
+        return 369 * (bore_encoder.getAbsolutePosition() - 0.146338);
+    }
+    public double getWinchAngleDegrees(){
+        return winch_encoder.getPosition();
+    }
+
+
+    public void lockArm(boolean shooting) {
+        winch_motor.setIdleMode(IdleMode.kBrake);
+    }
+
+    public void unlockArm() {
+        winch_motor.setIdleMode(IdleMode.kCoast);
+    }
+
+    public enum ArmPosition {
+        DOWN(64.127554), 
+        SPEAKER_CLOSE(38.472514),
+        SPEAKER_STAGE(49.373346),
+        UP(0);
+
+        double degrees;
+
+        private ArmPosition(double degrees) {
+            this.degrees = degrees;
+        }
+
+        public double getPosDegrees() {
+            return degrees;
+        };
+    }
 }

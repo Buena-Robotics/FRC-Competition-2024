@@ -1,12 +1,6 @@
 package frc.robot.subsystems.notearm;
 
-
-import java.awt.Color;
-
 import com.revrobotics.ColorSensorV3;
-import com.revrobotics.ColorSensorV3.ColorSensorResolution;
-import com.revrobotics.ColorSensorV3.ProximitySensorMeasurementRate;
-import com.revrobotics.ColorSensorV3.ProximitySensorResolution;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -15,10 +9,10 @@ import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.utils.TunableNumber;
 
 public class NoteArm extends SubsystemBase {
     private static final PneumaticsModuleType PNEUMATICS_MODULE_TYPE = PneumaticsModuleType.REVPH;
@@ -78,15 +72,14 @@ public class NoteArm extends SubsystemBase {
         return 100 - (proximity_11bit * PROXIMITY_VALUE_PER_MM);
     }
 
-    static final double _20BIT_TO_8BIT_SCALE_FACTOR = 4096; 
-    private int _20bitTo8bit(int value20bit){ return (int)(value20bit / _20BIT_TO_8BIT_SCALE_FACTOR); }
-    private int getColorSensorRed8bit()  { return _20bitTo8bit(color_sensor.getRed()); }
-    private int getColorSensorGreen8bit(){ return _20bitTo8bit(color_sensor.getGreen()); }
-    private int getColorSensorBlue8bit() { return _20bitTo8bit(color_sensor.getBlue()); }
-
     public boolean detectingNoteColor(){
-        final float[] HSV = Color.RGBtoHSB(getColorSensorRed8bit(), getColorSensorGreen8bit(), getColorSensorBlue8bit(), null);
-        SmartDashboard.putNumberArray("NoteArm/ColorDetectingHSV", new Double[]{(double)getColorSensorRed8bit(), (double)getColorSensorGreen8bit(), (double)getColorSensorBlue8bit()});
+        final Color color = color_sensor.getColor();
+        final float[] HSV = java.awt.Color.RGBtoHSB((int)(color.red*255), (int)(color.green*255), (int)(color.blue*255),  null);
+
+        SmartDashboard.putNumberArray("NoteArm/ColorRGBNormal", new Double[]{color.red, color.green, color.blue});
+        SmartDashboard.putNumberArray("NoteArm/ColorRGB", new Double[]{color.red * 255, color.green * 255, color.blue * 255});
+        SmartDashboard.putNumberArray("NoteArm/ColorHSV", new Double[]{(double)HSV[0], (double)HSV[1], (double)HSV[2]});
+
         if(HSV[0] < NOTE_HUE_LOWER_THRESHOLD || HSV[0] > NOTE_HUE_UPPER_THRESHOLD)
             if(HSV[1] > NOTE_SATURATION_THRESHOLD && HSV[2] > NOTE_VALUE_THRESHOLD) return true;
         return false;
@@ -125,7 +118,6 @@ public class NoteArm extends SubsystemBase {
             .andThen(new WaitCommand(DELAY))
             .andThen(pushArmOutCommand());
     }
-    private TunableNumber delay = new TunableNumber("NoteArmDelay", 0);
     public Command releaseNoteFullCommand(){
         // if(isClawOpen() || !isArmUp() || !isArmOut()) return this.runOnce(() -> {});
         return releaseNoteCommand()

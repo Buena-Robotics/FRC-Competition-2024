@@ -9,11 +9,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.subsystems.ClimbSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.climber.Climb;
+import frc.robot.subsystems.climber.ClimbSim;
 import frc.robot.subsystems.drive.SwerveDrive;
 import frc.robot.subsystems.notearm.NoteArm;
+import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionReal;
 import frc.robot.subsystems.vision.VisionSim;
@@ -35,11 +35,11 @@ public final class Constants {
     }
 
     public static class SubSystems{
-        public static final ClimbSubsystem climb_subsystem = new ClimbSubsystem();
-        public static final Vision vision = Robot.isReal() ? new VisionReal() : new VisionSim();
+        public static final Climb climb = new ClimbSim();
+        public static final Shooter shooter = new Shooter();
         public static final NoteArm note_arm = new NoteArm();
         public static final SwerveDrive swerve_drive = new SwerveDrive();
-        public static final ShooterSubsystem shooter = new ShooterSubsystem();
+        public static final Vision vision = Robot.isReal() ? new VisionReal() : new VisionSim();
     }
 
     public static class FieldPoses {

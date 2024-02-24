@@ -5,8 +5,12 @@
 package frc.robot;
 
 import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -15,7 +19,15 @@ public class Robot extends LoggedRobot {
 
     private RobotContainer robot_container;
 
+    public Robot(){
+        super(Robot.defaultPeriodSecs);
+    }
     @Override public void robotInit() {
+        Logger.addDataReceiver(new WPILOGWriter("/media/sda2/"));
+        LoggedPowerDistribution.getInstance(50, ModuleType.kRev);
+        Logger.start();
+        Logger.end();
+
         robot_container = new RobotContainer();
         DriverStation.silenceJoystickConnectionWarning(true);
     }
@@ -29,7 +41,6 @@ public class Robot extends LoggedRobot {
     @Override public void disabledPeriodic() {}
 
     @Override public void autonomousInit() {
-        System.out.println("auto");
         m_autonomousCommand = robot_container.getAutonomousCommand();
 
         if (m_autonomousCommand != null)
