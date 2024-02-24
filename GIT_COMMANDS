@@ -1,0 +1,3 @@
+Setting dev branch to main:
+Get commit_id in main from github
+git branch -f "branch_name" commit_id
