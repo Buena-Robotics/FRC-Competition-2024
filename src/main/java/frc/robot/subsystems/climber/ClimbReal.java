@@ -2,10 +2,13 @@ package frc.robot.subsystems.climber;
 
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.SparkLimitSwitch.Type;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkLimitSwitch;
 
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class ClimbReal extends Climb {
     private static final int WINCH_MOTOR_ID = 12;
@@ -14,13 +17,14 @@ public class ClimbReal extends Climb {
     private final CANSparkMax winch_motor = new CANSparkMax(WINCH_MOTOR_ID, MotorType.kBrushless);
     private final RelativeEncoder winch_encoder = winch_motor.getEncoder();
     private final DutyCycleEncoder bore_encoder = new DutyCycleEncoder(BORE_ENCODER_CHANNEL);
-    
+    private final SparkLimitSwitch limit_switch;
     public ClimbReal() {
         super();
         this.bore_encoder.setPositionOffset(0.146338);
         this.bore_encoder.setDistancePerRotation(Math.PI * 2);
 
         this.winch_motor.setIdleMode(IdleMode.kBrake);
+        this.limit_switch = this.winch_motor.getForwardLimitSwitch(Type.kNormallyOpen);
         this.winch_motor.enableVoltageCompensation(12.0);
         this.winch_encoder.setPositionConversionFactor(WINCH_MOTOR_GEAR_RATIO);
         this.winch_encoder.setVelocityConversionFactor(WINCH_MOTOR_GEAR_RATIO);
@@ -47,6 +51,8 @@ public class ClimbReal extends Climb {
     @Override public void periodic() {
         super.periodic();
         winch_motor.clearFaults();
+        SmartDashboard.putBoolean("LimitSwitch is pressed", limit_switch.isPressed());
+        
 
         // SmartDashboard.putNumber("bore angle", getBoreAngleDegrees());
         // SmartDashboard.putNumber("bore distance", bore_encoder.getDistance());

@@ -3,18 +3,24 @@ package frc.robot.subsystems.vision;
 import java.util.List;
 import java.util.Optional;
 
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.targeting.MultiTargetPNPResult;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 
 public class VisionReal extends Vision {
     public VisionReal(){
         super();
     }
-
+/*
     private TimestampedVisionMeasurement getVisionMeasurementMultiTarget(VisionCamera camera, PhotonPipelineResult pipeline_result, double result_timestamp){
         final MultiTargetPNPResult multitag_result = pipeline_result.getMultiTagResult();
         final List<Integer> fiducial_ids = multitag_result.fiducialIDsUsed;
@@ -43,22 +49,57 @@ public class VisionReal extends Vision {
         }
         return Optional.empty();
     }
-    
+*/  
+    public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
+    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
+    public Matrix<N3, N1> getEstimationStdDevs(VisionCamera camera, Pose2d estimatedPose) {
+        var estStdDevs = kSingleTagStdDevs;
+        var targets = camera.photon_camera.getLatestResult().getTargets();
+        int numTags = 0;
+        double avgDist = 0;
+        for (var tgt : targets) {
+            var tagPose = camera.photon_pose_estimator.getFieldTags().getTagPose(tgt.getFiducialId());
+            if (tagPose.isEmpty()) continue;
+            numTags++;
+            avgDist +=
+                    tagPose.get().toPose2d().getTranslation().getDistance(estimatedPose.getTranslation());
+        }
+        if (numTags == 0) return estStdDevs;
+        avgDist /= numTags;
+        // Decrease std devs if multiple targets are visible
+        if (numTags > 1) estStdDevs = kMultiTagStdDevs;
+        // Increase std devs based on (average) distance
+        if (numTags == 1 && avgDist > 4)
+            estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+        else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+
+        return estStdDevs;
+    }
+
     @Override protected Optional<TimestampedVisionMeasurement> getVisionMeasurement(VisionCamera camera){
         camera.tracked_target_poses.clear();
 
         if(!camera.photon_camera.isConnected()) return Optional.empty();
 
-        final PhotonPipelineResult pipeline_result = camera.photon_camera.getLatestResult();
-        final double result_timestamp = pipeline_result.getTimestampSeconds();
+        final Optional<EstimatedRobotPose> optional_estimated_pose = camera.photon_pose_estimator.update();
 
-        if(result_timestamp != camera.previous_vision_result_timestamp && pipeline_result.hasTargets()){
-            camera.previous_vision_result_timestamp = result_timestamp;
-            if(pipeline_result.getMultiTagResult().estimatedPose.isPresent) // Multi Tag Detection
-                return Optional.of(getVisionMeasurementMultiTarget(camera, pipeline_result, result_timestamp));
-            else // Single Tag Detection
-                return getVisionMeasurementSingleTarget(camera, pipeline_result, result_timestamp);
+        if(optional_estimated_pose.isEmpty())
+            return Optional.empty();
+        else{
+            EstimatedRobotPose estimated_pose = optional_estimated_pose.get();
+            return Optional.of(new TimestampedVisionMeasurement(
+                estimated_pose.estimatedPose.toPose2d(), 
+                estimated_pose.timestampSeconds,
+                getEstimationStdDevs(camera, estimated_pose.estimatedPose.toPose2d()) ));
         }
-        return Optional.empty();
+
+        // if(result_timestamp != camera.previous_vision_result_timestamp && pipeline_result.hasTargets()){
+        //     camera.previous_vision_result_timestamp = result_timestamp;
+        //     if(pipeline_result.getMultiTagResult().estimatedPose.isPresent) // Multi Tag Detection
+        //         return Optional.of(getVisionMeasurementMultiTarget(camera, pipeline_result, result_timestamp));
+        //     else // Single Tag Detection
+        //         return getVisionMeasurementSingleTarget(camera, pipeline_result, result_timestamp);
+        // }
+        // return Optional.empty();
     }
 }

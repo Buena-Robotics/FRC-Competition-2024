@@ -25,7 +25,7 @@ public class Robot extends LoggedRobot {
         super(Robot.defaultPeriodSecs);
     }
     @Override public void robotInit() {
-        Logger.addDataReceiver(new WPILOGWriter("/AdvantageKit-ReplayLogs/Simulation/"));
+        Logger.addDataReceiver(new WPILOGWriter("/media/sda1/"));
         Logger.addDataReceiver(new NT4Publisher());
         LoggedPowerDistribution.getInstance(10, ModuleType.kRev);
         Logger.start();

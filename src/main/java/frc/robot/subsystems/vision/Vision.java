@@ -11,12 +11,15 @@ import org.photonvision.estimation.TargetModel;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -28,7 +31,8 @@ public abstract class Vision extends SubsystemBase {
     public static class TimestampedVisionMeasurement {
         public final Pose2d pose;
         public final double timestamp;
-        public TimestampedVisionMeasurement(Pose2d pose, double timestamp){ this.pose = pose; this.timestamp = timestamp; }
+        public final Matrix<N3, N1> std_devs;
+        public TimestampedVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> std_devs){ this.pose = pose; this.timestamp = timestamp; this.std_devs = std_devs; }
     }
     public static class VisionCamera {
         public final PhotonCamera photon_camera;
@@ -37,7 +41,7 @@ public abstract class Vision extends SubsystemBase {
         public ArrayList<Pose2d> tracked_target_poses = new ArrayList<Pose2d>();
         public VisionCamera(String photon_camera_name, Transform3d robot_to_camera){
             this.photon_camera = new PhotonCamera(photon_camera_name); 
-            this.photon_pose_estimator = new PhotonPoseEstimator(field_layout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robot_to_camera);
+            this.photon_pose_estimator = new PhotonPoseEstimator(field_layout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, photon_camera, robot_to_camera);
             this.photon_pose_estimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
             this.photon_pose_estimator.setTagModel(TargetModel.kAprilTag36h11);
         }
@@ -52,15 +56,16 @@ public abstract class Vision extends SubsystemBase {
 
     protected final ArrayList<VisionCamera> cameras = new ArrayList<VisionCamera>();
     protected final ArrayList<TimestampedVisionMeasurement> vision_measurements = new ArrayList<TimestampedVisionMeasurement>();
-
-    public Vision(){
-        FieldVisualizer.setAprilTags(field_layout);
-        cameras.add(new VisionCamera("Microsoft_LifeCam_HD-3000", 
-            new Transform3d(
+    public final Transform3d camera_pose = new Transform3d(
                 Units.inchesToMeters(14.5),
                 Units.inchesToMeters(14.5),
                 Units.inchesToMeters(69/4.0),
-                new Rotation3d(0,Units.degreesToRadians(-30),Units.degreesToRadians(-10)))));
+                new Rotation3d(0,Units.degreesToRadians(-20), 0));
+
+    public Vision(){
+        FieldVisualizer.setAprilTags(field_layout);
+        cameras.add(new VisionCamera("Microsoft_LifeCam_HD-3000", camera_pose));
+        
     }
 
     protected abstract Optional<TimestampedVisionMeasurement> getVisionMeasurement(VisionCamera camera);

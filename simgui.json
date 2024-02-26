@@ -96,10 +96,7 @@
         "left": 150,
         "right": 2961,
         "top": 79,
-        "width": 16.541748046875,
-        "window": {
-          "visible": true
-        }
+        "width": 16.541748046875
       }
     }
   },
@@ -109,9 +106,6 @@
     },
     "transitory": {
       "AdvantageKit": {
-        "Climb": {
-          "open": true
-        },
         "open": true
       },
       "FMSInfo": {
@@ -236,9 +230,6 @@
         }
       }
     }
-  },
-  "NetworkTables Info": {
-    "visible": true
   },
   "NetworkTables Settings": {
     "mode": "",

@@ -7,6 +7,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -20,6 +21,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import frc.robot.Robot;
 import frc.robot.Constants.SubSystems;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.utils.FieldVisualizer;
 import frc.robot.utils.TimerUtil;
 import frc.robot.utils.TunableNumber;
@@ -114,7 +116,9 @@ public class SwerveDrive extends SubsystemBase {
                 modules[2].getPosition(),
                 modules[3].getPosition()} );
         Logger.recordOutput("PoseEstimation/PoseEstimation", robot_pose);
-
+        Logger.recordOutput("CameraPoses/Test1", new Pose3d(robot_pose).plus(SubSystems.vision.camera_pose.inverse()));
+        Logger.recordOutput("CameraPoses/Test2", new Pose3d(robot_pose).plus(SubSystems.vision.camera_pose));
+        Logger.recordOutput("CameraPoses/Test3", new Pose3d(robot_pose).transformBy(SubSystems.vision.camera_pose));
 
         FieldVisualizer.getField().setRobotPose(robot_pose);
         FieldVisualizer.getField().getObject("SwerveModules").setPoses(
