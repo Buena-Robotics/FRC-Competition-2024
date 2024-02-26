@@ -10,12 +10,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import frc.robot.utils.TunableNumber;
 import frc.robot.Robot;
 
-public abstract class SwerveModule implements Sendable {
+public abstract class SwerveModule {
     @AutoLog public static class SwerveModuleInputs {
         public double drive_position_radians = 0.0;
         public double drive_velocity_radians_per_second = 0.0;
@@ -113,14 +111,4 @@ public abstract class SwerveModule implements Sendable {
     public double getVelocityMetersPerSec() { return inputs.drive_velocity_radians_per_second * WHEEL_RADIUS_METERS; }
     public SwerveModulePosition getPosition() { return new SwerveModulePosition(getPositionMeters(), getAngle()); }
     public SwerveModuleState getState() { return new SwerveModuleState(getVelocityMetersPerSec(), getAngle()); }
-
-    public String sState(){ return getState().toString(); }
-    public String sPos(){ return getPosition().toString(); }
-
-    @Override public void initSendable(SendableBuilder builder){
-        builder.setSmartDashboardType("Swerve Module");
-        builder.addStringProperty("abs encoder", this::sState, null);
-        builder.addStringProperty("state", this::sState, null);
-        builder.addStringProperty("position", this::sPos, null);
-    }
 }

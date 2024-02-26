@@ -1,5 +1,7 @@
 package frc.robot.subsystems.drive;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -68,7 +70,7 @@ public class SwerveDrive extends SubsystemBase {
                 modules[1].getPosition(),
                 modules[2].getPosition(),
                 modules[3].getPosition() },  
-            new Pose2d(), 
+            robot_pose, 
             POSITION_STD_DEV, 
             VISION_STD_DEV );
 
@@ -86,7 +88,7 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     @Override public void periodic(){
-        for (SwerveModule module : modules) module.periodic();
+        for (var module : modules) module.periodic();
         SubSystems.vision._periodic();
         var vision_measurements = SubSystems.vision.getVisionMeasurements();
         for (var vision_measurement : vision_measurements){
@@ -96,7 +98,14 @@ public class SwerveDrive extends SubsystemBase {
                 pose_estimator.addVisionMeasurement(vision_measurement.pose, vision_measurement.timestamp, VISION_FIRST_STD_DEV);
             }
             else pose_estimator.addVisionMeasurement(vision_measurement.pose, vision_measurement.timestamp, VISION_STD_DEV);
+            Logger.recordOutput("PoseEstimation/VisionMeasurement", vision_measurement.pose);
         }
+        SwerveModuleState[] swerve_module_states = new SwerveModuleState[] {
+                modules[0].getState(),
+                modules[1].getState(),
+                modules[2].getState(),
+                modules[3].getState()};
+        Logger.recordOutput("SwerveModules/SwerveModuleStates", swerve_module_states);
         robot_pose = pose_estimator.update(
             navx.getRotation2d(),
             new SwerveModulePosition[] {
@@ -104,6 +113,8 @@ public class SwerveDrive extends SubsystemBase {
                 modules[1].getPosition(),
                 modules[2].getPosition(),
                 modules[3].getPosition()} );
+        Logger.recordOutput("PoseEstimation/PoseEstimation", robot_pose);
+
 
         FieldVisualizer.getField().setRobotPose(robot_pose);
         FieldVisualizer.getField().getObject("SwerveModules").setPoses(

@@ -1,154 +1,119 @@
 package frc.robot.subsystems.climber;
 
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
+import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SubSystems;
 
-public class Climb extends SubsystemBase {
-    protected static final double WINCH_ENCODER_GEAR_RATIO = 1 / 64.0;
-    //Units.inchesToMeters(2.75)
-    protected static final double WINCH_ENCODER_ROTATION_TO_RADIANS       = WINCH_ENCODER_GEAR_RATIO * Math.PI; 
-    protected static final double WINCH_ENCODER_RPM_TO_RADIANS_PER_SECOND = WINCH_ENCODER_ROTATION_TO_RADIANS / 60; 
-    private final int WINCH_MOTOR_ID = 12;
-    private final int BORE_ENCODER_CHANNEL = 0;
+public abstract class Climb extends SubsystemBase {
+    @AutoLog public static class ClimbInputs {
+        public double bore_absolute_position_radians = 0.0;
 
-    private final CANSparkMax winch_motor = new CANSparkMax(WINCH_MOTOR_ID, MotorType.kBrushless);
-    private final RelativeEncoder winch_encoder = winch_motor.getEncoder();
-    private final DutyCycleEncoder bore_encoder = new DutyCycleEncoder(BORE_ENCODER_CHANNEL);
-
-    
-    public boolean armLocked = false;
-
-    public Climb() {
-        winch_motor.setIdleMode(IdleMode.kBrake);
-        // winch_encoder.setPosition(getBoreAngleDegrees());
-        winch_encoder.setPositionConversionFactor(1);
-        winch_encoder.setVelocityConversionFactor(1);
-        winch_encoder.setPosition(0);
+        public double winch_position_radians = 0.0;
+        public double winch_velocity_radians_per_second = 0.0;
+        public double winch_rotations = 0.0;
+        public double winch_rotations_per_second = 0.0;
+        public double winch_applied_volts = 0.0;
+        public double[] winch_current_amps = new double[] {};
+        public double[] winch_temp_celcius = new double[] {};
     }
+    public enum ArmPosition {
+        DOWN(new Rotation2d(1.57079632679)), 
+        SOURCE(new Rotation2d(1.11923695855)), 
+        SPEAKER_CLOSE(new Rotation2d(0.67147204082)),
+        SPEAKER_STAGE(new Rotation2d(0.861727450426)),
+        UP(new Rotation2d(0));
+
+        private Rotation2d rotation;
+        private ArmPosition(Rotation2d rotation) { this.rotation = rotation; }
+        public Rotation2d getRotation() { return this.rotation; };
+    }
+    protected static final double WINCH_ROPE_LENGTH_METERS = Units.inchesToMeters(17);
+    protected static final double WINCH_MOTOR_GEAR_RATIO = 1 / 64.0;
+    protected static final double WINCH_ENCODER_ROTATIONS_TO_RADIANS = Math.PI * 2;
+    protected static final double WINCH_TOTAL_FULL_ROTATIONS = 2.34375;
+    
+    protected ClimbInputsAutoLogged inputs = new ClimbInputsAutoLogged();
+    
+    public abstract void updateInputs();
+    public abstract void setWinchVoltage(double volts);
 
     @Override public void periodic() {
-        SmartDashboard.putNumber("bore angle", getBoreAngleDegrees());
-        SmartDashboard.putNumber("bore distance", bore_encoder.getDistance());
-        SmartDashboard.putNumber("winch angle deg", getWinchAngleDegrees());
-        SmartDashboard.putNumber("winch angle rad", getWinchAngleRadians());
-        SmartDashboard.putNumber("winch velocity", winch_encoder.getVelocity());
-        SmartDashboard.putNumber("winch voltage", winch_motor.getAppliedOutput());
+        updateInputs();
+        Logger.processInputs("Climb", inputs);
     }
 
-    public void moveArm(double speed, boolean lock, boolean shooting) {
-        if(winch_encoder.getPosition() < 4 && speed < 0){
-            winch_motor.set(0);
-            DriverStation.reportWarning("Winch exceeded lower bounds: " + winch_encoder.getPosition(), false);
+    public void runSetpoint(Rotation2d setpoint){
+        final Rotation2d measurement = new Rotation2d(inputs.bore_absolute_position_radians);
+        
+        double voltage = 0.0;
+        if(measurement.minus(setpoint).getRadians() < 0)
+            voltage = Math.sqrt(measurement.unaryMinus().plus(setpoint).getDegrees()) + 1;
+        else 
+            voltage = -Math.sqrt(measurement.minus(setpoint).getDegrees()) - 1;
+        voltage = MathUtil.clamp(voltage, -12, 12);
+
+        if(inputs.winch_rotations < 4/64.0 && voltage < 0){
+            setWinchVoltage(0);
             return;
         }
-        else if(winch_encoder.getPosition() > 112 && speed > 0){
-            winch_motor.set(0);
-            DriverStation.reportWarning("Winch exceeded lower bounds: " + winch_encoder.getPosition(), false);
+        else if(inputs.winch_rotations > 112/64.0 && voltage > 0){
+            setWinchVoltage(0);
             return;
         }
-        winch_motor.set(speed);
+        setWinchVoltage(voltage);
     }
 
-    public double getSetpointVoltage(double setpoint){
-        double measurement = getBoreAngleDegrees();
-        if(measurement - setpoint < 0)
-            return Math.sqrt(-measurement + setpoint);
-        else
-            return -Math.sqrt(measurement - setpoint);
-    }
-    public void runSetpoint(double setpoint){
-        double voltage = MathUtil.clamp(getSetpointVoltage(setpoint), -12, 12);
-
-        if(winch_encoder.getPosition() < 4 && voltage < 0){
-            winch_motor.set(0);
-            DriverStation.reportWarning("Winch exceeded lower bounds: " + winch_encoder.getPosition(), false);
-            return;
-        }
-        else if(winch_encoder.getPosition() > 112 && voltage > 0){
-            winch_motor.set(0);
-            DriverStation.reportWarning("Winch exceeded lower bounds: " + winch_encoder.getPosition(), false);
-            return;
-        }
-        // double voltage = MathUtil.clamp(getSetpointVoltage(setpoint), -12, 12);
-        winch_motor.setVoltage(voltage);
-    }
-
-    public Command moveArmToPosition(ArmPosition position) {
+    public Command moveArmTriggers(Supplier<Double> speed_function){
         return new Command() {
-            private final double setpoint = position.getPosDegrees();
-            private double measurement = getBoreAngleDegrees();
-
-            @Override
-            public void initialize() {
-                addRequirements(SubSystems.climb);
+            { addRequirements(SubSystems.climb); }
+            private final Supplier<Double> speed = speed_function;
+            @Override public void execute() {
+                double voltage = speed.get() * 12;
+                voltage = MathUtil.clamp(voltage, -12, 12);
+                if(inputs.winch_rotations < 4/64.0 && voltage < 0){
+                    setWinchVoltage(0);
+                    return;
+                }
+                else if(inputs.winch_rotations > 120/64.0 && voltage > 0){
+                    setWinchVoltage(0);
+                    return;
+                }
+                setWinchVoltage(speed.get() * 12);
             }
+            @Override public void end(boolean interrupted) { setWinchVoltage(0); }
+            @Override public boolean isFinished() { return false; }
+        };
+    }
+    public Command moveArmToPosition(ArmPosition position){ return moveArmToPosition(position.getRotation()); }
+    public Command moveArmToPosition(Rotation2d rotation) {
+        return new Command() {
+            private final Rotation2d setpoint = rotation;
+            private Rotation2d measurement = new Rotation2d(inputs.bore_absolute_position_radians);
+            private Rotation2d prev_measurement = new Rotation2d(inputs.bore_absolute_position_radians);
+
+            @Override public void initialize() { addRequirements(SubSystems.climb); }
 
             @Override public void execute() {
+                this.prev_measurement = measurement;
                 runSetpoint(setpoint);
-                this.measurement = getBoreAngleDegrees();
+                this.measurement = new Rotation2d(inputs.bore_absolute_position_radians);
             }
-            @Override public void end(boolean interrupted) {
-                winch_motor.setVoltage(0);
-            }
+            @Override public void end(boolean interrupted) { setWinchVoltage(0); }
             @Override public boolean isFinished() {
-                return Math.abs(measurement - setpoint) < 3;
+                boolean wrong_direction = Math.abs(setpoint.minus(measurement).getRadians()) > Math.abs(setpoint.minus(prev_measurement).getRadians());
+                if(wrong_direction) DriverStation.reportWarning("move arm to position cmd wrong direction", false);
+                return wrong_direction
+                    || Math.abs(setpoint.minus(measurement).getDegrees()) < 3;
             }
-        };
-        // double setpoint = position.getPosDegrees();
-        // runSetpoint(setpoint);
-        // double measurement = getBoreAngleDegrees();
-        // if(Math.abs(measurement - setpoint) < 5)
-        //     winch_motor.setVoltage(0);
-    }
-
-    public double getBoreAngleDegrees() {
-        return 369 * (bore_encoder.getAbsolutePosition() - 0.146338);
-    }
-    public double getBoreAngleRadians(){
-        return Units.degreesToRadians(getBoreAngleDegrees());
-    }
-    public double getWinchAngleRadians(){
-        return winch_encoder.getPosition();
-    }
-    public double getWinchAngleDegrees(){
-        return Units.radiansToDegrees(getWinchAngleRadians());
-    }
-
-
-    public void lockArm(boolean shooting) {
-        winch_motor.setIdleMode(IdleMode.kBrake);
-    }
-
-    public void unlockArm() {
-        winch_motor.setIdleMode(IdleMode.kCoast);
-    }
-
-    public enum ArmPosition {
-        DOWN(64.127554), 
-        SPEAKER_CLOSE(38.472514),
-        SPEAKER_STAGE(49.373346),
-        UP(0);
-
-        double degrees;
-
-        private ArmPosition(double degrees) {
-            this.degrees = degrees;
-        }
-
-        public double getPosDegrees() {
-            return degrees;
         };
     }
 }

@@ -7,7 +7,6 @@ package frc.robot;
 import frc.robot.Constants.IO;
 import frc.robot.Constants.SubSystems;
 import frc.robot.commands.LaunchNote;
-import frc.robot.commands.MoveArmCommand;
 import frc.robot.commands.PrepareLaunch;
 import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.subsystems.climber.Climb.ArmPosition;
@@ -40,10 +39,6 @@ public class RobotContainer {
         return IO.controller.getRightTriggerAxis();
     }
 
-    private boolean isShooting() {
-        return !IO.controller.getXButton();
-    }
-
     private void configureBindings() {
         SubSystems.swerve_drive.setDefaultCommand(new SwerveJoystickCmd(
             SubSystems.swerve_drive, 
@@ -51,7 +46,7 @@ public class RobotContainer {
             () -> IO.controller.getLeftX(),  // X-Axis
             () -> IO.controller.getRightX()  // Rot-Axis
         ));
-        SubSystems.climb.setDefaultCommand(new MoveArmCommand(SubSystems.climb, this::getClimberSpeed, isShooting()));
+        SubSystems.climb.setDefaultCommand(SubSystems.climb.moveArmTriggers(this::getClimberSpeed));
         IO.commandController.leftBumper().whileTrue(SubSystems.shooter.intakeCommand());
 
         IO.commandController.rightBumper().whileTrue(new PrepareLaunch(SubSystems.shooter)
@@ -64,10 +59,10 @@ public class RobotContainer {
         IO.commandController.x().onTrue(SubSystems.note_arm.grabNoteFullCommand());
         IO.commandController.y().onTrue(SubSystems.note_arm.releaseNoteFullCommand());
 
-        IO.dpadUp.onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.UP));
-        IO.dpadDown.onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.DOWN));
-        IO.dpadLeft.onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.SPEAKER_CLOSE));
-        IO.dpadRight.onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.SPEAKER_STAGE));
+        IO.commandController.povUp().onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.UP));
+        IO.commandController.povDown().onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.DOWN));
+        IO.commandController.povLeft().onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.SPEAKER_CLOSE));
+        IO.commandController.povRight().onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.SPEAKER_STAGE));
     }
 
     public Command getAutonomousCommand() {

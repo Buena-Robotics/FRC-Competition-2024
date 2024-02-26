@@ -10,13 +10,24 @@
   },
   "NTProvider": {
     "types": {
+      "/AdvantageKit/RealOutputs/Climb/Mecha/Arm Mechanism": "Mechanism2d",
+      "/AdvantageKit/RealOutputs/Climb/Mecha/Winch Mechansim": "Mechanism2d",
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Climb": "Mechanism2d",
+      "/SmartDashboard/Climb/Arm Mechanism": "Mechanism2d",
+      "/SmartDashboard/Climb/Mecha/Arm Mechanism": "Mechanism2d",
+      "/SmartDashboard/Climb/Mecha/Winch Mechansim": "Mechanism2d",
+      "/SmartDashboard/Climb/Winch Mechansim": "Mechanism2d",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/VisionSystemSim-VisionSim/Sim Field": "Field2d"
     },
     "windows": {
-      "/SmartDashboard/Climb": {
+      "/SmartDashboard/Climb/Mecha/Arm Mechanism": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Climb/Mecha/Winch Mechansim": {
         "window": {
           "visible": true
         }
@@ -97,6 +108,21 @@
       "open": false
     },
     "transitory": {
+      "AdvantageKit": {
+        "Climb": {
+          "open": true
+        },
+        "open": true
+      },
+      "FMSInfo": {
+        "open": true
+      },
+      "LiveWindow": {
+        "open": true
+      },
+      "Shuffleboard": {
+        "open": true
+      },
       "SmartDashboard": {
         "Climb": {
           "open": true

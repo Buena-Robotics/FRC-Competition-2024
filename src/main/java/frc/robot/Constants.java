@@ -8,8 +8,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.climber.Climb;
+import frc.robot.subsystems.climber.ClimbReal;
 import frc.robot.subsystems.climber.ClimbSim;
 import frc.robot.subsystems.drive.SwerveDrive;
 import frc.robot.subsystems.notearm.NoteArm;
@@ -27,15 +27,10 @@ public final class Constants {
         //Controllers
         public static final CXboxController commandController = new CXboxController(XBOXCONTROLLERPORT);
         public static final XboxController controller = new XboxController(XBOXCONTROLLERPORT);
-        public static final Trigger dpadUp = new Trigger(() -> controller.getPOV() == 0);
-        public static final Trigger dpadDown = new Trigger(() -> controller.getPOV() == 180);
-        public static final Trigger dpadLeft = new Trigger(() -> controller.getPOV() == 270);
-        public static final Trigger dpadRight = new Trigger(() -> controller.getPOV() == 90);
-
     }
 
     public static class SubSystems{
-        public static final Climb climb = new Climb();
+        public static final Climb climb = Robot.isReal() ? new ClimbReal() : new ClimbSim();
         public static final Shooter shooter = new Shooter();
         public static final NoteArm note_arm = new NoteArm();
         public static final SwerveDrive swerve_drive = new SwerveDrive();

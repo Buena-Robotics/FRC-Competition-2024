@@ -8,7 +8,6 @@ import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -30,46 +29,25 @@ public class SwerveModuleReal extends SwerveModule {
         this.absolute_encoder_offset_radians = absolute_encoder_offset_radians;
 
         this.drive_motor = new CANSparkMax(drive_motor_id, MotorType.kBrushless);
+        this.drive_motor.enableVoltageCompensation(12.0);
+        
         this.turn_motor =  new CANSparkMax(turn_motor_id,  MotorType.kBrushless);
+        this.turn_motor.enableVoltageCompensation(12.0);
 
         this.drive_encoder = drive_motor.getEncoder();
-        // this.drive_encoder.setMeasurementPeriod(10);
-        // this.drive_encoder.setAverageDepth(2);
         this.drive_encoder.setPositionConversionFactor(DRIVE_ENCODER_ROTATION_TO_METERS);
         this.drive_encoder.setVelocityConversionFactor(DRIVE_ENCODER_RPM_TO_METERS_PER_SECOND);
         this.drive_encoder.setPosition(0.0);
+        this.drive_encoder.setMeasurementPeriod(20);
+        this.drive_encoder.setAverageDepth(2);
         
         this.turn_encoder = turn_motor.getEncoder();
-        // this.turn_encoder.setMeasurementPeriod(10);
-        // this.turn_encoder.setAverageDepth(2);
-        
         this.turn_encoder.setPositionConversionFactor(TURN_ENCODER_ROTATION_TO_RADIANS);
         this.turn_encoder.setVelocityConversionFactor(TURN_ENCODER_RPM_TO_RADIANS_PER_SECOND);
         this.turn_encoder.setPosition(0);
-        
-        this.drive_motor.enableVoltageCompensation(12.0);
-        this.turn_motor.enableVoltageCompensation(12.0);
+        this.turn_encoder.setMeasurementPeriod(20);
+        this.turn_encoder.setAverageDepth(2);
 
-
-        checkConnections();
-    }
-
-    private void checkConnections(){
-        REVLibError drive_revlib_error = drive_motor.getLastError();
-        REVLibError turn_revlib_error = drive_motor.getLastError();
-        boolean absolute_encoder_connected = absolute_encoder.isAccumulatorChannel();
-
-        String str_error = "";
-
-        if(drive_revlib_error != REVLibError.kOk)
-            str_error += String.format("[SModule%d: %s - Drive Motor]: %s", index, module_name, SparkMaxUtils.REVErrorToString(drive_revlib_error));
-        if(turn_revlib_error != REVLibError.kOk)
-            str_error += String.format("[SModule%d: %s - Turn Motor]: %s", index, module_name, SparkMaxUtils.REVErrorToString(turn_revlib_error));
-        if(!absolute_encoder_connected)
-            str_error += String.format("[SModule%d: %s - Abs Encoder]: Disconnected", index, module_name);
-        
-        if(!str_error.equals(""))
-            DriverStation.reportError(str_error, false);
     }
 
     private double getAbsoluteEncoderRadians(){ 
@@ -119,9 +97,4 @@ public class SwerveModuleReal extends SwerveModule {
     @Override public void setTurnBrakeMode (boolean enable) { turn_motor.setIdleMode(enable ? IdleMode.kBrake : IdleMode.kCoast); }
 
     public double absEncoder(){ return absolute_encoder.getVoltage() / RobotController.getVoltage5V(); }
-    @Override
-    public void initSendable(SendableBuilder builder) {
-        super.initSendable(builder);
-        builder.addDoubleProperty("abs_encoder", this::getAbsoluteEncoderRadians, null);
-    }
 }

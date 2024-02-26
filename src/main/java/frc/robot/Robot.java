@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
@@ -16,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Robot extends LoggedRobot {
-    private Command m_autonomousCommand;
+    private Command autonomous_command;
 
     private RobotContainer robot_container;
 
@@ -24,7 +25,7 @@ public class Robot extends LoggedRobot {
         super(Robot.defaultPeriodSecs);
     }
     @Override public void robotInit() {
-        // Logger.addDataReceiver(new WPILOGWriter("/media/sda2/"));
+        Logger.addDataReceiver(new WPILOGWriter("/AdvantageKit-ReplayLogs/Simulation/"));
         Logger.addDataReceiver(new NT4Publisher());
         LoggedPowerDistribution.getInstance(10, ModuleType.kRev);
         Logger.start();
@@ -42,17 +43,17 @@ public class Robot extends LoggedRobot {
     @Override public void disabledPeriodic() {}
 
     @Override public void autonomousInit() {
-        m_autonomousCommand = robot_container.getAutonomousCommand();
+        autonomous_command = robot_container.getAutonomousCommand();
 
-        if (m_autonomousCommand != null)
-            m_autonomousCommand.schedule();
+        if (autonomous_command != null)
+        autonomous_command.schedule();
     }
 
     @Override public void autonomousPeriodic() {}
 
     @Override public void teleopInit() {
-        if (m_autonomousCommand != null)
-            m_autonomousCommand.cancel();
+        if (autonomous_command != null)
+            autonomous_command.cancel();
     }
 
     @Override public void teleopPeriodic() {}

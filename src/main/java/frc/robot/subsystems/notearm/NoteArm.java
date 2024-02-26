@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
+import frc.robot.Constants.SubSystems;
 import frc.robot.subsystems.climber.Climb.ArmPosition;
 import frc.robot.utils.TunableNumber;
 
@@ -120,26 +121,25 @@ public class NoteArm extends SubsystemBase {
     public Command pullArmDownCommand(){ return this.runOnce(() -> { moveArmDown(); }); }
 
     public Command grabNoteFullCommand(){
-        // if(isArmUp() || !isArmOut()) return this.runOnce(() -> {});
-        return 
-        // new ParallelCommandGroup(
-                // Constants.SubSystems.climb.moveArmToPosition(ArmPosition.UP),
+        return new ParallelCommandGroup(
+                Constants.SubSystems.climb.moveArmToPosition(ArmPosition.UP),
                 grabNoteCommand()
-                .andThen(new WaitCommand(DELAY).andThen(pullArmInCommand()))
-                // )
-            .andThen(new WaitCommand(DELAY))
+                    .andThen(new WaitCommand(0.75)
+                    .andThen(pullArmInCommand()))
+            )
+            .andThen(new WaitCommand(0.5))
             .andThen(pushArmUpCommand())
-            .andThen(new WaitCommand(DELAY))
+            .andThen(new WaitCommand(0.75))
             .andThen(pushArmOutCommand());
     }
     public Command releaseNoteFullCommand(){
-        // if(isClawOpen() || !isArmUp() || !isArmOut()) return this.runOnce(() -> {});
-        return releaseNoteCommand()
-            .andThen(new WaitCommand(DELAY + 1.0))
-            .andThen(pullArmInCommand())
-            .andThen(new WaitCommand(DELAY)) 
-            .andThen(pullArmDownCommand())
-            .andThen(new WaitCommand(0.05))
-            .andThen(pushArmOutCommand());
+        return SubSystems.climb.moveArmToPosition(ArmPosition.UP)
+                .andThen(releaseNoteCommand())
+                .andThen(new WaitCommand(DELAY + 1.0))
+                .andThen(pullArmInCommand())
+                .andThen(new WaitCommand(DELAY))
+                .andThen(pullArmDownCommand())
+                .andThen(new WaitCommand(0.05))
+                .andThen(pushArmOutCommand());
     }
 }

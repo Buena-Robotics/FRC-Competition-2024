@@ -1,57 +1,55 @@
 package frc.robot.subsystems.climber;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import frc.robot.Constants;
 import frc.robot.Robot;
 
-public class ClimbSim extends Climb{
-    // private final FlywheelSim winch_sim = new FlywheelSim(DCMotor.getNEO(1), 1 / WINCH_ENCODER_GEAR_RATIO, 0.004);
-    private final DCMotorSim winch_sim = new DCMotorSim(DCMotor.getNEO(1), 1 / WINCH_ENCODER_GEAR_RATIO, 0.004);
+public class ClimbSim extends Climb {
+    private final FlywheelSim winch_sim = new FlywheelSim(DCMotor.getNEO(1), 1 / WINCH_MOTOR_GEAR_RATIO, 0.00025);
+    private double winch_applied_volts = 0;
     
-    private Mechanism2d mechanism = new Mechanism2d(60, 60);
-    private Rotation2d shooter_arm_rotation = Rotation2d.fromDegrees(95);
-    private MechanismLigament2d shooter_arm_joint = new MechanismLigament2d("arm", 35, shooter_arm_rotation.getDegrees(), 4, new Color8Bit("#802020"));
+    private final Mechanism2d winch_mechanism = new Mechanism2d(60, 60);
+    private final Mechanism2d arm_mechanism = new Mechanism2d(60, 60);
+    private final MechanismLigament2d winch_ligament = new MechanismLigament2d("winch_ligament", 20, 70, 4, new Color8Bit("#802020"));
+    private final MechanismLigament2d arm_ligament = new MechanismLigament2d("arm_ligament", 20, 86, 4, new Color8Bit("#802020"));
 
     public ClimbSim(){
-        mechanism.getRoot("root", 10, 10).append(shooter_arm_joint);
-        SmartDashboard.putData("Climb", mechanism);
+        super();
+        winch_mechanism.getRoot("winch_root", 30, 30).append(winch_ligament);
+        arm_mechanism.getRoot("arm_root", 5, 30).append(arm_ligament);
+        SmartDashboard.putData("Climb/Mecha/Winch Mechansim", winch_mechanism);
+        SmartDashboard.putData("Climb/Mecha/Arm Mechanism", arm_mechanism);
+    }
+
+    @Override public void updateInputs() {
+        inputs.winch_position_radians += (winch_sim.getAngularVelocityRadPerSec() * Robot.defaultPeriodSecs);
+        inputs.winch_velocity_radians_per_second = winch_sim.getAngularVelocityRadPerSec();
+        inputs.winch_rotations = inputs.winch_position_radians / (Math.PI * 2);
+        inputs.winch_rotations_per_second = winch_sim.getAngularVelocityRPM() / 60;
+        inputs.winch_applied_volts = winch_applied_volts;
+        inputs.winch_current_amps = new double[] {winch_sim.getCurrentDrawAmps()};
+        inputs.winch_temp_celcius = new double[] {};
+        inputs.bore_absolute_position_radians =  (inputs.winch_rotations/WINCH_TOTAL_FULL_ROTATIONS) * (Math.PI/2);
+    }
+    @Override public void setWinchVoltage(double volts) {
+        winch_applied_volts = MathUtil.clamp(volts, -12.0, 12.0);
+        winch_sim.setInputVoltage(winch_applied_volts);
     }
 
     @Override public void periodic() {
+        super.periodic();
         winch_sim.update(Robot.defaultPeriodSecs);
-
-        double voltage;
-        if(Constants.IO.controller.getLeftTriggerAxis() > 0.01)
-            voltage = Constants.IO.controller.getLeftTriggerAxis();
-        else 
-            voltage = -Constants.IO.controller.getRightTriggerAxis();
-
-        voltage *= 12;
-
-        winch_sim.setInputVoltage(voltage);
-        double velocity = winch_sim.getAngularVelocityRadPerSec() * Robot.defaultPeriodSecs;
-        SmartDashboard.putNumber("Climb/AngVelocity", winch_sim.getAngularVelocityRadPerSec());
-        SmartDashboard.putNumber("Climb/PosRad", winch_sim.getAngularPositionRad());
-        SmartDashboard.putNumber("Climb/PosRot", winch_sim.getAngularPositionRotations());
-        SmartDashboard.putNumber("Climb/AngRPM", winch_sim.getAngularVelocityRPM());
-        SmartDashboard.putNumber("Climb/AngRot", winch_sim.getAngularVelocityRPM() / 60 / (Math.PI * 2) * Robot.defaultPeriodSecs);
-
-
-
-        shooter_arm_rotation = shooter_arm_rotation.plus(Rotation2d.fromRadians(winch_sim.getAngularVelocityRPM() / 60 / (Math.PI * 2) * Robot.defaultPeriodSecs * 10 ));
-        // shooter_arm_rotation = shooter_arm_rotation.minus(Rotation2d.fromDegrees(Constants.IO.controller.getRightTriggerAxis() * 12));
-
-        shooter_arm_rotation = shooter_arm_rotation.plus(Rotation2d.fromDegrees(0.001));
-        shooter_arm_rotation = Rotation2d.fromDegrees(MathUtil.clamp(shooter_arm_rotation.getDegrees(), 0, 95));
-
-        shooter_arm_joint.setAngle(shooter_arm_rotation);
+        winch_ligament.setAngle(70 + -inputs.winch_rotations*360);
+        arm_ligament.setAngle(Units.radiansToDegrees((Math.PI/2) - inputs.bore_absolute_position_radians));
+        Logger.recordOutput("Climb/Mecha/Winch Mechansim", winch_mechanism);
+        Logger.recordOutput("Climb/Mecha/Arm Mechanism", arm_mechanism);
     }    
 }
