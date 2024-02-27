@@ -41,7 +41,7 @@ public class ClimbReal extends Climb {
         inputs.winch_position_radians = winch_encoder.getPosition() * WINCH_ENCODER_ROTATIONS_TO_RADIANS;
         inputs.winch_velocity_radians_per_second = winch_encoder.getVelocity() * WINCH_ENCODER_ROTATIONS_TO_RADIANS / 60;
         inputs.winch_rotations = winch_encoder.getPosition();
-        inputs.winch_rotations_per_second = winch_encoder.getVelocity() / 60;
+        inputs.winch_velocity_rotations_per_second = winch_encoder.getVelocity() / 60;
         inputs.winch_applied_volts = winch_motor.getAppliedOutput() * winch_motor.getBusVoltage();
         inputs.winch_current_amps = new double[] {winch_motor.getOutputCurrent()};
         inputs.winch_temp_celcius = new double[] {};

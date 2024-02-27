@@ -60,7 +60,7 @@ public class RobotContainer {
         IO.commandController.y().onTrue(SubSystems.note_arm.releaseNoteFullCommand());
 
         IO.commandController.povUp().onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.UP));
-        IO.commandController.povDown().onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.DOWN));
+        IO.commandController.povDown().onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.SOURCE));
         IO.commandController.povLeft().onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.SPEAKER_CLOSE));
         IO.commandController.povRight().onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.SPEAKER_STAGE));
     }

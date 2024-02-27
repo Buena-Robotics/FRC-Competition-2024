@@ -13,8 +13,12 @@ import frc.robot.subsystems.climber.ClimbReal;
 import frc.robot.subsystems.climber.ClimbSim;
 import frc.robot.subsystems.drive.SwerveDrive;
 import frc.robot.subsystems.notearm.NoteArm;
+import frc.robot.subsystems.notearm.NoteArmReal;
+import frc.robot.subsystems.notearm.NoteArmSim;
 import frc.robot.subsystems.servo.ServoSub;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterReal;
+import frc.robot.subsystems.shooter.ShooterSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionReal;
 import frc.robot.subsystems.vision.VisionSim;
@@ -32,8 +36,8 @@ public final class Constants {
 
     public static class SubSystems{
         public static final Climb climb = Robot.isReal() ? new ClimbReal() : new ClimbSim();
-        public static final Shooter shooter = new Shooter();
-        public static final NoteArm note_arm = new NoteArm();
+        public static final Shooter shooter = Robot.isReal() ? new ShooterReal() : new ShooterSim();
+        public static final NoteArm note_arm = Robot.isReal() ? new NoteArmReal() : new NoteArmSim();
         public static final SwerveDrive swerve_drive = new SwerveDrive();
         public static final Vision vision = Robot.isReal() ? new VisionReal() : new VisionSim();
         public static final ServoSub servo = new ServoSub();

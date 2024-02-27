@@ -18,22 +18,22 @@ public class ClimbSim extends Climb {
     
     private final Mechanism2d winch_mechanism = new Mechanism2d(60, 60);
     private final Mechanism2d arm_mechanism = new Mechanism2d(60, 60);
-    private final MechanismLigament2d winch_ligament = new MechanismLigament2d("winch_ligament", 20, 70, 4, new Color8Bit("#802020"));
+    private final MechanismLigament2d winch_ligament = new MechanismLigament2d("winch_ligament", 5, 70, 4, new Color8Bit("#5050FF"));
     private final MechanismLigament2d arm_ligament = new MechanismLigament2d("arm_ligament", 20, 86, 4, new Color8Bit("#802020"));
 
     public ClimbSim(){
         super();
-        winch_mechanism.getRoot("winch_root", 30, 30).append(winch_ligament);
+        winch_mechanism.getRoot("winch_root", 6, 6).append(winch_ligament);
         arm_mechanism.getRoot("arm_root", 5, 30).append(arm_ligament);
-        SmartDashboard.putData("Climb/Mecha/Winch Mechansim", winch_mechanism);
-        SmartDashboard.putData("Climb/Mecha/Arm Mechanism", arm_mechanism);
+        SmartDashboard.putData("Climb/Mechanism", winch_mechanism);
+        SmartDashboard.putData("Climb/Mechanism", arm_mechanism);
     }
 
     @Override public void updateInputs() {
         inputs.winch_position_radians += (winch_sim.getAngularVelocityRadPerSec() * Robot.defaultPeriodSecs);
         inputs.winch_velocity_radians_per_second = winch_sim.getAngularVelocityRadPerSec();
         inputs.winch_rotations = inputs.winch_position_radians / (Math.PI * 2);
-        inputs.winch_rotations_per_second = winch_sim.getAngularVelocityRPM() / 60;
+        inputs.winch_velocity_rotations_per_second = winch_sim.getAngularVelocityRPM() / 60;
         inputs.winch_applied_volts = winch_applied_volts;
         inputs.winch_current_amps = new double[] {winch_sim.getCurrentDrawAmps()};
         inputs.winch_temp_celcius = new double[] {};

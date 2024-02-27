@@ -19,7 +19,7 @@ import frc.robot.Constants.SubSystems;
 import frc.robot.subsystems.climber.Climb.ArmPosition;
 import frc.robot.utils.TunableNumber;
 
-public class NoteArm extends SubsystemBase {
+public abstract class NoteArm extends SubsystemBase {
     private static final TunableNumber note_distance_threshold_mm = new TunableNumber("NoteArm/NoteDistanceThreshMM", 2000);
     private static final TunableNumber note_hue_lower_threshold = new TunableNumber("NoteArm/NoteHueLowerThresh", 10);
     private static final TunableNumber note_hue_upper_threshold = new TunableNumber("NoteArm/NoteHueUpperThresh", 90);
@@ -37,16 +37,14 @@ public class NoteArm extends SubsystemBase {
     private static final I2C.Port COLOR_SENSOR_PORT   = I2C.Port.kOnboard;
     private static final double DELAY = 1;
 
-    private final PneumaticHub hub = new PneumaticHub(PNEUMATIC_MODULE_ID);
-    private final Compressor compressor = new Compressor(PNEUMATIC_MODULE_ID, PNEUMATICS_MODULE_TYPE);
-    private final DoubleSolenoid claw_solenoid    = new DoubleSolenoid(PNEUMATIC_MODULE_ID, PNEUMATICS_MODULE_TYPE, CLAW_SOLENOID_FORWARD_CHANNEL, CLAW_SOLENOID_REVERSE_CHANNEL);
-    private final DoubleSolenoid arm_up_solenoid  = new DoubleSolenoid(PNEUMATIC_MODULE_ID, PNEUMATICS_MODULE_TYPE, ARM_UP_SOLENOID_FORWARD_CHANNEL, ARM_UP_SOLENOID_REVERSE_CHANNEL);
-    private final DoubleSolenoid arm_out_solenoid = new DoubleSolenoid(PNEUMATIC_MODULE_ID, PNEUMATICS_MODULE_TYPE, ARM_OUT_SOLENOID_FORWARD_CHANNEL, ARM_OUT_SOLENOID_REVERSE_CHANNEL);
-    private final ColorSensorV3 color_sensor      = new ColorSensorV3(COLOR_SENSOR_PORT);
+    protected final PneumaticHub hub = new PneumaticHub(PNEUMATIC_MODULE_ID);
+    protected final Compressor compressor = new Compressor(PNEUMATIC_MODULE_ID, PNEUMATICS_MODULE_TYPE);
+    protected final DoubleSolenoid claw_solenoid    = new DoubleSolenoid(PNEUMATIC_MODULE_ID, PNEUMATICS_MODULE_TYPE, CLAW_SOLENOID_FORWARD_CHANNEL, CLAW_SOLENOID_REVERSE_CHANNEL);
+    protected final DoubleSolenoid arm_up_solenoid  = new DoubleSolenoid(PNEUMATIC_MODULE_ID, PNEUMATICS_MODULE_TYPE, ARM_UP_SOLENOID_FORWARD_CHANNEL, ARM_UP_SOLENOID_REVERSE_CHANNEL);
+    protected final DoubleSolenoid arm_out_solenoid = new DoubleSolenoid(PNEUMATIC_MODULE_ID, PNEUMATICS_MODULE_TYPE, ARM_OUT_SOLENOID_FORWARD_CHANNEL, ARM_OUT_SOLENOID_REVERSE_CHANNEL);
+    protected final ColorSensorV3 color_sensor      = new ColorSensorV3(COLOR_SENSOR_PORT);
     
     public NoteArm(){
-        // color_sensor.configureColorSensor(ColorSensorResolution.k, null, null);
-        // color_sensor.configureProximitySensor(ProximitySensorResolution.kProxRes11bit, ProximitySensorMeasurementRate.);
         claw_solenoid.set(Value.kOff);
         arm_up_solenoid.set(Value.kOff);
         arm_out_solenoid.set(Value.kOff);
@@ -66,6 +64,14 @@ public class NoteArm extends SubsystemBase {
     public void moveArmDown(){ arm_up_solenoid.set(Value.kReverse); }
     public void moveArmIn()  { arm_out_solenoid.set(Value.kReverse); }
 
+    public Color getColor(){
+        return color_sensor.getColor();
+    }
+
+    public int[] getColorSensorRGB(){
+        final Color color = color_sensor.getColor();
+        return new int[]{(int)(color.red*255), (int)(color.green*255), (int)(color.blue*255)};
+    }
 
     public double milimetersFromObject(){
         final int PROXIMITY_SENSOR_MAX_VALUE = 2047;
@@ -79,11 +85,11 @@ public class NoteArm extends SubsystemBase {
     }
 
     public boolean detectingNoteColor(){
-        final Color color = color_sensor.getColor();
-        final float[] HSV = java.awt.Color.RGBtoHSB((int)(color.red*255), (int)(color.green*255), (int)(color.blue*255),  null);
+        int[] rgb = getColorSensorRGB();
+        final float[] HSV = java.awt.Color.RGBtoHSB(rgb[0], rgb[1], rgb[2], null);
 
-        SmartDashboard.putNumberArray("NoteArm/ColorRGBNormal", new Double[]{color.red, color.green, color.blue});
-        SmartDashboard.putNumberArray("NoteArm/ColorRGB", new Double[]{color.red * 255, color.green * 255, color.blue * 255});
+        // SmartDashboard.putNumberArray("NoteArm/ColorRGBNormal", new Double[]{color.red, color.green, color.blue});
+        // SmartDashboard.putNumberArray("NoteArm/ColorRGB", new Double[]{color.red * 255, color.green * 255, color.blue * 255});
         SmartDashboard.putNumberArray("NoteArm/ColorHSV", new Double[]{(double)HSV[0], (double)HSV[1], (double)HSV[2]});
         SmartDashboard.putNumberArray("NoteArm/RangeHSV", new Double[]{
             note_hue_lower_threshold.get()/360, 

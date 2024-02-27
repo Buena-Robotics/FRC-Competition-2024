@@ -26,76 +26,36 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utils.FieldVisualizer;
 
 public abstract class Vision extends SubsystemBase {
-    public static final AprilTagFieldLayout field_layout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+    protected final VisionCamera[] cameras;
+    // public final Transform3d camera_pose = new Transform3d(
+    //             Units.inchesToMeters(14.5),
+    //             Units.inchesToMeters(14.5),
+    //             Units.inchesToMeters(69/4.0),
+    //             new Rotation3d(0,Units.degreesToRadians(-20), 0));
 
-    public static class TimestampedVisionMeasurement {
-        public final Pose2d pose;
-        public final double timestamp;
-        public final Matrix<N3, N1> std_devs;
-        public TimestampedVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> std_devs){ this.pose = pose; this.timestamp = timestamp; this.std_devs = std_devs; }
-    }
-    public static class VisionCamera {
-        public final PhotonCamera photon_camera;
-        public final PhotonPoseEstimator photon_pose_estimator;
-        public double previous_vision_result_timestamp = 0.0;
-        public ArrayList<Pose2d> tracked_target_poses = new ArrayList<Pose2d>();
-        public VisionCamera(String photon_camera_name, Transform3d robot_to_camera){
-            this.photon_camera = new PhotonCamera(photon_camera_name); 
-            this.photon_pose_estimator = new PhotonPoseEstimator(field_layout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, photon_camera, robot_to_camera);
-            this.photon_pose_estimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-            this.photon_pose_estimator.setTagModel(TargetModel.kAprilTag36h11);
-        }
-        public Transform2d getTransform2d(){
-            Transform3d robot_to_camera_3d = this.photon_pose_estimator.getRobotToCameraTransform();
-            Translation2d translation2d = robot_to_camera_3d.getTranslation().toTranslation2d();
-            Rotation2d rotation2d = robot_to_camera_3d.getRotation().toRotation2d();
-            Transform2d robot_to_camera_2d = new Transform2d(translation2d, rotation2d);
-            return robot_to_camera_2d;
-        }
+    public Vision(VisionCamera... cameras){
+        FieldVisualizer.setAprilTags(VisionCamera.field_layout);
+        this.cameras = cameras.clone();
     }
 
-    protected final ArrayList<VisionCamera> cameras = new ArrayList<VisionCamera>();
-    protected final ArrayList<TimestampedVisionMeasurement> vision_measurements = new ArrayList<TimestampedVisionMeasurement>();
-    public final Transform3d camera_pose = new Transform3d(
-                Units.inchesToMeters(14.5),
-                Units.inchesToMeters(14.5),
-                Units.inchesToMeters(69/4.0),
-                new Rotation3d(0,Units.degreesToRadians(-20), 0));
-
-    public Vision(){
-        FieldVisualizer.setAprilTags(field_layout);
-        cameras.add(new VisionCamera("Microsoft_LifeCam_HD-3000", camera_pose));
-        
+    @Override public void periodic() {
+        super.periodic();
     }
-
-    protected abstract Optional<TimestampedVisionMeasurement> getVisionMeasurement(VisionCamera camera);
 
     public void _periodic() {
         // ArrayList<Double> found_fidicual_ids = new ArrayList<Double>();
 
-        for(VisionCamera camera : cameras){
-            if(camera.photon_camera.isConnected()){
-                var optional_vision_measurements = getVisionMeasurement(camera);
-                if(optional_vision_measurements.isPresent()){
-                    vision_measurements.add(optional_vision_measurements.get());
-                }
-            }
-        }
+        // for(VisionCamera camera : cameras){
+        //     var optional_vision_measurements = getVisionMeasurement(camera);
+        //     if(optional_vision_measurements.isPresent()){
+        //         vision_measurements.add(optional_vision_measurements.get());
+        //     }
+        // }
         // Double[] found_fidicual_ids_arr = new Double[found_fidicual_ids.size()];
         // found_fidicual_ids.toArray(found_fidicual_ids_arr);
         // SmartDashboard.putNumberArray("Vision/FoundIds", found_fidicual_ids_arr);
     }
 
-    public boolean hasVision(){
-        for(var camera : cameras) if(camera.photon_camera.isConnected()) return true;
-        return false;
-    }
-    public ArrayList<TimestampedVisionMeasurement> getVisionMeasurements(){ 
-        var clone = new ArrayList<TimestampedVisionMeasurement>();
-        clone.addAll(vision_measurements);
-        vision_measurements.clear();
-        return clone;
-    };
     public final ArrayList<VisionCamera> getCameras(){ return cameras; }
     public void addCameras(VisionCamera... cameras){ for(var camera : cameras) this.cameras.add(camera); }
     public List<Transform2d> getAllRobotToCameraTransforms(){

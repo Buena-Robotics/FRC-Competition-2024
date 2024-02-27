@@ -13,6 +13,8 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
@@ -21,7 +23,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import frc.robot.Robot;
 import frc.robot.Constants.SubSystems;
-import frc.robot.subsystems.vision.Vision;
 import frc.robot.utils.FieldVisualizer;
 import frc.robot.utils.TimerUtil;
 import frc.robot.utils.TunableNumber;
@@ -34,6 +35,7 @@ public class SwerveDrive extends SubsystemBase {
     public static final TunableNumber max_linear_acceleration_per_second = new TunableNumber("Drive/MaxDriveLinearAcceleration", Units.feetToMeters(4));
     public static final TunableNumber max_angular_acceleration_per_second = new TunableNumber("Drive/MaxDriveAngularAcceleration", Math.PI / 2);
     
+    private static final edu.wpi.first.wpilibj.SerialPort.Port NAVX_PORT = edu.wpi.first.wpilibj.SerialPort.Port.kUSB;
     private static final double CENTER_TO_MODULE = Units.inchesToMeters(10.75);
     private static final Matrix<N3, N1> POSITION_STD_DEV = VecBuilder.fill(0.1, 0.1, 0.1);
     private static final Matrix<N3, N1> VISION_STD_DEV   = VecBuilder.fill(1, 1, 3);
@@ -53,8 +55,9 @@ public class SwerveDrive extends SubsystemBase {
         back_left_position
     );
 
-    public final NavX navx = new NavX(edu.wpi.first.wpilibj.SerialPort.Port.kUSB);
+    public final NavX navx = Robot.isReal() ? new NavXReal(NAVX_PORT) : new NavXSim(NAVX_PORT);
     private final SwerveModule[] modules;
+    private final SwerveDriveOdometry odometry;
     private final SwerveDrivePoseEstimator pose_estimator;
 
     private Pose2d robot_pose = new Pose2d(1.567501, 5.380708, Rotation2d.fromDegrees(180));
@@ -66,12 +69,9 @@ public class SwerveDrive extends SubsystemBase {
             if(Robot.isReal()) modules[i] = new SwerveModuleReal(module_names[i], i*2 + 1, i*2 + 2, i, abs_encoder_offsets[i]);
             else modules[i] = new SwerveModuleSim(module_names[i], i);
         
+        odometry = new SwerveDriveOdometry(kinematics, navx.getRotation2d(), getModulePositions(), robot_pose);
         pose_estimator = new SwerveDrivePoseEstimator(kinematics, navx.getRotation2d(),
-            new SwerveModulePosition[] {
-                modules[0].getPosition(),
-                modules[1].getPosition(),
-                modules[2].getPosition(),
-                modules[3].getPosition() },  
+            getModulePositions(),  
             robot_pose, 
             POSITION_STD_DEV, 
             VISION_STD_DEV );
@@ -84,9 +84,6 @@ public class SwerveDrive extends SubsystemBase {
             navx.reset();
             navx.resetDisplacement();
         }).start();
-        // for(int i = 0; i < 4; i++)
-            // SmartDashboard.putData(module_names[i], modules[i]);
-        // FieldVisualizer.getField().getObject("Test").setPose(new Pose2d());
     }
 
     @Override public void periodic(){
@@ -96,29 +93,22 @@ public class SwerveDrive extends SubsystemBase {
         for (var vision_measurement : vision_measurements){
             if(!found_pose) {
                 found_pose = true;
-                // navx.setAngleAdjustment(vision_measurement.pose.getRotation().getDegrees() - navx.getAngle());
                 pose_estimator.addVisionMeasurement(vision_measurement.pose, vision_measurement.timestamp, VISION_FIRST_STD_DEV);
             }
             else pose_estimator.addVisionMeasurement(vision_measurement.pose, vision_measurement.timestamp, VISION_STD_DEV);
             Logger.recordOutput("PoseEstimation/VisionMeasurement", vision_measurement.pose);
         }
-        SwerveModuleState[] swerve_module_states = new SwerveModuleState[] {
-                modules[0].getState(),
-                modules[1].getState(),
-                modules[2].getState(),
-                modules[3].getState()};
-        Logger.recordOutput("SwerveModules/SwerveModuleStates", swerve_module_states);
-        robot_pose = pose_estimator.update(
+        odometry.update(navx.getRotation2d(), getWheelPositions());
+        pose_estimator.update(
             navx.getRotation2d(),
-            new SwerveModulePosition[] {
-                modules[0].getPosition(),
-                modules[1].getPosition(),
-                modules[2].getPosition(),
-                modules[3].getPosition()} );
+            getWheelPositions());
+
+        robot_pose = odometry.getPoseMeters();
+
+        Logger.recordOutput("SwerveModules/SwerveModuleStates", getModuleStates());
+        Logger.recordOutput("PoseEstimation/Odometry", odometry.getPoseMeters());
         Logger.recordOutput("PoseEstimation/PoseEstimation", robot_pose);
-        Logger.recordOutput("CameraPoses/Test1", new Pose3d(robot_pose).plus(SubSystems.vision.camera_pose.inverse()));
-        Logger.recordOutput("CameraPoses/Test2", new Pose3d(robot_pose).plus(SubSystems.vision.camera_pose));
-        Logger.recordOutput("CameraPoses/Test3", new Pose3d(robot_pose).transformBy(SubSystems.vision.camera_pose));
+        Logger.recordOutput("CameraPose/Front Left", new Pose3d(robot_pose).plus(SubSystems.vision.camera_pose));
 
         FieldVisualizer.getField().setRobotPose(robot_pose);
         FieldVisualizer.getField().getObject("SwerveModules").setPoses(
@@ -131,6 +121,23 @@ public class SwerveDrive extends SubsystemBase {
         FieldVisualizer.getField().getObject("Cameras").setPoses(SubSystems.vision.getAllRobotToCameraPoses(robot_pose));
     }
 
+    private SwerveDriveWheelPositions getWheelPositions(){
+        return new SwerveDriveWheelPositions(getModulePositions());
+    }
+    private SwerveModulePosition[] getModulePositions(){
+        return new SwerveModulePosition[] {
+                modules[0].getPosition(),
+                modules[1].getPosition(),
+                modules[2].getPosition(),
+                modules[3].getPosition()};
+    }
+    private SwerveModuleState[] getModuleStates(){
+        return new SwerveModuleState[] {
+                modules[0].getState(),
+                modules[1].getState(),
+                modules[2].getState(),
+                modules[3].getState()};
+    }
     public Pose2d getPose(){ return robot_pose; }
     public SwerveDriveKinematics getKinematics(){ return kinematics; }
 
@@ -145,10 +152,10 @@ public class SwerveDrive extends SubsystemBase {
         
         if(Robot.isSimulation()){
             ChassisSpeeds chassis_speeds = kinematics.toChassisSpeeds(desired_states);
-            navx.updateSimulationAngle((
-                Rotation2d.fromRadians(
-                    MathUtil.clamp(chassis_speeds.omegaRadiansPerSecond, -TELEOP_DRIVE_MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, TELEOP_DRIVE_MAX_ANGULAR_SPEED_RADIANS_PER_SECOND) 
-                        * Robot.defaultPeriodSecs)));
+            // navx.updateSimulationAngle((
+            //     Rotation2d.fromRadians(
+            //         MathUtil.clamp(chassis_speeds.omegaRadiansPerSecond, -TELEOP_DRIVE_MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, TELEOP_DRIVE_MAX_ANGULAR_SPEED_RADIANS_PER_SECOND) 
+            //             * Robot.defaultPeriodSecs)));
         }
     }
 }
