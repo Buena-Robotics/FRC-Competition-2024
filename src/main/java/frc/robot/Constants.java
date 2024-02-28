@@ -20,7 +20,6 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterReal;
 import frc.robot.subsystems.shooter.ShooterSim;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionReal;
 import frc.robot.subsystems.vision.VisionSim;
 import frc.robot.vendor.CXboxController;
 
@@ -39,7 +38,7 @@ public final class Constants {
         public static final Shooter shooter = Robot.isReal() ? new ShooterReal() : new ShooterSim();
         public static final NoteArm note_arm = Robot.isReal() ? new NoteArmReal() : new NoteArmSim();
         public static final SwerveDrive swerve_drive = new SwerveDrive();
-        public static final Vision vision = Robot.isReal() ? new VisionReal() : new VisionSim();
+        // public static final Vision vision = Robot.isReal() ? new VisionReal() : new VisionSim();
         public static final ServoSub servo = new ServoSub();
     }
 

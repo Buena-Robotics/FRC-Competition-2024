@@ -13,19 +13,18 @@ public class VisionSim extends Vision {
     public VisionSim(){
         super();
         vision_sim = new VisionSystemSim("VisionSim");
-        vision_sim.addAprilTags();
+        // vision_sim.addAprilTags();
 
-        VisionCamera vision_camera = this.cameras.get(0);
+        // VisionCamera vision_camera = ;
 
-        PhotonCameraSim cameraSim = new PhotonCameraSim(vision_camera.photon_camera, camera_properties);
+        // PhotonCameraSim cameraSim = new PhotonCameraSim(vision_camera.photon_camera, camera_properties);
         
         // Add this camera to the vision system simulation with the given robot-to-camera transform.
-        vision_sim.addCamera(cameraSim, vision_camera.photon_pose_estimator.getRobotToCameraTransform());
+        // vision_sim.addCamera(cameraSim, vision_camera.photon_pose_estimator.getRobotToCameraTransform());
+        // cameraSim.enableRawStream(true);
+        // cameraSim.enableProcessedStream(true);
 
-        cameraSim.enableRawStream(true);
-        cameraSim.enableProcessedStream(true);
-
-        cameraSim.enableDrawWireframe(true);
+        // cameraSim.enableDrawWireframe(true);
     }
     @Override public void periodic(){
         super.periodic();

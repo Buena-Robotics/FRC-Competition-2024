@@ -56,19 +56,19 @@ public abstract class Vision extends SubsystemBase {
         // SmartDashboard.putNumberArray("Vision/FoundIds", found_fidicual_ids_arr);
     }
 
-    public final ArrayList<VisionCamera> getCameras(){ return cameras; }
-    public void addCameras(VisionCamera... cameras){ for(var camera : cameras) this.cameras.add(camera); }
-    public List<Transform2d> getAllRobotToCameraTransforms(){
-        List<Transform2d> transforms = new ArrayList<Transform2d>();
-        for(VisionCamera camera : cameras)
-            transforms.add(camera.getTransform2d());
-        return transforms;
-    }
-    public List<Pose2d> getAllRobotToCameraPoses(Pose2d robot_pose){
-        List<Transform2d> transforms = getAllRobotToCameraTransforms();
-        List<Pose2d> poses = new ArrayList<Pose2d>(transforms.size());
-        for(Transform2d transform : transforms)
-            poses.add(robot_pose.transformBy(transform));
-        return poses;
-    }
+    // public final ArrayList<VisionCamera> getCameras(){ return cameras; }
+    // public void addCameras(VisionCamera... cameras){ for(var camera : cameras) this.cameras.add(camera); }
+    // public List<Transform2d> getAllRobotToCameraTransforms(){
+    //     List<Transform2d> transforms = new ArrayList<Transform2d>();
+    //     for(VisionCamera camera : cameras)
+    //         transforms.add(camera.getTransform2d());
+    //     return transforms;
+    // }
+    // public List<Pose2d> getAllRobotToCameraPoses(Pose2d robot_pose){
+    //     List<Transform2d> transforms = getAllRobotToCameraTransforms();
+    //     List<Pose2d> poses = new ArrayList<Pose2d>(transforms.size());
+    //     for(Transform2d transform : transforms)
+    //         poses.add(robot_pose.transformBy(transform));
+    //     return poses;
+    // }
 }

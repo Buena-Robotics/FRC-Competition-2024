@@ -1,8 +1,10 @@
 package frc.robot.subsystems.vision;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -20,12 +22,12 @@ public class VisionCameraReal extends VisionCamera {
     }
 
     private Matrix<N3, N1> getEstimationStdDevs(Pose2d estimatedPose) {
-        var estStdDevs = kSingleTagStdDevs;
-        var targets = photon_camera.getLatestResult().getTargets();
+        Matrix<N3, N1> estStdDevs = kSingleTagStdDevs;
+        List<PhotonTrackedTarget> targets = photon_camera.getLatestResult().getTargets();
         int numTags = 0;
         double avgDist = 0;
-        for (var tgt : targets) {
-            var tagPose = photon_pose_estimator.getFieldTags().getTagPose(tgt.getFiducialId());
+        for (PhotonTrackedTarget target : targets) {
+            var tagPose = photon_pose_estimator.getFieldTags().getTagPose(target.getFiducialId());
             if (tagPose.isEmpty()) continue;
             numTags++;
             avgDist +=
@@ -44,12 +46,17 @@ public class VisionCameraReal extends VisionCamera {
     }
 
     @Override public Optional<TimestampedVisionMeasurement> getVisionMeasurement(){
+        if(isCameraPipelineDisabled()) return Optional.empty();
+        if(pipeline != PhotonPipeline.APRILTAG || pipeline != PhotonPipeline.ARUCRO) return Optional.empty();
         if(!photon_camera.isConnected()) return Optional.empty();
+        
         final Optional<EstimatedRobotPose> optional_estimated_pose = photon_pose_estimator.update();
         if(optional_estimated_pose.isEmpty())
             return Optional.empty();
         else{
             EstimatedRobotPose estimated_pose = optional_estimated_pose.get();
+            if(previous_vision_result_timestamp == estimated_pose.timestampSeconds) return Optional.empty();
+            previous_vision_result_timestamp = estimated_pose.timestampSeconds;
             return Optional.of(new TimestampedVisionMeasurement(
                 estimated_pose.estimatedPose.toPose2d(), 
                 estimated_pose.timestampSeconds,

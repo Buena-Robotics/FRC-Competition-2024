@@ -2,12 +2,10 @@ package frc.robot.subsystems.drive;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -22,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import frc.robot.Robot;
-import frc.robot.Constants.SubSystems;
 import frc.robot.utils.FieldVisualizer;
 import frc.robot.utils.TimerUtil;
 import frc.robot.utils.TunableNumber;
@@ -88,16 +85,16 @@ public class SwerveDrive extends SubsystemBase {
 
     @Override public void periodic(){
         for (var module : modules) module.periodic();
-        SubSystems.vision._periodic();
-        var vision_measurements = SubSystems.vision.getVisionMeasurements();
-        for (var vision_measurement : vision_measurements){
-            if(!found_pose) {
-                found_pose = true;
-                pose_estimator.addVisionMeasurement(vision_measurement.pose, vision_measurement.timestamp, VISION_FIRST_STD_DEV);
-            }
-            else pose_estimator.addVisionMeasurement(vision_measurement.pose, vision_measurement.timestamp, VISION_STD_DEV);
-            Logger.recordOutput("PoseEstimation/VisionMeasurement", vision_measurement.pose);
-        }
+        // SubSystems.vision._periodic();
+        // var vision_measurements = SubSystems.vision.getVisionMeasurements();
+        // for (var vision_measurement : vision_measurements){
+        //     if(!found_pose) {
+        //         found_pose = true;
+        //         pose_estimator.addVisionMeasurement(vision_measurement.pose, vision_measurement.timestamp, VISION_FIRST_STD_DEV);
+        //     }
+        //     else pose_estimator.addVisionMeasurement(vision_measurement.pose, vision_measurement.timestamp, VISION_STD_DEV);
+        //     Logger.recordOutput("PoseEstimation/VisionMeasurement", vision_measurement.pose);
+        // }
         odometry.update(navx.getRotation2d(), getWheelPositions());
         pose_estimator.update(
             navx.getRotation2d(),
@@ -108,7 +105,7 @@ public class SwerveDrive extends SubsystemBase {
         Logger.recordOutput("SwerveModules/SwerveModuleStates", getModuleStates());
         Logger.recordOutput("PoseEstimation/Odometry", odometry.getPoseMeters());
         Logger.recordOutput("PoseEstimation/PoseEstimation", robot_pose);
-        Logger.recordOutput("CameraPose/Front Left", new Pose3d(robot_pose).plus(SubSystems.vision.camera_pose));
+        // Logger.recordOutput("CameraPose/Front Left", new Pose3d(robot_pose).plus(SubSystems.vision.camera_pose));
 
         FieldVisualizer.getField().setRobotPose(robot_pose);
         FieldVisualizer.getField().getObject("SwerveModules").setPoses(
@@ -118,7 +115,7 @@ public class SwerveDrive extends SubsystemBase {
             robot_pose.transformBy(new Transform2d(back_left_position, modules[3].getAngle()))
             );
         
-        FieldVisualizer.getField().getObject("Cameras").setPoses(SubSystems.vision.getAllRobotToCameraPoses(robot_pose));
+        // FieldVisualizer.getField().getObject("Cameras").setPoses(SubSystems.vision.getAllRobotToCameraPoses(robot_pose));
     }
 
     private SwerveDriveWheelPositions getWheelPositions(){
