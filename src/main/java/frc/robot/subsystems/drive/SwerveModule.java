@@ -3,7 +3,6 @@ package frc.robot.subsystems.drive;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -106,8 +105,8 @@ public abstract class SwerveModule {
         runSetpoint(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
     }
 
-    public Rotation2d getAngle() { return new Rotation2d(MathUtil.angleModulus(inputs.turn_absolute_position_radians)); }
-    public double getPositionMeters() { return inputs.drive_position_radians * WHEEL_RADIUS_METERS; }
+    public Rotation2d getAngle() { return new Rotation2d(inputs.turn_position_radians); }
+    public double getPositionMeters() { return inputs.drive_position_radians * DRIVE_MOTOR_GEAR_RATIO * Math.PI * WHEEL_DIAMETER_METERS; }
     public double getVelocityMetersPerSec() { return inputs.drive_velocity_radians_per_second * WHEEL_RADIUS_METERS; }
     public SwerveModulePosition getPosition() { return new SwerveModulePosition(getPositionMeters(), getAngle()); }
     public SwerveModuleState getState() { return new SwerveModuleState(getVelocityMetersPerSec(), getAngle()); }

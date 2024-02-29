@@ -35,11 +35,6 @@
       "/SmartDashboard/VisionSystemSim-VisionSim/Sim Field": "Field2d"
     },
     "windows": {
-      "/SmartDashboard/Climb/Mecha/Arm Mechanism": {
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/Climb/Mechanism": {
         "window": {
           "visible": true
@@ -116,7 +111,10 @@
         "left": 150,
         "right": 2961,
         "top": 79,
-        "width": 16.541748046875
+        "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
       }
     }
   },
@@ -127,9 +125,10 @@
     "transitory": {
       "AdvantageKit": {
         "Drive": {
-          "Module0": {
+          "NavX": {
             "open": true
-          }
+          },
+          "open": true
         },
         "open": true
       },

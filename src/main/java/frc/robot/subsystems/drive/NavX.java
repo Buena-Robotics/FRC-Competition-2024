@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drive;
 
 import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.Logger;
 
 import com.kauailabs.navx.frc.AHRS;
 
@@ -8,7 +9,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SerialPort;
 
 public abstract class NavX extends AHRS {
@@ -43,23 +43,20 @@ public abstract class NavX extends AHRS {
     }
 
     public abstract void updateInputs();
-    public abstract void updateSim();
 
     public void periodic(){
-
+        updateInputs();
+        Logger.processInputs("Drive/NavX", inputs);
     }
 
-    public double getRollRadians() { return Units.degreesToRadians(getRoll());  }
-    public double getPitchRadians(){ return Units.degreesToRadians(getPitch()); }
-    public double getYawRadians()  { return Units.degreesToRadians(getYaw());   }
+    public double getRollRadians() { return inputs.roll_radians;  }
+    public double getPitchRadians(){ return inputs.pitch_radians; }
+    public double getYawRadians()  { return inputs.yaw_radians;   }
 
-    public double[] getRotationArrayDegrees(){ return new double[]{getRoll(), getPitch(), getYaw()}; }
-    public double[] getRotationArrayRadians(){ return new double[]{getRollRadians(), getPitchRadians(), getYawRadians()}; }
-
-    public double[] getDisplacementMeters(){ return new double[]{getDisplacementX(), getDisplacementY(), getDisplacementZ()}; }
-    public double[] getVelocityMetersPerSecond(){ return new double[]{getVelocityX(), getVelocityY(), getVelocityZ()}; }
+    public double[] getDisplacementMeters(){ return new double[]{inputs.displacement_x, inputs.displacement_y, inputs.displacement_z}; }
+    public double[] getVelocityMetersPerSecond(){ return new double[]{inputs.velocity_x, inputs.velocity_y, inputs.velocity_z}; }
 
     public Rotation3d getRotation3d() { return new Rotation3d(getRollRadians(), getPitchRadians(), getYawRadians()); }
-    public Translation3d getTranslation3d() { return new Translation3d(getDisplacementX(), getDisplacementY(), getDisplacementZ()); }
+    public Translation3d getTranslation3d() { return new Translation3d(inputs.velocity_x, inputs.velocity_y, inputs.velocity_z); }
     public Pose3d getPose3d(){ return new Pose3d(getTranslation3d(), getRotation3d()); }
 }

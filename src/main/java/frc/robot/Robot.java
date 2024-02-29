@@ -16,18 +16,18 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants.SubSystems;
 import frc.robot.utils.Print;
 
 public class Robot extends LoggedRobot {
-    private Command autonomous_command;
-
     private RobotContainer robot_container;
+    private Command autonomous_command;
+    private boolean enabled_flag = false;
 
     public Robot(){
         super(Robot.defaultPeriodSecs);
     }
     @Override public void robotInit() {
-
         switch (RobotConfig.getRobotMode()) {
         case REAL:
             Logger.addDataReceiver(new WPILOGWriter("/media/sda1/"));
@@ -55,6 +55,11 @@ public class Robot extends LoggedRobot {
 
     @Override public void robotPeriodic() {
         CommandScheduler.getInstance().run();
+        if(DriverStation.isDisabled()) enabled_flag = false;
+        if(!enabled_flag && DriverStation.isEnabled()){
+            enabled_flag = true;
+            SubSystems.swerve_drive.setHeadingDefault();
+        }
     }
 
     @Override public void disabledInit() {}

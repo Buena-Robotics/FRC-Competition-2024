@@ -9,13 +9,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants;
-import frc.robot.FieldConstants;
+import frc.robot.Robot;
 import frc.robot.Constants.IO;
-import frc.robot.FieldConstants.AimAssistTarget;
 import frc.robot.subsystems.drive.SwerveDrive;
 import frc.robot.utils.TunableNumber;
 
@@ -45,10 +43,7 @@ public class SwerveJoystickCmd extends Command {
         
         this.turret_mode = Constants.IO.controller::getStartButton;
         IO.commandController.back().onTrue(new InstantCommand(
-            () -> {
-                    swerve_drive.navx.zeroYaw();
-                    field_oriented_mode = !field_oriented_mode; }
-            ));
+            () -> { field_oriented_mode = !field_oriented_mode; }));
 
         addRequirements(swerve_drive);
     }
@@ -82,11 +77,12 @@ public class SwerveJoystickCmd extends Command {
         y_speed *= SwerveDrive.TELEOP_DRIVE_MAX_SPEED_METERS_PER_SECOND;
         turn_speed *= SwerveDrive.TELEOP_DRIVE_MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
 
-        
         ChassisSpeeds chassis_speeds = new ChassisSpeeds(x_speed, y_speed, turn_speed);
+        if(Robot.isSimulation())
+            chassis_speeds = new ChassisSpeeds(-x_speed, -y_speed, -turn_speed);
 
         if(field_oriented_mode){
-            chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x_speed, y_speed, turn_speed, swerve_drive.navx.getRotation2d());
+            chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x_speed, y_speed, turn_speed, swerve_drive.getHeading());
         }
 
         // final var best_aim_assist_target = FieldConstants.getBestAimAssistTarget(swerve_drive.getPose());

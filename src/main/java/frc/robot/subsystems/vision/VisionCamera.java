@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.littletonrobotics.junction.AutoLog;
-import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.estimation.TargetModel;
+import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -28,7 +28,7 @@ public abstract class VisionCamera {
         public PhotonPipeline pipeline;
         public boolean driver_mode;
         public Pose3d camera_pose;
-        public List<PhotonTrackedTarget> tracked_targets = new ArrayList<PhotonTrackedTarget>();
+        // public List<PhotonTrackedTarget> tracked_targets = new ArrayList<PhotonTrackedTarget>();
     }
     public static class TimestampedVisionMeasurement {
         public final Pose2d pose;
@@ -70,6 +70,7 @@ public abstract class VisionCamera {
         this.photon_pose_estimator.setTagModel(TargetModel.kAprilTag36h11);
     }
     public abstract Optional<TimestampedVisionMeasurement> getVisionMeasurement();
+    public abstract Optional<PhotonPipelineResult> getNoteDetection();
 
     public void periodic(){
 

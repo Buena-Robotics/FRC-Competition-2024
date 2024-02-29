@@ -1,10 +1,7 @@
 package frc.robot.subsystems.vision;
 
-import org.photonvision.simulation.PhotonCameraSim;
-import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.utils.FieldVisualizer;
 
 public class VisionSim extends Vision {

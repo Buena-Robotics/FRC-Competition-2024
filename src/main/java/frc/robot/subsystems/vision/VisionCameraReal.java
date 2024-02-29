@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
+import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.Matrix;
@@ -46,9 +47,9 @@ public class VisionCameraReal extends VisionCamera {
     }
 
     @Override public Optional<TimestampedVisionMeasurement> getVisionMeasurement(){
-        if(isCameraPipelineDisabled()) return Optional.empty();
         if(pipeline != PhotonPipeline.APRILTAG || pipeline != PhotonPipeline.ARUCRO) return Optional.empty();
         if(!photon_camera.isConnected()) return Optional.empty();
+        if(isCameraPipelineDisabled()) return Optional.empty();
         
         final Optional<EstimatedRobotPose> optional_estimated_pose = photon_pose_estimator.update();
         if(optional_estimated_pose.isEmpty())
@@ -63,5 +64,14 @@ public class VisionCameraReal extends VisionCamera {
                 getEstimationStdDevs(estimated_pose.estimatedPose.toPose2d()),
                 estimated_pose.targetsUsed ));
         }
+    }
+    @Override public Optional<PhotonPipelineResult> getNoteDetection() {
+        if(pipeline != PhotonPipeline.NOTE_DETECTION) return Optional.empty();
+        if(!photon_camera.isConnected()) return Optional.empty();
+        if(isCameraPipelineDisabled()) return Optional.empty();
+
+        if(!photon_camera.getLatestResult().hasTargets()) return Optional.empty();
+
+        return Optional.of(photon_camera.getLatestResult());
     }
 }

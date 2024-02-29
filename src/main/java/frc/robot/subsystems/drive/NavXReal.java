@@ -1,5 +1,6 @@
 package frc.robot.subsystems.drive;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SerialPort;
 
 public class NavXReal extends NavX {
@@ -9,7 +10,25 @@ public class NavXReal extends NavX {
     }
     
     @Override public void updateInputs() {
-        
+        inputs.calibrating = super.isCalibrating();
+        inputs.moving = super.isMoving();
+        inputs.rotating = super.isRotating();
+
+        inputs.timestamp = super.getLastSensorTimestamp();
+        inputs.angle_adjustment = super.getAngleAdjustment();
+        inputs.temperature_celcius = super.getTempC();
+
+        inputs.angle = super.getRotation2d();
+        inputs.roll_radians = Units.degreesToRadians(super.getRoll());
+        inputs.pitch_radians = Units.degreesToRadians(super.getPitch());
+        inputs.yaw_radians = Units.degreesToRadians(super.getYaw());
+
+        inputs.velocity_x = super.getVelocityX();
+        inputs.velocity_y = super.getVelocityY();
+        inputs.velocity_z = super.getVelocityZ();
+
+        inputs.displacement_x = super.getDisplacementX();
+        inputs.displacement_y = super.getDisplacementY();
+        inputs.displacement_z = super.getDisplacementZ();
     }
-    @Override public void updateSim() {}
 }
