@@ -79,5 +79,5 @@ public abstract class NavX extends AHRS {
     public Rotation3d getRotation3d() { return new Rotation3d(getRollRadians(), getPitchRadians(), getYawRadians()); }
     public Translation3d getTranslation3d() { return new Translation3d(inputs.velocity_x, inputs.velocity_y, inputs.velocity_z); }
     public Pose3d getPose3d(){ return new Pose3d(getTranslation3d(), getRotation3d()).relativeTo(new Pose3d(start_pose)); }
-    public Pose3d getEstimatedPose(){ return inputs.estimated_pose; }
+    public Pose2d getEstimatedPose(){ return inputs.estimated_pose; }
 }

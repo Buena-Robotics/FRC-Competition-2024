@@ -20,6 +20,23 @@ import frc.robot.subsystems.climber.Climb.ArmPosition;
 import frc.robot.utils.TunableNumber;
 
 public abstract class NoteArm extends SubsystemBase {
+    @AutoLog public static class NoteArmInputs {
+        public boolean is_claw_open = true;
+        public boolean is_arm_out = false;
+        public boolean is_arm_up = false;
+
+        public double color_sensor_color[] = new double[3];
+        public int color_sensor_red_raw = 0;
+        public int color_sensor_green_raw = 0;
+        public int color_sensor_blue_raw = 0;
+        public int color_sensor_ir_raw = 0;
+        public int color_sensor_proximity_raw = 2047;
+
+        public double compressor_applied_volts = 0.0;
+        public double compressor_current_amps = 0.0;
+        public double[] compressor_pressure = 0.0;
+    }
+
     private static final TunableNumber note_distance_threshold_mm = new TunableNumber("NoteArm/NoteDistanceThreshMM", 2000);
     private static final TunableNumber note_hue_lower_threshold = new TunableNumber("NoteArm/NoteHueLowerThresh", 10);
     private static final TunableNumber note_hue_upper_threshold = new TunableNumber("NoteArm/NoteHueUpperThresh", 90);
@@ -43,13 +60,31 @@ public abstract class NoteArm extends SubsystemBase {
     protected final DoubleSolenoid arm_up_solenoid  = new DoubleSolenoid(PNEUMATIC_MODULE_ID, PNEUMATICS_MODULE_TYPE, ARM_UP_SOLENOID_FORWARD_CHANNEL, ARM_UP_SOLENOID_REVERSE_CHANNEL);
     protected final DoubleSolenoid arm_out_solenoid = new DoubleSolenoid(PNEUMATIC_MODULE_ID, PNEUMATICS_MODULE_TYPE, ARM_OUT_SOLENOID_FORWARD_CHANNEL, ARM_OUT_SOLENOID_REVERSE_CHANNEL);
     protected final ColorSensorV3 color_sensor      = new ColorSensorV3(COLOR_SENSOR_PORT);
-    
+
+    protected NoteArmInputsAutoLogged inputs = new NoteArmInputsAutoLogged();
+
     public NoteArm(){
         claw_solenoid.set(Value.kOff);
         arm_up_solenoid.set(Value.kOff);
         arm_out_solenoid.set(Value.kOff);
-        hub.enableCompressorDigital();
         compressor.enableDigital();
+    }
+
+    protected void updateInputs(){
+        is_claw_open = isClawOpen();
+        is_arm_out = isArmOut();
+        is_arm_up = isArmUp();
+
+        color_sensor_color[] = new double[3];
+        color_sensor_red_raw = color_sensor.getRed();
+        color_sensor_green_raw = color_sensor.getGreen();
+        color_sensor_blue_raw = color_sensor.getBlue();
+        color_sensor_ir_raw = color_sensor.getIR();
+        color_sensor_proximity_raw = color_sensor.getProximity();
+
+        compressor_applied_volts = compressor.getAnalogVoltage();
+        compressor_current_amps = compressor.getCurrent();
+        compressor_pressure = compressor.getPressure();
     }
 
     public boolean isClawOpen(){ return claw_solenoid.get() == Value.kForward; }
@@ -110,6 +145,8 @@ public abstract class NoteArm extends SubsystemBase {
 
 
     @Override public void periodic() {
+        updateInputs();
+        Logger.processInputs("NoteArm", inputs);
         SmartDashboard.putBoolean("NoteArm/NoteDetected", noteDetected());
         SmartDashboard.putBoolean("NoteArm/ColorSensorConnected", color_sensor.isConnected());
 
@@ -127,15 +164,12 @@ public abstract class NoteArm extends SubsystemBase {
     public Command pullArmDownCommand(){ return this.runOnce(() -> { moveArmDown(); }); }
 
     public Command grabNoteFullCommand(){
-        return new ParallelCommandGroup(
-                Constants.SubSystems.climb.moveArmToPosition(ArmPosition.UP),
-                grabNoteCommand()
-                    .andThen(new WaitCommand(0.75)
-                    .andThen(pullArmInCommand()))
-            )
-            .andThen(new WaitCommand(0.5))
+        return grabNoteCommand()
+            .andThen(new WaitCommand(0.5)
+            .andThen(pullArmInCommand()))
+            .andThen(new WaitCommand(0.25))
             .andThen(pushArmUpCommand())
-            .andThen(new WaitCommand(0.75))
+            .andThen(new WaitCommand(0.5))
             .andThen(pushArmOutCommand());
     }
     public Command releaseNoteFullCommand(){
@@ -143,7 +177,7 @@ public abstract class NoteArm extends SubsystemBase {
                 .andThen(releaseNoteCommand())
                 .andThen(new WaitCommand(DELAY + 1.0))
                 .andThen(pullArmInCommand())
-                .andThen(new WaitCommand(DELAY))
+                .andThen(new WaitCommand(0.65))
                 .andThen(pullArmDownCommand())
                 .andThen(new WaitCommand(0.05))
                 .andThen(pushArmOutCommand());

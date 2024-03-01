@@ -78,10 +78,10 @@ public abstract class Climb extends SubsystemBase {
         final Rotation2d measurement = new Rotation2d(inputs.bore_absolute_position_radians);
         
         double voltage = 0.0;
-        if(measurement.minus(setpoint).getRadians() < 0)
-            voltage = Math.sqrt(measurement.unaryMinus().plus(setpoint).getDegrees()) + 1;
+        if(measurement.minus(setpoint).getDegrees() < 0)
+            voltage = Math.sqrt(measurement.unaryMinus().plus(setpoint).getDegrees());
         else 
-            voltage = -Math.sqrt(measurement.minus(setpoint).getDegrees()) - 1;
+            voltage = -Math.sqrt(measurement.minus(setpoint).getDegrees());
         voltage = MathUtil.clamp(voltage, -12, 12);
 
         if(inputs.winch_rotations < 4/64.0 && voltage < 0){

@@ -13,7 +13,7 @@ public class NavXReal extends NavX {
         this.resetDisplacement();
     }
     
-    private void updateOdometer(){
+    private Pose2d updatePose(){
         estimated_pose.transformBy(
             new Transform2d(
                 inputs.velocity_x * delta_time, 
@@ -23,6 +23,7 @@ public class NavXReal extends NavX {
         double timestamp = Timer.getFPGATimestamp();
         delta_time = timestamp - last_timestamp; 
         last_timestamp = timestamp;
+        return estimated_pose.relativeTo(start_pose);
     }
 
     @Override public void updateInputs() {
@@ -48,6 +49,6 @@ public class NavXReal extends NavX {
         inputs.displacement_y = removeNoise(super.getDisplacementY());
         inputs.displacement_z = removeNoise(super.getDisplacementZ());
 
-        inputs.estimated_pose = estimated_pose;
+        inputs.estimated_pose = updatePose();
     }
 }
