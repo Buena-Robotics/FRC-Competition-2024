@@ -8,8 +8,6 @@ import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
@@ -67,12 +65,12 @@ public class SwerveModuleReal extends SwerveModule {
             DriverStation.reportError(str_error, false);
     }
 
-    private double getAbsoluteEncoderRadians(){ 
+    /*private double getAbsoluteEncoderRadians(){ 
         double angle = absolute_encoder.getVoltage() / RobotController.getVoltage5V();
         angle *= 2.0 * Math.PI;
         angle -= absolute_encoder_offset_radians;
         return angle;
-    }
+    }*/
 
     @Override public void updateInputs() {
         inputs.drive_position_meters = drive_encoder.getPosition();

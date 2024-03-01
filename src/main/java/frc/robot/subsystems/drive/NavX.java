@@ -5,6 +5,7 @@ import org.littletonrobotics.junction.Logger;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -54,7 +55,7 @@ public abstract class NavX extends AHRS {
 
     public abstract void updateInputs();
 
-    @Override public void periodic(){
+    public void periodic(){
         updateInputs();
         Logger.processInputs("Drive/NavX", inputs);
     }

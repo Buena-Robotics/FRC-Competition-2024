@@ -1,5 +1,7 @@
 package frc.robot.subsystems.shooter;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 
@@ -28,10 +30,10 @@ public class ShooterSim extends Shooter {
     }
     @Override public void setFeedVoltage(double volts){ 
         feed_applied_volts = MathUtil.clamp(volts, -12.0, 12.0);
-        feed_motor.setVoltage(feed_applied_volts); 
+        feed_sim.setInputVoltage(feed_applied_volts); 
     }
     @Override public void setLaunchVoltage(double volts){ 
         launch_applied_volts = MathUtil.clamp(volts, -12.0, 12.0);
-        launch_motor.setVoltage(launch_applied_volts); 
+        launch_sim.setInputVoltage(launch_applied_volts); 
     }
 }

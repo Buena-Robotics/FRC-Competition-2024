@@ -10,8 +10,8 @@ public class LaunchNote extends Command {
     public LaunchNote(Shooter shooter) { this.shooter = shooter; }
 
     @Override public void initialize() {
-        shooter.setLaunchVoltage(LAUNCH_SPEED_MAX * 12);
-        shooter.setFeedVoltage(LAUNCH_SPEED_MAX * 12);
+        shooter.setLaunchVoltage(Shooter.LAUNCH_SPEED_MAX * 12);
+        shooter.setFeedVoltage(Shooter.LAUNCH_SPEED_MAX * 12);
     }
     @Override public boolean isFinished() { return false; }
 

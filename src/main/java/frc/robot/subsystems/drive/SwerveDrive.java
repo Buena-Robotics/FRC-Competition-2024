@@ -41,7 +41,6 @@ public class SwerveDrive extends SubsystemBase {
     private static final double CENTER_TO_MODULE = Units.inchesToMeters(10.75);
     private static final Matrix<N3, N1> POSITION_STD_DEV = VecBuilder.fill(0.1, 0.1, 0.1);
     private static final Matrix<N3, N1> VISION_STD_DEV   = VecBuilder.fill(1, 1, 3);
-    private static final Matrix<N3, N1> VISION_FIRST_STD_DEV   = VecBuilder.fill(0.3, 0.3, 0.1);
     private static final int MAX_NAVX_CALIBRATION_TIME_MS = 20 * 1000;
     private static final String[] module_names = { "Front Right", "Front Left", "Back Right", "Back Left" };
     private static final double[] abs_encoder_offsets = { 4.071693, 2.830042 + Math.PI, 5.274043, 1.992770 + Math.PI };
@@ -63,7 +62,6 @@ public class SwerveDrive extends SubsystemBase {
     private final SwerveDrivePoseEstimator pose_estimator;
 
     private Pose2d robot_pose = new Pose2d(1.567501, 5.380708, Rotation2d.fromDegrees(180));
-    private boolean found_pose = false;
 
     public SwerveDrive(){
         modules = new SwerveModule[4];

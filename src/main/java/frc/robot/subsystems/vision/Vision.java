@@ -6,15 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.subsystems.vision.VisionCamera.TimestampedVisionMeasurement;
 import frc.robot.utils.FieldVisualizer;
-import frc.robot.utils.Print;
 
 public class Vision extends SubsystemBase {
     public static class CameraData {
