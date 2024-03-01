@@ -14,8 +14,8 @@ import frc.robot.Robot;
 
 public abstract class SwerveModule {
     @AutoLog public static class SwerveModuleInputs {
-        public double drive_position_radians = 0.0;
-        public double drive_velocity_radians_per_second = 0.0;
+        public double drive_position_meters = 0.0;
+        public double drive_velocity_meters_per_second = 0.0;
         public double drive_applied_volts = 0.0;
         public double[] drive_current_amps = new double[] {};
         public double[] drive_temp_celcius = new double[] {};
@@ -29,13 +29,12 @@ public abstract class SwerveModule {
     }
 
     protected static final double WHEEL_DIAMETER_METERS  = Units.inchesToMeters(4);
-    protected static final double WHEEL_RADIUS_METERS  = WHEEL_DIAMETER_METERS / 2;
     protected static final double DRIVE_MOTOR_GEAR_RATIO = 1 / 6.75;
     protected static final double TURN_MOTOR_GEAR_RATIO  = 1 / 12.8;
-    protected static final double DRIVE_ENCODER_ROTATION_TO_METERS       = DRIVE_MOTOR_GEAR_RATIO * WHEEL_DIAMETER_METERS * Math.PI;
-    protected static final double DRIVE_ENCODER_RPM_TO_METERS_PER_SECOND = DRIVE_ENCODER_ROTATION_TO_METERS / 60;
-    protected static final double TURN_ENCODER_ROTATION_TO_RADIANS       = TURN_MOTOR_GEAR_RATIO * 2 * Math.PI; 
-    protected static final double TURN_ENCODER_RPM_TO_RADIANS_PER_SECOND = TURN_ENCODER_ROTATION_TO_RADIANS / 60; 
+    private static final double DRIVE_ENCODER_ROTATION_TO_METERS       = DRIVE_MOTOR_GEAR_RATIO * Math.PI * WHEEL_DIAMETER_METERS;
+    private static final double TURN_ENCODER_ROTATION_TO_RADIANS       = TURN_MOTOR_GEAR_RATIO * 2 * Math.PI;
+    private static final double DRIVE_ENCODER_RPM_TO_METERS_PER_SECOND = DRIVE_ENCODER_ROTATION_TO_METERS / 60;
+    private static final double TURN_ENCODER_RPM_TO_RADIANS_PER_SECOND = TURN_ENCODER_ROTATION_TO_RADIANS / 60;
 
     private static final TunableNumber driveKp = new TunableNumber("Drive/Module/DriveKp", 1.0);
     private static final TunableNumber driveKd = new TunableNumber("Drive/Module/DriveKd");
@@ -80,19 +79,25 @@ public abstract class SwerveModule {
         drive_feedforward = new SimpleMotorFeedforward(driveKs.get(), driveKv.get());
     }
 
-    public SwerveModuleState runSetpoint(SwerveModuleState state) {
+    public void runSetpoint(SwerveModuleState state) {
+        if(Math.abs(state.speedMetersPerSecond) < SET_STATE_SPEED_METERS_PER_SECOND_DEADBAND) {
+            stop();
+            return;
+        }
         SwerveModuleState optimized_state = SwerveModuleState.optimize(state, getAngle());
 
-        setTurnVoltage( 
-            turn_feedback.calculate(getAngle().getRadians(), optimized_state.angle.getRadians()) );
+        setDriveVoltage( (optimized_state.speedMetersPerSecond / Constants.Drive.PHYSICAL_MAX_SPEED_METERS_PER_SECOND) * 12);
+        setTurnVoltage( (turn_feedback.calculate(turn_position_radians, state.angle.getRadians()) ) * 12);
 
-        optimized_state.speedMetersPerSecond *= Math.cos(turn_feedback.getPositionError());
+        // setTurnVoltage(
+            // turn_feedback.calculate(getAngle().getRadians(), optimized_state.angle.getRadians()) );
 
-        double velocity_radians_per_second = optimized_state.speedMetersPerSecond / WHEEL_RADIUS_METERS;
-        setDriveVoltage(
-            drive_feedforward.calculate(velocity_radians_per_second) 
-                + drive_feedback.calculate(inputs.drive_velocity_radians_per_second, velocity_radians_per_second));
-        return optimized_state;
+        // optimized_state.speedMetersPerSecond *= Math.cos(turn_feedback.getPositionError());
+
+        // double velocity_radians_per_second = optimized_state.speedMetersPerSecond / WHEEL_RADIUS_METERS;
+        // setDriveVoltage(
+            // drive_feedforward.calculate(velocity_radians_per_second) 
+                // + drive_feedback.calculate(inputs.drive_velocity_radians_per_second, velocity_radians_per_second));
     }
 
     public void stop() {
@@ -106,8 +111,8 @@ public abstract class SwerveModule {
     }
 
     public Rotation2d getAngle() { return new Rotation2d(inputs.turn_position_radians); }
-    public double getPositionMeters() { return inputs.drive_position_radians * DRIVE_MOTOR_GEAR_RATIO * Math.PI * WHEEL_DIAMETER_METERS; }
-    public double getVelocityMetersPerSec() { return inputs.drive_velocity_radians_per_second * WHEEL_RADIUS_METERS; }
+    public double getPositionMeters() { return inputs.drive_position_meters; }
+    public double getVelocityMetersPerSec() { return inputs.drive_velocity_meters_per_second; }
     public SwerveModulePosition getPosition() { return new SwerveModulePosition(getPositionMeters(), getAngle()); }
     public SwerveModuleState getState() { return new SwerveModuleState(getVelocityMetersPerSec(), getAngle()); }
 }

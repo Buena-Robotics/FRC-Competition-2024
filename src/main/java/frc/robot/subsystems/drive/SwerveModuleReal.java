@@ -39,11 +39,15 @@ public class SwerveModuleReal extends SwerveModule {
         this.turn_motor.setCANTimeout(CAN_TIMEOUT);
 
         this.drive_encoder = drive_motor.getEncoder();
+        this.drive_encoder.setPositionConversionFactor(DRIVE_ENCODER_ROTATION_TO_METERS);
+        this.drive_encoder.setVelocityConversionFactor(DRIVE_ENCODER_RPM_TO_METERS_PER_SECOND);
         this.drive_encoder.setPosition(0.0);
         this.drive_encoder.setMeasurementPeriod(10);
         this.drive_encoder.setAverageDepth(2);
         
         this.turn_encoder = turn_motor.getEncoder();
+        this.turn_encoder.setPositionConversionFactor(TURN_ENCODER_ROTATION_TO_RADIANS);
+        this.turn_encoder.setVelocityConversionFactor(TURN_ENCODER_RPM_TO_RADIANS_PER_SECOND);
         this.turn_encoder.setPosition(0);
         this.turn_encoder.setMeasurementPeriod(10);
         this.turn_encoder.setAverageDepth(2);
@@ -53,14 +57,8 @@ public class SwerveModuleReal extends SwerveModule {
     }
 
     @Override public void updateInputs() {
-        inputs.drive_position_radians =
-            SparkMaxUtils.cleanSparkMaxValue(
-                inputs.drive_position_radians,
-                Units.rotationsToRadians(drive_encoder.getPosition()) * DRIVE_ENCODER_ROTATION_TO_METERS); //TODO: Replace '/' with '*'
-        inputs.drive_velocity_radians_per_second =
-            SparkMaxUtils.cleanSparkMaxValue(
-                inputs.drive_velocity_radians_per_second,
-                Units.rotationsPerMinuteToRadiansPerSecond(drive_encoder.getVelocity()) * DRIVE_ENCODER_ROTATION_TO_METERS);
+        inputs.drive_position_meters = drive_encoder.getPosition();
+        inputs.drive_velocity_meters_per_second = drive_encoder.getVelocity();
         inputs.drive_applied_volts = drive_motor.getAppliedOutput() * drive_motor.getBusVoltage();
         inputs.drive_current_amps = new double[] {drive_motor.getOutputCurrent()};
         inputs.drive_temp_celcius = new double[] {drive_motor.getMotorTemperature()};
@@ -70,17 +68,11 @@ public class SwerveModuleReal extends SwerveModule {
                 new Rotation2d(
                         (absolute_encoder.getVoltage()
                             / RobotController.getVoltage5V()
-                            * 2.0
-                            * Math.PI - absolute_encoder_offset_radians))
+                            * 2.0 * Math.PI 
+                            - absolute_encoder_offset_radians))
                     .getRadians());
-        inputs.turn_position_radians =
-            SparkMaxUtils.cleanSparkMaxValue(
-                inputs.turn_position_radians,
-                Units.rotationsToRadians(turn_encoder.getPosition()) * TURN_ENCODER_ROTATION_TO_RADIANS);
-        inputs.turn_velocity_radians_per_second =
-            SparkMaxUtils.cleanSparkMaxValue(
-                inputs.turn_velocity_radians_per_second,
-                Units.rotationsPerMinuteToRadiansPerSecond(turn_encoder.getVelocity()) * TURN_ENCODER_ROTATION_TO_RADIANS);
+        inputs.turn_position_radians = turn_encoder.getPosition();
+        inputs.turn_velocity_radians_per_second = turn_encoder.getVelocity();
         inputs.turn_applied_volts = turn_motor.getAppliedOutput() * turn_motor.getBusVoltage();
         inputs.turn_current_amps = new double[] {turn_motor.getOutputCurrent()};
         inputs.turn_temp_celcius = new double[] {turn_motor.getMotorTemperature()};
@@ -90,6 +82,4 @@ public class SwerveModuleReal extends SwerveModule {
     @Override public void setTurnVoltage (double volts) { turn_motor.setVoltage(volts); }
     @Override public void setDriveBrakeMode(boolean enable) { drive_motor.setIdleMode(enable ? IdleMode.kBrake : IdleMode.kCoast); }
     @Override public void setTurnBrakeMode (boolean enable) { turn_motor.setIdleMode(enable ? IdleMode.kBrake : IdleMode.kCoast); }
-
-    // public double absEncoder(){ return absolute_encoder.getVoltage() / RobotController.getVoltage5V(); }
 }
