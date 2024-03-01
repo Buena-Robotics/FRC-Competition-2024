@@ -35,6 +35,7 @@ public abstract class SwerveModule {
     protected static final double TURN_ENCODER_ROTATION_TO_RADIANS       = TURN_MOTOR_GEAR_RATIO * 2 * Math.PI;
     protected static final double DRIVE_ENCODER_RPM_TO_METERS_PER_SECOND = DRIVE_ENCODER_ROTATION_TO_METERS / 60;
     protected static final double TURN_ENCODER_RPM_TO_RADIANS_PER_SECOND = TURN_ENCODER_ROTATION_TO_RADIANS / 60;
+    private static final double SET_STATE_SPEED_METERS_PER_SECOND_DEADBAND = 0.001;
 
     private static final TunableNumber driveKp = new TunableNumber("Drive/Module/DriveKp", 1.0);
     private static final TunableNumber driveKd = new TunableNumber("Drive/Module/DriveKd");
@@ -58,12 +59,14 @@ public abstract class SwerveModule {
 
         this.drive_feedforward = new SimpleMotorFeedforward(driveKs.get(), driveKv.get());
         this.drive_feedback = new PIDController(driveKp.get(), 0.0, driveKd.get(), Robot.defaultPeriodSecs);
-        this.turn_feedback  = new PIDController(turnKp.get(), 0.0, turnKd.get(), Robot.defaultPeriodSecs);
+        this.turn_feedback  = new PIDController(0.5, 0.0, 0, Robot.defaultPeriodSecs);
         
         this.turn_feedback.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     public abstract void updateInputs();
+    public abstract void setDrive(double value);
+    public abstract void setTurn(double value);
     public abstract void setDriveVoltage(double volts);
     public abstract void setTurnVoltage(double volts);
     public abstract void setDriveBrakeMode(boolean enable);
@@ -74,20 +77,24 @@ public abstract class SwerveModule {
         Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
 
         // Update controllers if tunable numbers have changed
-        drive_feedback.setPID(driveKp.get(), 0.0, driveKd.get());
-        turn_feedback.setPID(turnKp.get(), 0.0, turnKd.get());
-        drive_feedforward = new SimpleMotorFeedforward(driveKs.get(), driveKv.get());
+        // drive_feedback.setPID(driveKp.get(), 0.0, driveKd.get());
+        // turn_feedback.setPID(turnKp.get(), 0.0, turnKd.get());
+        // drive_feedforward = new SimpleMotorFeedforward(driveKs.get(), driveKv.get());
     }
 
     public void runSetpoint(SwerveModuleState state) {
-        if(Math.abs(state.speedMetersPerSecond) < 0.0001) {
+        if(Math.abs(state.speedMetersPerSecond) < SET_STATE_SPEED_METERS_PER_SECOND_DEADBAND) {
             stop();
             return;
         }
         SwerveModuleState optimized_state = SwerveModuleState.optimize(state, getAngle());
 
-        setDriveVoltage( (optimized_state.speedMetersPerSecond / SwerveDrive.PHYSICAL_MAX_SPEED_METERS_PER_SECOND) * 12);
-        setTurnVoltage( (turn_feedback.calculate(inputs.turn_position_radians, state.angle.getRadians()) ) * 12);
+        setTurn( turn_feedback.calculate(inputs.turn_absolute_position_radians, optimized_state.angle.getRadians()));   
+
+        optimized_state.speedMetersPerSecond *= Math.cos(turn_feedback.getPositionError());
+        setDriveVoltage(
+            drive_feedforward.calculate(optimized_state.speedMetersPerSecond)
+                + drive_feedback.calculate(inputs.drive_velocity_meters_per_second, optimized_state.speedMetersPerSecond));
 
         // setTurnVoltage(
             // turn_feedback.calculate(getAngle().getRadians(), optimized_state.angle.getRadians()) );

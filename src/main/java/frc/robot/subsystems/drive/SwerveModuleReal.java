@@ -3,15 +3,13 @@ package frc.robot.subsystems.drive;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
-import frc.robot.utils.SparkMaxUtils;
+import frc.robot.utils.Print;
 
 public class SwerveModuleReal extends SwerveModule {
     private final CANSparkMax drive_motor;
@@ -38,39 +36,18 @@ public class SwerveModuleReal extends SwerveModule {
         this.turn_encoder = turn_motor.getEncoder();
         this.turn_encoder.setPositionConversionFactor(TURN_ENCODER_ROTATION_TO_RADIANS);
         this.turn_encoder.setVelocityConversionFactor(TURN_ENCODER_RPM_TO_RADIANS_PER_SECOND);
-        this.turn_encoder.setPosition(0);
+        this.turn_encoder.setPosition(getAbsoluteEncoderRadians());
         
         this.drive_motor.enableVoltageCompensation(12.0);
         this.turn_motor.enableVoltageCompensation(12.0);
-
-
-        checkConnections();
     }
 
-    private void checkConnections(){
-        REVLibError drive_revlib_error = drive_motor.getLastError();
-        REVLibError turn_revlib_error = drive_motor.getLastError();
-        boolean absolute_encoder_connected = absolute_encoder.isAccumulatorChannel();
-
-        String str_error = "";
-
-        if(drive_revlib_error != REVLibError.kOk)
-            str_error += String.format("[SModule%d: %s - Drive Motor]: %s", index, module_name, SparkMaxUtils.REVErrorToString(drive_revlib_error));
-        if(turn_revlib_error != REVLibError.kOk)
-            str_error += String.format("[SModule%d: %s - Turn Motor]: %s", index, module_name, SparkMaxUtils.REVErrorToString(turn_revlib_error));
-        if(!absolute_encoder_connected)
-            str_error += String.format("[SModule%d: %s - Abs Encoder]: Disconnected", index, module_name);
-        
-        if(!str_error.equals(""))
-            DriverStation.reportError(str_error, false);
-    }
-
-    /*private double getAbsoluteEncoderRadians(){ 
+    private double getAbsoluteEncoderRadians(){ 
         double angle = absolute_encoder.getVoltage() / RobotController.getVoltage5V();
         angle *= 2.0 * Math.PI;
         angle -= absolute_encoder_offset_radians;
         return angle;
-    }*/
+    }
 
     @Override public void updateInputs() {
         inputs.drive_position_meters = drive_encoder.getPosition();
@@ -98,4 +75,12 @@ public class SwerveModuleReal extends SwerveModule {
     @Override public void setTurnVoltage (double volts) { turn_motor.setVoltage(volts); }
     @Override public void setDriveBrakeMode(boolean enable) { drive_motor.setIdleMode(enable ? IdleMode.kBrake : IdleMode.kCoast); }
     @Override public void setTurnBrakeMode (boolean enable) { turn_motor.setIdleMode(enable ? IdleMode.kBrake : IdleMode.kCoast); }
+
+    @Override public void setDrive(double value) {
+        // if(index == 0)
+            // Print.log("%s: %f", module_name, value);
+        drive_motor.set(value); 
+    }
+
+    @Override public void setTurn(double value) { turn_motor.set(value); }
 }

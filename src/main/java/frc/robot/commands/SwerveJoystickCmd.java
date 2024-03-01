@@ -6,6 +6,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants;
@@ -56,6 +57,8 @@ public class SwerveJoystickCmd extends Command {
         double y_speed = y_speed_function.get();
         double turn_speed = turn_speed_function.get();
 
+        SmartDashboard.putNumber("Read/BeforeX", x_speed);
+
         if(Math.abs(x_speed) > 0.9)
              y_speed = Math.abs(y_speed) > left_joystick_deadband.get() + LEFT_DEADBAND_MODIFIER ? y_speed : 0.0;
         else y_speed = Math.abs(y_speed) > left_joystick_deadband.get() ? y_speed : 0.0;
@@ -104,7 +107,9 @@ public class SwerveJoystickCmd extends Command {
         //     }
         // }
 
-        
+        SmartDashboard.putNumber("Read/AfterX", x_speed);
+
+
         SwerveModuleState[] module_states = swerve_drive.getKinematics().toSwerveModuleStates(chassis_speeds);
         swerve_drive.setModuleStates(module_states);
     }

@@ -43,7 +43,7 @@ public class SwerveDrive extends SubsystemBase {
     private static final Matrix<N3, N1> VISION_STD_DEV   = VecBuilder.fill(1, 1, 3);
     private static final int MAX_NAVX_CALIBRATION_TIME_MS = 20 * 1000;
     private static final String[] module_names = { "Front Right", "Front Left", "Back Right", "Back Left" };
-    private static final double[] abs_encoder_offsets = { 4.071693, 2.830042 + Math.PI, 5.274043, 1.992770 + Math.PI };
+    private static final double[] abs_encoder_offsets = { 4.071693, 2.830042 + Math.PI, 5.274043, 1.992770 };
     
     private static final Translation2d front_right_position = new Translation2d(CENTER_TO_MODULE,  -CENTER_TO_MODULE); // (+, -)
     private static final Translation2d front_left_position  = new Translation2d(CENTER_TO_MODULE,   CENTER_TO_MODULE); // (+, +)
