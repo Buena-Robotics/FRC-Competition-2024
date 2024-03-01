@@ -6,10 +6,8 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.Constants.IO;
 import frc.robot.subsystems.drive.SwerveDrive;
@@ -23,9 +21,9 @@ public class SwerveJoystickCmd extends Command {
     private final SwerveDrive swerve_drive;
 
     private final PIDController turret_turn_feedback;
-    private final PIDController aim_assist_x_feedback, aim_assist_y_feedback;
+    // private final PIDController aim_assist_x_feedback, aim_assist_y_feedback;
     private final Supplier<Double> x_speed_function, y_speed_function, turn_speed_function;
-    private final Supplier<Boolean> turret_mode;
+    // private final Supplier<Boolean> turret_mode;
     private boolean field_oriented_mode = false;
     
     public SwerveJoystickCmd(SwerveDrive swerve_drive, Supplier<Double> x_speed_function, Supplier<Double> y_speed_function, Supplier<Double> turn_speed_function){
@@ -33,13 +31,13 @@ public class SwerveJoystickCmd extends Command {
         
         this.turret_turn_feedback = new PIDController(5, 0, 0.1);
         this.turret_turn_feedback.enableContinuousInput(-Math.PI, Math.PI);
-        this.aim_assist_x_feedback = new PIDController(0.75, 0, 0);
-        this.aim_assist_y_feedback = new PIDController(0.75, 0, 0);
+        // this.aim_assist_x_feedback = new PIDController(0.75, 0, 0);
+        // this.aim_assist_y_feedback = new PIDController(0.75, 0, 0);
         this.x_speed_function    = x_speed_function;
         this.y_speed_function    = y_speed_function;
         this.turn_speed_function = turn_speed_function;
         
-        this.turret_mode = Constants.IO.controller::getStartButton;
+        // this.turret_mode = Constants.IO.controller::getStartButton;
         IO.commandController.back().onTrue(new InstantCommand(
             () -> { field_oriented_mode = !field_oriented_mode; }));
 
@@ -56,8 +54,6 @@ public class SwerveJoystickCmd extends Command {
         double x_speed = x_speed_function.get();
         double y_speed = y_speed_function.get();
         double turn_speed = turn_speed_function.get();
-
-        SmartDashboard.putNumber("Read/BeforeX", x_speed);
 
         if(Math.abs(x_speed) > 0.9)
              y_speed = Math.abs(y_speed) > left_joystick_deadband.get() + LEFT_DEADBAND_MODIFIER ? y_speed : 0.0;
@@ -106,9 +102,6 @@ public class SwerveJoystickCmd extends Command {
 
         //     }
         // }
-
-        SmartDashboard.putNumber("Read/AfterX", x_speed);
-
 
         SwerveModuleState[] module_states = swerve_drive.getKinematics().toSwerveModuleStates(chassis_speeds);
         swerve_drive.setModuleStates(module_states);

@@ -36,7 +36,6 @@ public class ClimbReal extends Climb {
 
     @Override public void updateInputs() {
         inputs.bore_absolute_position_raw = bore_encoder.getAbsolutePosition();
-        //TODO: Check if supposed to be Math.PI/2 OR MATH.PI * 2
         inputs.bore_absolute_position_radians = ((41*Math.PI)/20) * (bore_encoder.getAbsolutePosition() - 0.146338);
         
         inputs.winch_top_limit_switch_triggered = winch_top_limit_switch.isPressed();

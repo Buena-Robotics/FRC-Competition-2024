@@ -11,7 +11,7 @@ import com.revrobotics.RelativeEncoder;
 
 public class ShooterReal extends Shooter {
     private static final int SHOOTER_LEDGE_BREAKER_ID = 1;
-    private static final int HOLDING_NOTE_BREAKER_ID = 2;
+    private static final int HOLDING_NOTE_BREAKER_ID = 3;
     
     private static final int FEED_MOTOR_ID = 10;
     private static final int LAUNCH_MOTOR_ID = 9;

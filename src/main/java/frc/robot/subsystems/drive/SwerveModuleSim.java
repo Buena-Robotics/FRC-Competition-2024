@@ -60,15 +60,5 @@ public class SwerveModuleSim extends SwerveModule {
     @Override public void setDriveBrakeMode(boolean enable) {}
     @Override public void setTurnBrakeMode(boolean enable) {}
 
-    @Override
-    public void setDrive(double value) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setDrive'");
-    }
-
-    @Override
-    public void setTurn(double value) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setTurn'");
-    }
+    @Override public void setTurn(double value) { throw new UnsupportedOperationException("Unimplemented method 'setTurn'"); }
 }

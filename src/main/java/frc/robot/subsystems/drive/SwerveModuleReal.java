@@ -9,7 +9,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.RobotController;
-import frc.robot.utils.Print;
 
 public class SwerveModuleReal extends SwerveModule {
     private final CANSparkMax drive_motor;
@@ -75,12 +74,6 @@ public class SwerveModuleReal extends SwerveModule {
     @Override public void setTurnVoltage (double volts) { turn_motor.setVoltage(volts); }
     @Override public void setDriveBrakeMode(boolean enable) { drive_motor.setIdleMode(enable ? IdleMode.kBrake : IdleMode.kCoast); }
     @Override public void setTurnBrakeMode (boolean enable) { turn_motor.setIdleMode(enable ? IdleMode.kBrake : IdleMode.kCoast); }
-
-    @Override public void setDrive(double value) {
-        // if(index == 0)
-            // Print.log("%s: %f", module_name, value);
-        drive_motor.set(value); 
-    }
 
     @Override public void setTurn(double value) { turn_motor.set(value); }
 }

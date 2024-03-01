@@ -29,7 +29,7 @@ public class Robot extends LoggedRobot {
     @Override public void robotInit() {
         switch (RobotConfig.getRobotMode()) {
         case REAL:
-            // Logger.addDataReceiver(new WPILOGWriter("/media/sda/"));
+            Logger.addDataReceiver(new WPILOGWriter("/media/sda/"));
             Logger.addDataReceiver(new NT4Publisher());
             break;
         case SIM: 
