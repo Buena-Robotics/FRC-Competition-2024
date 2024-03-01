@@ -12,7 +12,7 @@ public class PrepareLaunch extends Command {
         addRequirements(shooter);
     }
 
-    @Override public void initialize() { shooter.launch_motor.set(Shooter.LAUNCH_SPEED); }
+    @Override public void initialize() { shooter.setLaunchVoltage(Shooter.LAUNCH_SPEED_MAX * 12); }
 
     @Override public void end(boolean interrupted) {}
 

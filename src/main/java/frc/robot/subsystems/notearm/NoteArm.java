@@ -34,7 +34,7 @@ public abstract class NoteArm extends SubsystemBase {
     private static final int ARM_UP_SOLENOID_REVERSE_CHANNEL  = 3;
     private static final int ARM_OUT_SOLENOID_FORWARD_CHANNEL = 4;
     private static final int ARM_OUT_SOLENOID_REVERSE_CHANNEL = 5;
-    private static final I2C.Port COLOR_SENSOR_PORT   = I2C.Port.kOnboard;
+    private static final I2C.Port COLOR_SENSOR_PORT = I2C.Port.kOnboard;
     private static final double DELAY = 1;
 
     protected final PneumaticHub hub = new PneumaticHub(PNEUMATIC_MODULE_ID);
@@ -52,15 +52,15 @@ public abstract class NoteArm extends SubsystemBase {
         compressor.enableDigital();
     }
 
-    public boolean isClawOpen(){ return claw_solenoid.get() == Value.kReverse; }
+    public boolean isClawOpen(){ return claw_solenoid.get() == Value.kForward; }
     public boolean isArmUp()   { return arm_up_solenoid.get() == Value.kForward; }
     public boolean isArmOut()  { return arm_out_solenoid.get() == Value.kForward; }
 
-    public void openClaw()  { claw_solenoid.set(Value.kReverse); }
+    public void openClaw()  { claw_solenoid.set(Value.kForward); }
     public void moveArmUp() { arm_up_solenoid.set(Value.kForward); }
     public void moveArmOut(){ arm_out_solenoid.set(Value.kForward); }
 
-    public void closeClaw()  { claw_solenoid.set(Value.kForward); }
+    public void closeClaw()  { claw_solenoid.set(Value.kReverse); }
     public void moveArmDown(){ arm_up_solenoid.set(Value.kReverse); }
     public void moveArmIn()  { arm_out_solenoid.set(Value.kReverse); }
 

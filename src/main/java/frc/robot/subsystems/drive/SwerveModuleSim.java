@@ -32,9 +32,9 @@ public class SwerveModuleSim extends SwerveModule {
             turn_absolute_position_radians -= 2.0 * Math.PI;
         }
 
-        inputs.drive_position_radians += 
+        inputs.drive_position_meters += 
             (drive_sim.getAngularVelocityRadPerSec() * Robot.defaultPeriodSecs);
-        inputs.drive_velocity_radians_per_second = drive_sim.getAngularVelocityRadPerSec();
+        inputs.drive_velocity_meters_per_second = drive_sim.getAngularVelocityRadPerSec();
         inputs.drive_applied_volts = drive_applied_volts;
         inputs.drive_current_amps = new double[] {Math.abs(drive_sim.getCurrentDrawAmps())};
         inputs.drive_temp_celcius = new double[] {};
