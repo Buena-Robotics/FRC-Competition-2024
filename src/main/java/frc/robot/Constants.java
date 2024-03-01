@@ -4,8 +4,14 @@
 
 package frc.robot;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.subsystems.climber.Climb;
@@ -20,7 +26,7 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterReal;
 import frc.robot.subsystems.shooter.ShooterSim;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionSim;
+import frc.robot.subsystems.vision.Vision.CameraData;
 import frc.robot.vendor.CXboxController;
 
 public final class Constants {
@@ -38,8 +44,14 @@ public final class Constants {
         public static final Shooter shooter = Robot.isReal() ? new ShooterReal() : new ShooterSim();
         public static final NoteArm note_arm = Robot.isReal() ? new NoteArmReal() : new NoteArmSim();
         public static final SwerveDrive swerve_drive = new SwerveDrive();
-        // public static final Vision vision = Robot.isReal() ? new VisionReal() : new VisionSim();
         public static final ServoSub servo = new ServoSub();
+        public static final Vision vision = new Vision(
+                new CameraData("Microsoft_LifeCam_HD-3000", new Transform3d(
+                        Units.inchesToMeters(14.5),
+                        Units.inchesToMeters(14.5),
+                        Units.inchesToMeters(69/4.0),
+                        new Rotation3d(0,Units.degreesToRadians(-20), 0)))
+                        );
     }
 
     public static class FieldPoses {

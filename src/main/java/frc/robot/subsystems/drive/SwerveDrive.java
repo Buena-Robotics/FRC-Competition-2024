@@ -22,6 +22,8 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.constraint.SwerveDriveKinematicsConstraint;
 import frc.robot.FieldConstants;
 import frc.robot.Robot;
+import frc.robot.Constants.SubSystems;
+import frc.robot.subsystems.vision.VisionCamera.TimestampedVisionMeasurement;
 import frc.robot.utils.FieldVisualizer;
 import frc.robot.utils.Print;
 import frc.robot.utils.TimerUtil;
@@ -89,22 +91,17 @@ public class SwerveDrive extends SubsystemBase {
     @Override public void periodic(){
         for (var module : modules) module.periodic();
         navx.periodic();
-        // SubSystems.vision._periodic();
-        // var vision_measurements = SubSystems.vision.getVisionMeasurements();
-        // for (var vision_measurement : vision_measurements){
-        //     if(!found_pose) {
-        //         found_pose = true;
-        //         pose_estimator.addVisionMeasurement(vision_measurement.pose, vision_measurement.timestamp, VISION_FIRST_STD_DEV);
-        //     }
-        //     else pose_estimator.addVisionMeasurement(vision_measurement.pose, vision_measurement.timestamp, VISION_STD_DEV);
-        //     Logger.recordOutput("PoseEstimation/VisionMeasurement", vision_measurement.pose);
-        // }
+        var vision_measurements = SubSystems.vision.getAllVisionMeasurements();
+        for (TimestampedVisionMeasurement vision_measurement : vision_measurements){
+            pose_estimator.addVisionMeasurement(vision_measurement.pose, vision_measurement.timestamp, vision_measurement.std_devs);
+            Logger.recordOutput("PoseEstimation/VisionMeasurement", vision_measurement.pose);
+        }
         odometry.update(navx.getRotation2d(), getWheelPositions());
         pose_estimator.update(
             navx.getRotation2d(),
             getWheelPositions());
 
-        robot_pose = odometry.getPoseMeters();
+        robot_pose = pose_estimator.getEstimatedPosition();
 
         FieldVisualizer.getField().setRobotPose(odometry.getPoseMeters());
         FieldVisualizer.getField().getObject("SwerveModules").setPoses(
@@ -191,6 +188,7 @@ public class SwerveDrive extends SubsystemBase {
     public void stopModules(){ for(int i = 0; i < 4; i++) modules[i].stop(); }
     public void xStopModules(){ for(int i = 0; i < 4; i++) modules[i].xStop(); }
     public void setModuleStates(SwerveModuleState[] desired_states){
+        SwerveDriveKinematics.desaturateWheelSpeeds(desired_states, PHYSICAL_MAX_SPEED_METERS_PER_SECOND);
         for(int i = 0; i < 4; i++) modules[i].runSetpoint(desired_states[i]);
     }
 }

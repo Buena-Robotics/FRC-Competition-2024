@@ -23,7 +23,8 @@
           },
           "double[]##v_/SmartDashboard/NoteArm/RangeHSV": {
             "open": true
-          }
+          },
+          "open": true
         },
         "Swerve": {
           "Back Left": {
@@ -50,7 +51,8 @@
           },
           "SModule": {
             "open": true
-          }
+          },
+          "open": true
         },
         "open": true
       },
@@ -69,6 +71,7 @@
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/Nav-X": "Gyro",
       "/SmartDashboard/NoteArm": "Mechanism2d",
+      "/SmartDashboard/NoteArm/ColorSensor": "Mechanism2d",
       "/SmartDashboard/NoteArmMechanism": "Mechanism2d",
       "/SmartDashboard/PIDController[5]": "PIDController",
       "/SmartDashboard/PIDController[6]": "PIDController",
@@ -183,6 +186,11 @@
         "window": {
           "visible": true
         }
+      },
+      "/SmartDashboard/NoteArm/ColorSensor": {
+        "window": {
+          "visible": true
+        }
       }
     }
   },
@@ -195,7 +203,7 @@
   "NetworkTables Settings": {
     "clientName": "glasss",
     "dsClient": false,
-    "mode": "Client (NT3)",
+    "mode": "Client (NT4)",
     "serverTeam": "1726"
   },
   "Plots": {

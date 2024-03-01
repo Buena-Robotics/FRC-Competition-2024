@@ -8,19 +8,24 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
+import frc.robot.Constants.IO;
 import frc.robot.Constants.SubSystems;
 import frc.robot.subsystems.climber.Climb.ArmPosition;
 import frc.robot.utils.TunableNumber;
 
 public abstract class NoteArm extends SubsystemBase {
-    private static final TunableNumber note_distance_threshold_mm = new TunableNumber("NoteArm/NoteDistanceThreshMM", 2000);
+    private final Mechanism2d color_sensor_mechanism = new Mechanism2d(10, 10, new Color8Bit()); 
+
+    private static final TunableNumber note_distance_threshold_mm = new TunableNumber("NoteArm/NoteDistanceThreshMM", 1480);
     private static final TunableNumber note_hue_lower_threshold = new TunableNumber("NoteArm/NoteHueLowerThresh", 10);
     private static final TunableNumber note_hue_upper_threshold = new TunableNumber("NoteArm/NoteHueUpperThresh", 90);
     private static final TunableNumber note_saturation_threshold = new TunableNumber("NoteArm/NoteSatThresh", 100);
@@ -50,6 +55,8 @@ public abstract class NoteArm extends SubsystemBase {
         arm_out_solenoid.set(Value.kOff);
         hub.enableCompressorDigital();
         compressor.enableDigital();
+        SmartDashboard.putData("NoteArm/ColorSensor", color_sensor_mechanism);
+        closeClaw();
     }
 
     public boolean isClawOpen(){ return claw_solenoid.get() == Value.kReverse; }
@@ -81,7 +88,7 @@ public abstract class NoteArm extends SubsystemBase {
 
         SmartDashboard.putNumber("NoteArm/MMFromObject", (double)proximity_11bit);
         SmartDashboard.putNumber("NoteArm/CMFromObject", (double)proximity_11bit / 600);
-        return 100 - (proximity_11bit * PROXIMITY_VALUE_PER_MM);
+        return (double)proximity_11bit;
     }
 
     public boolean detectingNoteColor(){
@@ -112,10 +119,10 @@ public abstract class NoteArm extends SubsystemBase {
     @Override public void periodic() {
         SmartDashboard.putBoolean("NoteArm/NoteDetected", noteDetected());
         SmartDashboard.putBoolean("NoteArm/ColorSensorConnected", color_sensor.isConnected());
-
+        color_sensor_mechanism.setBackgroundColor(new Color8Bit(getColor()));     
         // if(color_sensor.isConnected())
             // if(isClawOpen() && !isArmUp() && isArmOut() && noteDetected()) closeClaw();
-        if(noteDetected()) closeClaw();
+        if(noteDetected() && !IO.controller.getStartButton()) openClaw();
     }
 
     public Command grabNoteCommand()  { return this.runOnce(() -> { closeClaw(); }); }

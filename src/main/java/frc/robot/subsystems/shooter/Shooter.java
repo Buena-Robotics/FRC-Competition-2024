@@ -8,6 +8,7 @@ import org.littletonrobotics.junction.AutoLog;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -36,7 +37,8 @@ public abstract class Shooter extends SubsystemBase {
     public static final double INTAKE_LAUNCH_SPEED = -1; 
     public static final double INTAKE_FEED_SPEED = -.2;
 
-    public final CANSparkMax feed_motor = new CANSparkMax(FEED_MOTOR_ID, MotorType.kBrushless);;
+    public final DigitalInput beam_break_sensor = new DigitalInput(1);
+    public final CANSparkMax feed_motor = new CANSparkMax(FEED_MOTOR_ID, MotorType.kBrushless);
     public final CANSparkMax launch_motor = new CANSparkMax(LAUNCH_MOTOR_ID, MotorType.kBrushless);
     public final RelativeEncoder feed_motor_encoder;
     public final RelativeEncoder launch_motor_encoder;
@@ -72,5 +74,6 @@ public abstract class Shooter extends SubsystemBase {
     @Override public void periodic(){
         SmartDashboard.putNumber("Shooter/LaunchMotorVelocity", launch_motor_encoder.getVelocity());
         SmartDashboard.putNumber("Shooter/LaunchMotorVoltage", launch_motor.getBusVoltage());
+        SmartDashboard.putBoolean("Shooter/BeamBreak", beam_break_sensor.get());
     }
 }

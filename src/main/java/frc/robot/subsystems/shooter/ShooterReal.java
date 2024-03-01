@@ -6,8 +6,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 
 public class ShooterReal extends Shooter {
-
-
+    
     public ShooterReal() {
         super();
 
