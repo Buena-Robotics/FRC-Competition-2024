@@ -83,6 +83,7 @@ public class SwerveDrive extends SubsystemBase {
             navx.reset();
             navx.resetDisplacement();
         }).start();
+        Logger.recordOutput("PoseEstimation/VisionMeasurement", new Pose2d());
     }
 
     @Override public void periodic(){
@@ -133,7 +134,7 @@ public class SwerveDrive extends SubsystemBase {
         return closestValue;
     }
     public void postEnableSetup(){
-        // navx.setStartPose(robot_pose);
+        navx.setStartPose(robot_pose);
         setHeadingDefault();
     }
     public void setHeadingDefault(){

@@ -76,9 +76,8 @@ public abstract class NoteArm extends SubsystemBase {
         claw_solenoid.set(Value.kOff);
         arm_up_solenoid.set(Value.kOff);
         arm_out_solenoid.set(Value.kOff);
-        compressor.enableDigital();
         SmartDashboard.putData("NoteArm/ColorSensor", color_sensor_mechanism);
-        closeClaw();
+        openClaw();
     }
 
     protected void updateInputs(){
@@ -103,7 +102,7 @@ public abstract class NoteArm extends SubsystemBase {
         updateInputs();
         Logger.processInputs("NoteArm", inputs);
         
-        if(noteDetected() && !IO.controller.getStartButton()) openClaw();
+        // if(noteDetected() && !IO.controller.getStartButton()) closeClaw();
 
         color_sensor_mechanism.setBackgroundColor(new Color8Bit(getColor()));
         Logger.recordOutput("NoteArm/ColorSensorMechanism", color_sensor_mechanism);
@@ -171,7 +170,7 @@ public abstract class NoteArm extends SubsystemBase {
 
     public Command grabNoteFullCommand(){
         return grabNoteCommand()
-            .andThen(new WaitCommand(0.5)
+            .andThen(new WaitCommand(0.8)
             .andThen(pullArmInCommand()))
             .andThen(new WaitCommand(0.25))
             .andThen(pushArmUpCommand())

@@ -30,7 +30,7 @@ public class RobotContainer {
         SubSystems.swerve_drive.setDefaultCommand(new SwerveJoystickCmd(
             SubSystems.swerve_drive, 
             () -> IO.controller.getLeftY(), // Y-Axis 
-            () -> -IO.controller.getLeftX(),  // X-Axis
+            () -> IO.controller.getLeftX(),  // X-Axis
             () -> IO.controller.getRightX()  // Rot-Axis
         ));
         SubSystems.climb.setDefaultCommand(SubSystems.climb.moveArmTriggers(this::getClimberSpeed));
