@@ -59,7 +59,7 @@ public class SwerveDrive extends SubsystemBase {
 
     private final NavX navx = Robot.isReal() ? new NavXReal(NAVX_PORT) : new NavXSim(NAVX_PORT);
     private final SwerveModule[] modules;
-    private final SwerveDriveOdometry odometry;
+    private final SwerveDriveOdometry odometer;
     private final SwerveDrivePoseEstimator pose_estimator;
 
     private Pose2d robot_pose = new Pose2d(1.567501, 5.380708, Rotation2d.fromDegrees(180));
@@ -71,7 +71,7 @@ public class SwerveDrive extends SubsystemBase {
             if(Robot.isReal()) modules[i] = new SwerveModuleReal(module_names[i], i*2 + 1, i*2 + 2, i, abs_encoder_offsets[i]);
             else modules[i] = new SwerveModuleSim(module_names[i], i);
         
-        odometry = new SwerveDriveOdometry(kinematics, navx.getRotation2d(), getModulePositions(), robot_pose);
+        odometer = new SwerveDriveOdometry(kinematics, navx.getRotation2d(), getModulePositions(), robot_pose);
         pose_estimator = new SwerveDrivePoseEstimator(kinematics, navx.getRotation2d(),
             getModulePositions(),  
             robot_pose, 
@@ -96,14 +96,14 @@ public class SwerveDrive extends SubsystemBase {
             pose_estimator.addVisionMeasurement(vision_measurement.pose, vision_measurement.timestamp, vision_measurement.std_devs);
             Logger.recordOutput("PoseEstimation/VisionMeasurement", vision_measurement.pose);
         }
-        odometry.update(navx.getRotation2d(), getWheelPositions());
+        odometer.update(navx.getRotation2d(), getWheelPositions());
         pose_estimator.update(
             navx.getRotation2d(),
             getWheelPositions());
 
         robot_pose = pose_estimator.getEstimatedPosition();
 
-        FieldVisualizer.getField().setRobotPose(odometry.getPoseMeters());
+        FieldVisualizer.getField().setRobotPose(odometer.getPoseMeters());
         FieldVisualizer.getField().getObject("SwerveModules").setPoses(
             robot_pose.transformBy(new Transform2d(front_right_position, modules[0].getAngle())),
             robot_pose.transformBy(new Transform2d(front_left_position, modules[1].getAngle())),
@@ -113,12 +113,14 @@ public class SwerveDrive extends SubsystemBase {
         
         // FieldVisualizer.getField().getObject("Cameras").setPoses(SubSystems.vision.getAllRobotToCameraPoses(robot_pose));
 
-        Logger.recordOutput("Drive/Modules/States", getModuleStates());
+        Logger.recordOutput("Drive/Modules/States/Actual", getModuleStates());
         Logger.recordOutput("Drive/Modules/Positions", getModulePositions());
-        Logger.recordOutput("PoseEstimation/Odometry", odometry.getPoseMeters());
-        Logger.recordOutput("PoseEstimation/NavX", navx.getPose3d());
-        Logger.recordOutput("PoseEstimation/PoseEstimation", robot_pose);
-        // Logger.recordOutput("CameraPose/Front Left", new Pose3d(robot_pose).plus(SubSystems.vision.camera_pose));
+        Logger.recordOutput("PoseEstimation/Odometer", odometer.getPoseMeters());
+        Logger.recordOutput("PoseEstimation/NavX-Displacement", navx.getPose3d());
+        Logger.recordOutput("PoseEstimation/NavX-Odometer", navx.getEstimatedPose());
+        Logger.recordOutput("PoseEstimation/FullPoseEstimator", robot_pose);
+        // Logger.recordOutput("DriverCamPose", 
+            // new Pose3d(robot_pose).plus(SubSystems.vision.getCamera("DriverCam").getTransform()));
     }
 
     private double getClosestToTarget(double target, double[] values) {
@@ -133,18 +135,23 @@ public class SwerveDrive extends SubsystemBase {
         }
         return closestValue;
     }
+    public void postEnableSetup(){
+        navx.setStartPose(robot_pose);
+        setHeadingDefault();
+    }
     public void setHeadingDefault(){
-        Print.error("Fix this gng");
+        Pose2d held_pose = robot_pose;
+        Print.error("Fix this gng?");
         if(FieldConstants.isBlueAlliance()){
             Print.log("Heading Blue Alliance");
             final double robot_rotation = robot_pose.getRotation().getDegrees();
             final double[] rotations = new double[]{-120.0, 180.0, -180.0, 120.0};
             final double target_rotation = getClosestToTarget(robot_rotation, rotations);
             switch ((int)target_rotation) {
-                case -120: setHeading(Rotation2d.fromDegrees(360- -120)); break;
+                case -120: setHeading(Rotation2d.fromDegrees(120)); break;
                 case -180:
-                case 180: setHeading(Rotation2d.fromDegrees(360-180)); break;
-                case 120: setHeading(Rotation2d.fromDegrees(360-120)); break;
+                case 180: setHeading(Rotation2d.fromDegrees(180)); break;
+                case 120: setHeading(Rotation2d.fromDegrees(-120)); break;
                 default: Print.error("Blue Alliance Unknown Rotation"); break;
             }
         } else { // Red Alliances
@@ -153,12 +160,17 @@ public class SwerveDrive extends SubsystemBase {
             final double[] rotations = new double[]{-60.0, 0.0, 60.0};
             final double target_rotation = getClosestToTarget(robot_rotation, rotations);
             switch ((int)target_rotation) {
-                case -60: setHeading(Rotation2d.fromDegrees(-60)); break;
+                case -60: setHeading(Rotation2d.fromDegrees(180-60)); break;
                 case 0: setHeading(Rotation2d.fromDegrees(180)); break;
-                case 60: setHeading(Rotation2d.fromDegrees(60)); break;
+                case 60: setHeading(Rotation2d.fromDegrees(180+60)); break;
                 default: Print.error("Red Alliance Unknown Rotation"); break;
             }
         }
+        odometer.resetPosition(navx.getRotation2d(), getWheelPositions(), held_pose);
+        pose_estimator.resetPosition(
+            navx.getRotation2d(),
+            getWheelPositions(),
+            held_pose);
     }
     public void setHeading(Rotation2d rotation){ navx.setAngleAdjustment(rotation.getDegrees()); }
     public Rotation2d getHeading(){ return navx.getRotation2d(); }
@@ -189,6 +201,7 @@ public class SwerveDrive extends SubsystemBase {
     public void xStopModules(){ for(int i = 0; i < 4; i++) modules[i].xStop(); }
     public void setModuleStates(SwerveModuleState[] desired_states){
         SwerveDriveKinematics.desaturateWheelSpeeds(desired_states, PHYSICAL_MAX_SPEED_METERS_PER_SECOND);
+        Logger.recordOutput("Drive/Modules/States/Desired", desired_states);
         for(int i = 0; i < 4; i++) modules[i].runSetpoint(desired_states[i]);
     }
 }

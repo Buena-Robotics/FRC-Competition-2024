@@ -18,10 +18,12 @@ public abstract class NavX extends AHRS {
         public boolean rotating = false;
 
         public long timestamp = 0;
+        public double delta_time = 0;
         public double angle_adjustment = 0.0;
         public double temperature_celcius = 0.0;
 
         public Rotation2d angle = new Rotation2d();
+        public double angle_rate = 0.0;
         public double roll_radians = 0.0;
         public double pitch_radians = 0.0;
         public double yaw_radians = 0.0;
@@ -33,9 +35,17 @@ public abstract class NavX extends AHRS {
         public double displacement_x = 0.0;
         public double displacement_y = 0.0;
         public double displacement_z = 0.0;
+
+        public Pose2d estimated_pose = new Pose2d();
     }
 
     protected NavXInputsAutoLogged inputs = new NavXInputsAutoLogged();
+    protected Pose2d start_pose = new Pose2d();
+
+    public NavX(SerialPort.Port serial_port_id, Pose2d start_pose){
+        this(serial_port_id);
+        this.start_pose = start_pose;
+    }
 
     public NavX(SerialPort.Port serial_port_id){ 
         super(serial_port_id);
@@ -44,10 +54,20 @@ public abstract class NavX extends AHRS {
 
     public abstract void updateInputs();
 
-    public void periodic(){
+    @Override public void periodic(){
         updateInputs();
         Logger.processInputs("Drive/NavX", inputs);
     }
+
+    protected double removeNoise(double value){
+        return removeNoise(value, 5);
+    }
+    protected double removeNoise(double value, int precision){
+        double move_decimal = Math.pow(10, precision);
+        return (double)((int)(value*move_decimal)) / move_decimal;
+    }
+
+    public void setStartPose(Pose2d start_pose){ this.start_pose = start_pose; }
 
     public double getRollRadians() { return inputs.roll_radians;  }
     public double getPitchRadians(){ return inputs.pitch_radians; }
@@ -58,5 +78,6 @@ public abstract class NavX extends AHRS {
 
     public Rotation3d getRotation3d() { return new Rotation3d(getRollRadians(), getPitchRadians(), getYawRadians()); }
     public Translation3d getTranslation3d() { return new Translation3d(inputs.velocity_x, inputs.velocity_y, inputs.velocity_z); }
-    public Pose3d getPose3d(){ return new Pose3d(getTranslation3d(), getRotation3d()); }
+    public Pose3d getPose3d(){ return new Pose3d(getTranslation3d(), getRotation3d()).relativeTo(new Pose3d(start_pose)); }
+    public Pose2d getEstimatedPose(){ return inputs.estimated_pose; }
 }

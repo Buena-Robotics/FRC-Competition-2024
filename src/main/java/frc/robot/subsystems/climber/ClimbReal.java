@@ -17,14 +17,14 @@ public class ClimbReal extends Climb {
     private final CANSparkMax winch_motor = new CANSparkMax(WINCH_MOTOR_ID, MotorType.kBrushless);
     private final RelativeEncoder winch_encoder = winch_motor.getEncoder();
     private final DutyCycleEncoder bore_encoder = new DutyCycleEncoder(BORE_ENCODER_CHANNEL);
-    private final SparkLimitSwitch limit_switch;
+    private final SparkLimitSwitch winch_top_limit_switch;
+    private final SparkLimitSwitch winch_bottom_limit_switch;
     public ClimbReal() {
         super();
-        this.bore_encoder.setPositionOffset(0.146338);
-        this.bore_encoder.setDistancePerRotation(Math.PI * 2);
+        this.winch_top_limit_switch = this.winch_motor.getForwardLimitSwitch(Type.kNormallyOpen);
+        this.winch_bottom_limit_switch = this.winch_motor.getReverseLimitSwitch(Type.kNormallyOpen);
 
-        this.winch_motor.setIdleMode(IdleMode.kBrake);
-        this.limit_switch = this.winch_motor.getForwardLimitSwitch(Type.kNormallyOpen);
+        this.winch_motor.setIdleMode(IdleMode.kBrake);        
         this.winch_motor.enableVoltageCompensation(12.0);
         this.winch_encoder.setPositionConversionFactor(WINCH_MOTOR_GEAR_RATIO);
         this.winch_encoder.setVelocityConversionFactor(WINCH_MOTOR_GEAR_RATIO);
@@ -36,8 +36,13 @@ public class ClimbReal extends Climb {
     }
 
     @Override public void updateInputs() {
-        inputs.bore_absolute_position_radians = bore_encoder.getAbsolutePosition();
+        inputs.bore_absolute_position_raw = bore_encoder.getAbsolutePosition();
+        //TODO: Check if supposed to be Math.PI/2 OR MATH.PI * 2
+        inputs.bore_absolute_position_radians = ((41*Math.PI)/20) * (bore_encoder.getAbsolutePosition() - 0.146338);
         
+        inputs.winch_top_limit_switch_triggered = winch_top_limit_switch.isPressed();
+        inputs.winch_bottom_limit_switch_triggered = winch_bottom_limit_switch.isPressed();
+
         inputs.winch_position_radians = winch_encoder.getPosition() * WINCH_ENCODER_ROTATIONS_TO_RADIANS;
         inputs.winch_velocity_radians_per_second = winch_encoder.getVelocity() * WINCH_ENCODER_ROTATIONS_TO_RADIANS / 60;
         inputs.winch_rotations = winch_encoder.getPosition();
@@ -51,14 +56,5 @@ public class ClimbReal extends Climb {
     @Override public void periodic() {
         super.periodic();
         winch_motor.clearFaults();
-        SmartDashboard.putBoolean("LimitSwitch is pressed", limit_switch.isPressed());
-        
-
-        // SmartDashboard.putNumber("bore angle", getBoreAngleDegrees());
-        // SmartDashboard.putNumber("bore distance", bore_encoder.getDistance());
-        // SmartDashboard.putNumber("winch angle deg", getWinchAngleDegrees());
-        // SmartDashboard.putNumber("winch angle rad", getWinchAngleRadians());
-        // SmartDashboard.putNumber("winch velocity", winch_encoder.getVelocity());
-        // SmartDashboard.putNumber("winch voltage", winch_motor.getAppliedOutput());
     }
 }
