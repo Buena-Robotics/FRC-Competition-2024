@@ -31,10 +31,10 @@ public abstract class SwerveModule {
     protected static final double WHEEL_DIAMETER_METERS  = Units.inchesToMeters(4);
     protected static final double DRIVE_MOTOR_GEAR_RATIO = 1 / 6.75;
     protected static final double TURN_MOTOR_GEAR_RATIO  = 1 / 12.8;
-    private static final double DRIVE_ENCODER_ROTATION_TO_METERS       = DRIVE_MOTOR_GEAR_RATIO * Math.PI * WHEEL_DIAMETER_METERS;
-    private static final double TURN_ENCODER_ROTATION_TO_RADIANS       = TURN_MOTOR_GEAR_RATIO * 2 * Math.PI;
-    private static final double DRIVE_ENCODER_RPM_TO_METERS_PER_SECOND = DRIVE_ENCODER_ROTATION_TO_METERS / 60;
-    private static final double TURN_ENCODER_RPM_TO_RADIANS_PER_SECOND = TURN_ENCODER_ROTATION_TO_RADIANS / 60;
+    protected static final double DRIVE_ENCODER_ROTATION_TO_METERS       = DRIVE_MOTOR_GEAR_RATIO * Math.PI * WHEEL_DIAMETER_METERS;
+    protected static final double TURN_ENCODER_ROTATION_TO_RADIANS       = TURN_MOTOR_GEAR_RATIO * 2 * Math.PI;
+    protected static final double DRIVE_ENCODER_RPM_TO_METERS_PER_SECOND = DRIVE_ENCODER_ROTATION_TO_METERS / 60;
+    protected static final double TURN_ENCODER_RPM_TO_RADIANS_PER_SECOND = TURN_ENCODER_ROTATION_TO_RADIANS / 60;
 
     private static final TunableNumber driveKp = new TunableNumber("Drive/Module/DriveKp", 1.0);
     private static final TunableNumber driveKd = new TunableNumber("Drive/Module/DriveKd");

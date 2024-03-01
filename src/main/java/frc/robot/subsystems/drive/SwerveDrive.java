@@ -136,7 +136,7 @@ public class SwerveDrive extends SubsystemBase {
         return closestValue;
     }
     public void postEnableSetup(){
-        navx.setStartPose(robot_pose);
+        // navx.setStartPose(robot_pose);
         setHeadingDefault();
     }
     public void setHeadingDefault(){
