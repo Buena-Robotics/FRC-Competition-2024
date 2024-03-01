@@ -21,6 +21,10 @@ public class ClimbSim extends Climb {
     }
 
     @Override public void updateInputs() {
+        //TODO: Make Simulated limit switches :3
+        inputs.winch_top_limit_switch_triggered = false;
+        inputs.winch_bottom_limit_switch_triggered = false;
+
         inputs.winch_position_radians += (winch_sim.getAngularVelocityRadPerSec() * Robot.defaultPeriodSecs);
         inputs.winch_velocity_radians_per_second = winch_sim.getAngularVelocityRadPerSec();
         inputs.winch_rotations = inputs.winch_position_radians / (Math.PI * 2);

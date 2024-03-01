@@ -56,6 +56,5 @@ public class ClimbReal extends Climb {
     @Override public void periodic() {
         super.periodic();
         winch_motor.clearFaults();
-        SmartDashboard.putBoolean("LimitSwitch is pressed", );
     }
 }
