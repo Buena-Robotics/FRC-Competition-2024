@@ -38,6 +38,7 @@ public class SwerveModuleReal extends SwerveModule {
         this.turn_encoder.setPosition(getAbsoluteEncoderRadians());
         
         this.drive_motor.enableVoltageCompensation(12.0);
+        this.drive_motor.setInverted(true); //TODO: :3
         this.turn_motor.enableVoltageCompensation(12.0);
     }
 

@@ -47,9 +47,9 @@ public class VisionCameraReal extends VisionCamera {
     }
 
     @Override public Optional<TimestampedVisionMeasurement> getVisionMeasurement(){
-        if(pipeline != PhotonPipeline.APRILTAG || pipeline != PhotonPipeline.ARUCRO) return Optional.empty();
+        // if(pipeline != PhotonPipeline.APRILTAG || pipeline != PhotonPipeline.ARUCRO) return Optional.empty();
         if(!photon_camera.isConnected()) return Optional.empty();
-        if(isCameraPipelineDisabled()) return Optional.empty();
+        // if(isCameraPipelineDisabled()) return Optional.empty();
         
         final Optional<EstimatedRobotPose> optional_estimated_pose = photon_pose_estimator.update();
         if(optional_estimated_pose.isEmpty())

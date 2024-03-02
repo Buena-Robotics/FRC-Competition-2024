@@ -1,6 +1,6 @@
 {
   "download": {
-    "remoteDir": "/media/sda",
+    "remoteDir": "/tmp",
     "serverTeam": "1726"
   }
 }

@@ -54,13 +54,13 @@ public abstract class Shooter extends SubsystemBase {
         final double shooter_pitch_radians = (Math.PI/2) - SubSystems.climb.getShooterAngleRadians();
         
         final Pose2d robot_pose = SubSystems.swerve_drive.getPose();
-        final double speaker_height = Units.feetToMeters(6 + (10/12.0)) - Units.inchesToMeters(77/4.0);
+        final double speaker_height = Units.feetToMeters(6 + (16/12.0)) - Units.inchesToMeters(21.5);
         final double distance_to_speaker = robot_pose.getTranslation().getDistance(FieldConstants.getSpeakerPoint().getTranslation());
 
         final double estimated_shooter_pitch = Math.atan2(speaker_height, distance_to_speaker);
 
-        if(inputs.holding_note_beam_broke)
-            SubSystems.climb.moveArmToPosition(new Rotation2d((Math.PI/2) - estimated_shooter_pitch)).schedule();
+        // if(inputs.holding_note_beam_broke)
+            // SubSystems.climb.moveArmToPosition(new Rotation2d((Math.PI/2) - estimated_shooter_pitch)).schedule();
 
         final List<Pose3d> estimated_note_trajectory = new ArrayList<Pose3d>(2);
         estimated_note_trajectory.add(getShooterPose(estimated_shooter_pitch));

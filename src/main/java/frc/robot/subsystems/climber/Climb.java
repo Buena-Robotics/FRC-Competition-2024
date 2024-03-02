@@ -87,9 +87,9 @@ public abstract class Climb extends SubsystemBase {
         
         double voltage = 0.0;
         if(measurement.minus(setpoint).getDegrees() < 0)
-            voltage = Math.sqrt(measurement.unaryMinus().plus(setpoint).getDegrees()) * 10;
+            voltage = Math.sqrt(measurement.unaryMinus().plus(setpoint).getDegrees());
         else 
-            voltage = -Math.sqrt(measurement.minus(setpoint).getDegrees()) * 10;
+            voltage = -Math.sqrt(measurement.minus(setpoint).getDegrees());
         voltage = MathUtil.clamp(voltage, -12, 12);
 
         if(inputs.winch_rotations < 4/64.0 && voltage < 0){
@@ -110,14 +110,14 @@ public abstract class Climb extends SubsystemBase {
             @Override public void execute() {
                 double voltage = speed.get() * 12;
                 voltage = MathUtil.clamp(voltage, -12, 12);
-                if(inputs.winch_rotations < 4/64.0 && voltage < 0){
-                    setWinchVoltage(0);
-                    return;
-                }
-                else if(inputs.winch_rotations > 120/64.0 && voltage > 0){
-                    setWinchVoltage(0);
-                    return;
-                }
+                    if(inputs.winch_rotations < 4/64.0 && voltage < 0){
+                        setWinchVoltage(0);
+                        return;
+                    }
+                    else if(inputs.winch_rotations > 120/64.0 && voltage > 0){
+                        setWinchVoltage(0);
+                        return;
+                    }
                 setWinchVoltage(speed.get() * 12);
             }
             @Override public void end(boolean interrupted) { setWinchVoltage(0); }

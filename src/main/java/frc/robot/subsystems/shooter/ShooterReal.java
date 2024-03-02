@@ -10,8 +10,8 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 
 public class ShooterReal extends Shooter {
-    private static final int SHOOTER_LEDGE_BREAKER_ID = 1;
-    private static final int HOLDING_NOTE_BREAKER_ID = 3;
+    private static final int SHOOTER_LEDGE_BREAKER_ID = 3;
+    private static final int HOLDING_NOTE_BREAKER_ID = 1;
     
     private static final int FEED_MOTOR_ID = 10;
     private static final int LAUNCH_MOTOR_ID = 9;
@@ -43,8 +43,8 @@ public class ShooterReal extends Shooter {
     }
 
     @Override public void updateInputs(){
-        inputs.shooter_ledge_beam_broke = shooter_ledge_beam_breaker.get();
-        inputs.holding_note_beam_broke = holding_note_beam_breaker.get();
+        inputs.shooter_ledge_beam_broke = !shooter_ledge_beam_breaker.get();
+        inputs.holding_note_beam_broke = !holding_note_beam_breaker.get();
 
         inputs.feed_velocity_rotations_per_second = feed_encoder.getVelocity();
         inputs.feed_applied_volts = feed_motor.getAppliedOutput() * feed_motor.getBusVoltage();

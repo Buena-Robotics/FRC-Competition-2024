@@ -27,7 +27,7 @@ public abstract class VisionCamera {
         public PhotonPipeline pipeline;
         public boolean driver_mode;
         public Pose3d camera_pose;
-        // public List<PhotonTrackedTarget> tracked_targets = new ArrayList<PhotonTrackedTarget>();
+        // public PhotonTrackedTarget[] tracked_targets = new PhotonTrackedTarget[] {};
     }
     public static class TimestampedVisionMeasurement {
         public final Pose2d pose;
@@ -63,7 +63,6 @@ public abstract class VisionCamera {
     protected double previous_vision_result_timestamp = 0.0;
     public VisionCamera(String photon_camera_name, Transform3d robot_to_camera){
         this.photon_camera = new PhotonCamera(photon_camera_name);
-        this.photon_camera.setDriverMode(false);
         this.photon_pose_estimator = new PhotonPoseEstimator(field_layout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, photon_camera, robot_to_camera);
         this.photon_pose_estimator.setMultiTagFallbackStrategy(PoseStrategy.AVERAGE_BEST_TARGETS);
         this.photon_pose_estimator.setTagModel(TargetModel.kAprilTag36h11);
@@ -71,8 +70,13 @@ public abstract class VisionCamera {
     public abstract Optional<TimestampedVisionMeasurement> getVisionMeasurement();
     public abstract Optional<PhotonPipelineResult> getNoteDetection();
 
-    public void periodic(){
+    // public void updateInputs(){
+        // inputs.camera_pose = getCameraPoseOnRobot(SubSystems.swerve_drive.getPose());
+        // inputs.pipeline = 
+    // }
 
+    public void periodic(){
+        
     }
 
     public void setPipeline(int index){ pipeline = PhotonPipeline.fromIndex(index); photon_camera.setPipelineIndex(index); }

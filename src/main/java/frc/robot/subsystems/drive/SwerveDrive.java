@@ -38,7 +38,7 @@ public class SwerveDrive extends SubsystemBase {
     private static final Matrix<N3, N1> VISION_STD_DEV   = VecBuilder.fill(1, 1, 3);
     private static final int MAX_NAVX_CALIBRATION_TIME_MS = 20 * 1000;
     private static final String[] module_names = { "Front Right", "Front Left", "Back Right", "Back Left" };
-    private static final double[] abs_encoder_offsets = { 4.071693, 2.830042 + Math.PI, 5.274043, 1.992770 + Math.PI};
+    private static final double[] abs_encoder_offsets = { 4.071693, 2.830042 + Math.PI, 5.274043, 1.992770};
     
     private static final Translation2d front_right_position = new Translation2d(CENTER_TO_MODULE,  -CENTER_TO_MODULE); // (+, -)
     private static final Translation2d front_left_position  = new Translation2d(CENTER_TO_MODULE,   CENTER_TO_MODULE); // (+, +)
@@ -205,7 +205,10 @@ public class SwerveDrive extends SubsystemBase {
     public void xStopModules(){ for(int i = 0; i < 4; i++) modules[i].xStop(); }
     public void setModuleStates(SwerveModuleState[] desired_states){
         SwerveDriveKinematics.desaturateWheelSpeeds(desired_states, PHYSICAL_MAX_SPEED_METERS_PER_SECOND);
+        SwerveModuleState[] optimized_states = new SwerveModuleState[4];
+        for(int i = 0; i < 4; i++) optimized_states[i] = modules[i].runSetpoint(desired_states[i]);
+
         Logger.recordOutput("Drive/Modules/States/Desired", desired_states);
-        for(int i = 0; i < 4; i++) modules[i].runSetpoint(desired_states[i]);
+        Logger.recordOutput("Drive/Modules/States/DesiredOptimized", optimized_states);
     }
 }

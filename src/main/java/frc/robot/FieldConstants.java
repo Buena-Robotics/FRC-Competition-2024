@@ -3,8 +3,6 @@ package frc.robot;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.opencv.core.Point;
-
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -47,7 +45,7 @@ public final class FieldConstants {
         Optional<Alliance> alliance = DriverStation.getAlliance();
         return alliance.isPresent() && alliance.get() == Alliance.Red;
     }
-    public static boolean isBlueAlliance(){ return !isRedAlliance(); }
+    public static boolean isBlueAlliance(){ return RobotConfig.FORCE_BLUE_ALLIANCE || !isRedAlliance(); }
     public static Pose2d getSpeakerPoint(){ return isBlueAlliance() ? BLUE_SPEAKER_TARGET : RED_SPEAKER_TARGET; }
 
     public static Pair<AimAssistTarget, Double> getBestAimAssistTarget(Pose2d robot_pose){

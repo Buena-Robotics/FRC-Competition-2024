@@ -31,7 +31,9 @@ public class ClimbReal extends Climb {
     }
 
     private double boreRadiansToWinchRevolutions(){
-        return 0.0;
+        final double bore_radians = ((41*Math.PI)/20) * (bore_encoder.getAbsolutePosition() - 0.146338);
+        final double slope = (1.746-0)/(1.456+0.019);
+        return (bore_radians + 0.019) * slope;
     }
 
     @Override public void updateInputs() {

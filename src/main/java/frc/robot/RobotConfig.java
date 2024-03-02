@@ -4,7 +4,8 @@ import frc.robot.utils.Print;
 
 public final class RobotConfig {
     public static final boolean LOG_SIMULATION_TO_FILE = false;
-    public static final boolean REPLAY = false;
+    public static final boolean REPLAY = true;
+    public static final boolean FORCE_BLUE_ALLIANCE = true;
 
     public static enum RobotMode {
         SIM,

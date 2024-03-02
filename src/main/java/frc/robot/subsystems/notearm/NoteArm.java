@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.Constants.IO;
 import frc.robot.Constants.SubSystems;
 import frc.robot.subsystems.climber.Climb.ArmPosition;
 import frc.robot.utils.TunableNumber;
@@ -28,6 +29,8 @@ public abstract class NoteArm extends SubsystemBase {
         public boolean is_claw_open = true;
         public boolean is_arm_out = false;
         public boolean is_arm_up = false;
+
+        public boolean note_end_beam_broke = false;
 
         public double color_sensor_color[] = new double[3];
         public int color_sensor_red_raw = 0;
@@ -58,7 +61,7 @@ public abstract class NoteArm extends SubsystemBase {
     private static final int ARM_OUT_SOLENOID_FORWARD_CHANNEL = 4;
     private static final int ARM_OUT_SOLENOID_REVERSE_CHANNEL = 5;
     private static final I2C.Port COLOR_SENSOR_PORT = I2C.Port.kOnboard;
-    private static final int NOTE_END_BREAKER_ID = 2;    
+    private static final int NOTE_END_BREAKER_ID = 4;    
 
     protected final PneumaticHub hub = new PneumaticHub(PNEUMATIC_MODULE_ID);
     protected final Compressor compressor = new Compressor(PNEUMATIC_MODULE_ID, PNEUMATICS_MODULE_TYPE);
@@ -83,6 +86,8 @@ public abstract class NoteArm extends SubsystemBase {
         inputs.is_arm_out = arm_out_solenoid.get() == Value.kForward;
         inputs.is_arm_up = arm_up_solenoid.get() == Value.kForward;
 
+        inputs.note_end_beam_broke = !note_end_beam_breaker.get();
+
         inputs.color_sensor_color = new double[]{color_sensor.getColor().red, color_sensor.getColor().green, color_sensor.getColor().blue};
         inputs.color_sensor_red_raw = color_sensor.getRed();
         inputs.color_sensor_green_raw = color_sensor.getGreen();
@@ -98,7 +103,7 @@ public abstract class NoteArm extends SubsystemBase {
     @Override public void periodic() {
         updateInputs();
         Logger.processInputs("NoteArm", inputs);
-        if(noteDetected()) closeClaw();
+        if(noteDetected() && IO.controller.getStartButton()) closeClaw();
 
         color_sensor_mechanism.setBackgroundColor(new Color8Bit(getColor()));
         Logger.recordOutput("NoteArm/ColorSensorMechanism", color_sensor_mechanism);
@@ -148,9 +153,7 @@ public abstract class NoteArm extends SubsystemBase {
     }
 
     public boolean noteDetected(){
-        SmartDashboard.putBoolean("NoteArm/BeamBreaker", note_end_beam_breaker.get());
-        detectingNoteColor();
-        return milimetersFromObject() < note_distance_threshold_mm.get() && detectingNoteColor() && note_end_beam_breaker.get();
+        return inputs.note_end_beam_broke;
     }
 
     public Command grabNoteCommand()  { return this.runOnce(() -> { closeClaw(); }); }

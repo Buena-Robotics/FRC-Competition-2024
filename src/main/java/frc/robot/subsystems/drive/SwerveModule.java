@@ -53,7 +53,7 @@ public abstract class SwerveModule {
 
         this.drive_feedforward = new SimpleMotorFeedforward(0.5, 1.5);
         this.drive_feedback = new PIDController(1.0, 0.0, 0.0, Robot.defaultPeriodSecs);
-        this.turn_feedback  = new PIDController(0.5, 0.0, 0.0, Robot.defaultPeriodSecs);
+        this.turn_feedback  = new PIDController(0.2, 0.0, 0.0, Robot.defaultPeriodSecs);
         
         this.turn_feedback.enableContinuousInput(-Math.PI, Math.PI);
     }
@@ -70,10 +70,10 @@ public abstract class SwerveModule {
         Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
     }
 
-    public void runSetpoint(SwerveModuleState state) {
+    public SwerveModuleState runSetpoint(SwerveModuleState state) {
         if(Math.abs(state.speedMetersPerSecond) < SET_STATE_SPEED_METERS_PER_SECOND_DEADBAND) {
             stop();
-            return;
+            return new SwerveModuleState();
         }
         SwerveModuleState optimized_state = SwerveModuleState.optimize(state, getAngle());
 
@@ -83,6 +83,7 @@ public abstract class SwerveModule {
         setDriveVoltage(
             drive_feedforward.calculate(optimized_state.speedMetersPerSecond)
                 + drive_feedback.calculate(inputs.drive_velocity_meters_per_second, optimized_state.speedMetersPerSecond));
+        return optimized_state;
     }
 
     public void stop() {

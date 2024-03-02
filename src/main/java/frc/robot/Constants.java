@@ -42,7 +42,7 @@ public final class Constants {
         public static final SwerveDrive swerve_drive = new SwerveDrive();
         public static final ServoSub servo = new ServoSub();
         public static final Vision vision = new Vision(
-                new CameraData("Microsoft_LifeCam_HD-3000", new Transform3d(
+                new CameraData("Microsoft_LifeCam_HD-3000 (1)", new Transform3d(
                         Units.inchesToMeters(14.5),
                         Units.inchesToMeters(14.5),
                         Units.inchesToMeters(69/4.0),
