@@ -65,5 +65,5 @@ public class NavXSim extends NavX {
                 speeds.omegaRadiansPerSecond);
         sim_odometry = sim_odometry.exp(twist);
     }
-    @Override public Rotation2d getRotation2d() { return inputs.angle.plus(Rotation2d.fromDegrees(inputs.angle_adjustment)).unaryMinus(); }
+    @Override public Rotation2d getRotation2d() { return inputs.angle.plus(Rotation2d.fromDegrees(inputs.angle_adjustment)); }
 }

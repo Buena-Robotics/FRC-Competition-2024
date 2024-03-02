@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drive;
 
 import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -25,6 +26,8 @@ public abstract class SwerveModule {
         public double turn_applied_volts = 0.0;
         public double[] turn_current_amps = new double[] {};
         public double[] turn_temp_celcius = new double[] {};
+
+        public SwerveModuleState sim_state = new SwerveModuleState();
     }
 
     protected static final double WHEEL_DIAMETER_METERS  = Units.inchesToMeters(4);
@@ -39,19 +42,18 @@ public abstract class SwerveModule {
     private SimpleMotorFeedforward drive_feedforward;
     private final PIDController drive_feedback;
     private final PIDController turn_feedback;
-    
     protected final String module_name;
     protected final int index;
-    protected SwerveModuleInputsAutoLogged inputs;
+    protected SwerveModuleInputsAutoLogged inputs = new SwerveModuleInputsAutoLogged();
+    // protected SwerveModuleOutputs outputs = new SwerveModuleOutputs();
 
     public SwerveModule(String module_name, int index){
-        this.inputs = new SwerveModuleInputsAutoLogged();
         this.module_name = module_name;
         this.index = index;
 
         this.drive_feedforward = new SimpleMotorFeedforward(0.5, 1.5);
         this.drive_feedback = new PIDController(1.0, 0.0, 0.0, Robot.defaultPeriodSecs);
-        this.turn_feedback  = new PIDController(0.5, 0.0, 0, Robot.defaultPeriodSecs);
+        this.turn_feedback  = new PIDController(0.5, 0.0, 0.0, Robot.defaultPeriodSecs);
         
         this.turn_feedback.enableContinuousInput(-Math.PI, Math.PI);
     }
@@ -75,7 +77,7 @@ public abstract class SwerveModule {
         }
         SwerveModuleState optimized_state = SwerveModuleState.optimize(state, getAngle());
 
-        setTurn( turn_feedback.calculate(inputs.turn_absolute_position_radians, optimized_state.angle.getRadians()));   
+        setTurn( turn_feedback.calculate(inputs.turn_position_radians, optimized_state.angle.getRadians()));   
 
         optimized_state.speedMetersPerSecond *= Math.cos(turn_feedback.getPositionError());
         setDriveVoltage(
@@ -93,6 +95,7 @@ public abstract class SwerveModule {
         runSetpoint(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
     }
 
+    public SwerveModuleState getSimState(){ return inputs.sim_state; }
     public Rotation2d getAngle() { return new Rotation2d(inputs.turn_position_radians); }
     public double getPositionMeters() { return inputs.drive_position_meters; }
     public double getVelocityMetersPerSec() { return inputs.drive_velocity_meters_per_second; }

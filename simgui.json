@@ -22,6 +22,7 @@
     "types": {
       "/AdvantageKit/RealOutputs/Climb/Mecha/Arm Mechanism": "Mechanism2d",
       "/AdvantageKit/RealOutputs/Climb/Mecha/Winch Mechansim": "Mechanism2d",
+      "/AdvantageKit/RealOutputs/NoteArm/ColorSensorMechanism": "Mechanism2d",
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Climb": "Mechanism2d",
       "/SmartDashboard/Climb/Arm Mechanism": "Mechanism2d",
@@ -124,12 +125,6 @@
     },
     "transitory": {
       "AdvantageKit": {
-        "Drive": {
-          "NavX": {
-            "open": true
-          },
-          "open": true
-        },
         "open": true
       },
       "SmartDashboard": {
@@ -163,8 +158,10 @@
           "Drive": {
             "Joystick": {
               "open": false
-            }
-          }
+            },
+            "open": true
+          },
+          "open": true
         },
         "open": true
       },

@@ -9,8 +9,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.Timer;
 
 public abstract class NavX extends AHRS {
     @AutoLog public static class NavXInputs {
@@ -19,7 +21,6 @@ public abstract class NavX extends AHRS {
         public boolean rotating = false;
 
         public long timestamp = 0;
-        public double delta_time = 0;
         public double angle_adjustment = 0.0;
         public double temperature_celcius = 0.0;
 
@@ -40,6 +41,9 @@ public abstract class NavX extends AHRS {
         public Pose2d estimated_pose = new Pose2d();
     }
 
+    private Pose2d estimated_pose = new Pose2d();
+    protected double last_timestamp = Timer.getFPGATimestamp();
+    protected double delta_time = 0;
     protected NavXInputsAutoLogged inputs = new NavXInputsAutoLogged();
     protected Pose2d start_pose = new Pose2d();
 
@@ -58,6 +62,20 @@ public abstract class NavX extends AHRS {
     public void periodic(){
         updateInputs();
         Logger.processInputs("Drive/NavX", inputs);
+        Logger.recordOutput("NavX/EstimatedPose", updatePose());
+    }
+
+    private Pose2d updatePose(){
+        estimated_pose = estimated_pose.transformBy(
+            new Transform2d(
+                inputs.velocity_x * delta_time, 
+                0, 
+                Rotation2d.fromDegrees(inputs.angle_rate * delta_time)));
+
+        double timestamp = Timer.getFPGATimestamp();
+        delta_time = timestamp - last_timestamp; 
+        last_timestamp = timestamp;
+        return estimated_pose.relativeTo(start_pose);
     }
 
     protected double removeNoise(double value){

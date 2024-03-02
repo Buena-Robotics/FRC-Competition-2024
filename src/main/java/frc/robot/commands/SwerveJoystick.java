@@ -13,7 +13,7 @@ import frc.robot.Constants.IO;
 import frc.robot.subsystems.drive.SwerveDrive;
 import frc.robot.utils.TunableNumber;
 
-public class SwerveJoystickCmd extends Command {
+public class SwerveJoystick extends Command {
     private static final TunableNumber left_joystick_deadband  = new TunableNumber("Joystick/LeftDeadband",0.1);
     private static final TunableNumber right_joystick_deadband = new TunableNumber("Joystick/RightDeadband",0.1);
     private static final double LEFT_DEADBAND_MODIFIER = 0.075;
@@ -26,7 +26,7 @@ public class SwerveJoystickCmd extends Command {
     // private final Supplier<Boolean> turret_mode;
     private boolean field_oriented_mode = false;
     
-    public SwerveJoystickCmd(SwerveDrive swerve_drive, Supplier<Double> x_speed_function, Supplier<Double> y_speed_function, Supplier<Double> turn_speed_function){
+    public SwerveJoystick(SwerveDrive swerve_drive, Supplier<Double> x_speed_function, Supplier<Double> y_speed_function, Supplier<Double> turn_speed_function){
         this.swerve_drive = swerve_drive;
         
         this.turret_turn_feedback = new PIDController(5, 0, 0.1);
@@ -79,6 +79,8 @@ public class SwerveJoystickCmd extends Command {
 
         if(field_oriented_mode){
             chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x_speed, y_speed, turn_speed, swerve_drive.getHeading());
+            if(Robot.isSimulation())
+                chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x_speed, y_speed, -turn_speed, swerve_drive.getHeading());
         }
 
         // final var best_aim_assist_target = FieldConstants.getBestAimAssistTarget(swerve_drive.getPose());

@@ -43,9 +43,6 @@ public class ShooterReal extends Shooter {
     }
 
     @Override public void updateInputs(){
-        //use current pose + climb angle
-        inputs.estimated_note_trajectory = new Pose3d[] {};
-
         inputs.shooter_ledge_beam_broke = shooter_ledge_beam_breaker.get();
         inputs.holding_note_beam_broke = holding_note_beam_breaker.get();
 

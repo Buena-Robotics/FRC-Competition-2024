@@ -36,8 +36,8 @@ public final class FieldConstants {
     //     NOTE_RED_TOP              = new Pose2d(13.65, 7.010, new Rotation2d()),
     //     NOTE_RED_CENTER           = new Pose2d(13.65, 5.560, new Rotation2d()),
     //     NOTE_RED_BOTTOM           = new Pose2d(13.65, 4.108, new Rotation2d());
-    private static final Point BLUE_SPEAKER_TARGET = new Point(0.000000, 5.547868); 
-    private static final Point RED_SPEAKER_TARGET = new Point(16.541748, 5.547868);
+    private static final Pose2d BLUE_SPEAKER_TARGET = new Pose2d(0.000000, 5.547868, new Rotation2d()); 
+    private static final Pose2d RED_SPEAKER_TARGET = new Pose2d(16.541748, 5.547868, new Rotation2d());
     public static final AimAssistTarget[] aim_assist_targets = {
         new AimAssistTarget(new Pose2d(1.835, 7.798, Rotation2d.fromDegrees(90)), null), // Blue Amp
         new AimAssistTarget(new Pose2d(14.70, 7.798, Rotation2d.fromDegrees(90)), null) // Red Amp
@@ -48,7 +48,7 @@ public final class FieldConstants {
         return alliance.isPresent() && alliance.get() == Alliance.Red;
     }
     public static boolean isBlueAlliance(){ return !isRedAlliance(); }
-    public static Point getSpeakerPoint(){ return isBlueAlliance() ? BLUE_SPEAKER_TARGET : RED_SPEAKER_TARGET; }
+    public static Pose2d getSpeakerPoint(){ return isBlueAlliance() ? BLUE_SPEAKER_TARGET : RED_SPEAKER_TARGET; }
 
     public static Pair<AimAssistTarget, Double> getBestAimAssistTarget(Pose2d robot_pose){
         AimAssistTarget best_target = null;

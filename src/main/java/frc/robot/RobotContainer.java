@@ -8,7 +8,7 @@ import frc.robot.Constants.IO;
 import frc.robot.Constants.SubSystems;
 import frc.robot.commands.LaunchNote;
 import frc.robot.commands.PrepareLaunch;
-import frc.robot.commands.SwerveJoystickCmd;
+import frc.robot.commands.SwerveJoystick;
 import frc.robot.subsystems.climber.Climb.ArmPosition;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,7 +27,7 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-        SubSystems.swerve_drive.setDefaultCommand(new SwerveJoystickCmd(
+        SubSystems.swerve_drive.setDefaultCommand(new SwerveJoystick(
             SubSystems.swerve_drive, 
             () -> IO.controller.getLeftY(), // Y-Axis 
             () -> IO.controller.getLeftX(),  // X-Axis

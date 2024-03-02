@@ -12,9 +12,6 @@ public class ShooterSim extends Shooter {
     private double feed_applied_volts = 0.0, launch_applied_volts = 0.0;
 
     @Override public void updateInputs(){
-        //use current pose + climb angle
-        inputs.estimated_note_trajectory = new Pose3d[] {};
-
         inputs.shooter_ledge_beam_broke = false;
         inputs.holding_note_beam_broke = false;
 

@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Constants.IO;
 import frc.robot.Constants.SubSystems;
 import frc.robot.subsystems.climber.Climb.ArmPosition;
 import frc.robot.utils.TunableNumber;
@@ -40,7 +39,6 @@ public abstract class NoteArm extends SubsystemBase {
 
         public double compressor_applied_volts = 0.0;
         public double compressor_current_amps = 0.0;
-        public double compressor_pressure = 0.0;
     }
 
     private static final TunableNumber note_distance_threshold_mm = new TunableNumber("NoteArm/NoteDistanceThreshMM", 2000);
@@ -81,11 +79,11 @@ public abstract class NoteArm extends SubsystemBase {
     }
 
     protected void updateInputs(){
-        inputs.is_claw_open = isClawOpen();
-        inputs.is_arm_out = isArmOut();
-        inputs.is_arm_up = isArmUp();
+        inputs.is_claw_open = claw_solenoid.get() == Value.kForward;
+        inputs.is_arm_out = arm_out_solenoid.get() == Value.kForward;
+        inputs.is_arm_up = arm_up_solenoid.get() == Value.kForward;
 
-        inputs.color_sensor_color = new double[3];
+        inputs.color_sensor_color = new double[]{color_sensor.getColor().red, color_sensor.getColor().green, color_sensor.getColor().blue};
         inputs.color_sensor_red_raw = color_sensor.getRed();
         inputs.color_sensor_green_raw = color_sensor.getGreen();
         inputs.color_sensor_blue_raw = color_sensor.getBlue();
@@ -95,43 +93,38 @@ public abstract class NoteArm extends SubsystemBase {
 
         inputs.compressor_applied_volts = compressor.getAnalogVoltage();
         inputs.compressor_current_amps = compressor.getCurrent();
-        inputs.compressor_pressure = compressor.getPressure();
     }
 
     @Override public void periodic() {
         updateInputs();
         Logger.processInputs("NoteArm", inputs);
-        
-        // if(noteDetected() && !IO.controller.getStartButton()) closeClaw();
+        if(noteDetected()) closeClaw();
 
         color_sensor_mechanism.setBackgroundColor(new Color8Bit(getColor()));
         Logger.recordOutput("NoteArm/ColorSensorMechanism", color_sensor_mechanism);
 
     }
 
-    public boolean isClawOpen(){ return claw_solenoid.get() == Value.kForward; }
-    public boolean isArmUp()   { return arm_up_solenoid.get() == Value.kForward; }
-    public boolean isArmOut()  { return arm_out_solenoid.get() == Value.kForward; }
+    public boolean isClawOpen(){ return inputs.is_claw_open; }
+    public boolean isArmUp()   { return inputs.is_arm_up; }
+    public boolean isArmOut()  { return inputs.is_arm_out; }
 
     public void openClaw()  { claw_solenoid.set(Value.kForward); }
     public void moveArmUp() { arm_up_solenoid.set(Value.kForward); }
     public void moveArmOut(){ arm_out_solenoid.set(Value.kForward); }
 
-    public void closeClaw()  { claw_solenoid.set(Value.kReverse); }
+    public void closeClaw()  { if(!SubSystems.shooter.hasNote()) claw_solenoid.set(Value.kReverse); }
     public void moveArmDown(){ arm_up_solenoid.set(Value.kReverse); }
     public void moveArmIn()  { arm_out_solenoid.set(Value.kReverse); }
 
-    public Color getColor(){
-        return color_sensor.getColor();
-    }
-
+    public Color getColor(){ return new Color(inputs.color_sensor_color[0], inputs.color_sensor_color[1], inputs.color_sensor_color[2]); }
     public int[] getColorSensorRGB(){
         final Color color = color_sensor.getColor();
         return new int[]{(int)(color.red*255), (int)(color.green*255), (int)(color.blue*255)};
     }
 
     public double milimetersFromObject(){
-        final int proximity_11bit = 2047 - color_sensor.getProximity();
+        final int proximity_11bit = 2047 - inputs.color_sensor_proximity_raw;
         SmartDashboard.putNumber("NoteArm/MMFromObject", (double)proximity_11bit / 60);
         SmartDashboard.putNumber("NoteArm/CMFromObject", (double)proximity_11bit / 600);
         return (double)proximity_11bit;
@@ -170,19 +163,19 @@ public abstract class NoteArm extends SubsystemBase {
 
     public Command grabNoteFullCommand(){
         return grabNoteCommand()
-            .andThen(new WaitCommand(0.8)
+            .andThen(new WaitCommand(0.65)
             .andThen(pullArmInCommand()))
-            .andThen(new WaitCommand(0.25))
+            .andThen(new WaitCommand(0.20))
             .andThen(pushArmUpCommand())
-            .andThen(new WaitCommand(0.5))
+            .andThen(new WaitCommand(0.40))
             .andThen(pushArmOutCommand());
     }
     public Command releaseNoteFullCommand(){
         return SubSystems.climb.moveArmToPosition(ArmPosition.UP)
                 .andThen(releaseNoteCommand())
-                .andThen(new WaitCommand(2.0))
+                .andThen(new WaitCommand(1.50))
                 .andThen(pullArmInCommand())
-                .andThen(new WaitCommand(0.65))
+                .andThen(new WaitCommand(0.50))
                 .andThen(pullArmDownCommand())
                 .andThen(new WaitCommand(0.05))
                 .andThen(pushArmOutCommand());

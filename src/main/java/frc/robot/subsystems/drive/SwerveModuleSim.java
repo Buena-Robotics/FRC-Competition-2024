@@ -1,6 +1,10 @@
 package frc.robot.subsystems.drive;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.Robot;
@@ -9,6 +13,7 @@ public class SwerveModuleSim extends SwerveModule {
     private final FlywheelSim drive_sim = new FlywheelSim(DCMotor.getNEO(1), 1 / DRIVE_MOTOR_GEAR_RATIO, 0.025);
     private final FlywheelSim turn_sim =  new FlywheelSim(DCMotor.getNEO(1), 1 / TURN_MOTOR_GEAR_RATIO, 0.004);
 
+    private double drive_position_radians = 0.0;
     private double turn_relative_position_radians = 0.0;
     private double turn_absolute_position_radians = Math.random() * 2.0 * Math.PI;
     private double drive_applied_volts = 0.0;
@@ -32,9 +37,9 @@ public class SwerveModuleSim extends SwerveModule {
             turn_absolute_position_radians -= 2.0 * Math.PI;
         }
 
-        inputs.drive_position_meters += 
-            (drive_sim.getAngularVelocityRadPerSec() * Robot.defaultPeriodSecs);
-        inputs.drive_velocity_meters_per_second = drive_sim.getAngularVelocityRadPerSec();
+        drive_position_radians += drive_sim.getAngularVelocityRadPerSec() * Robot.defaultPeriodSecs;
+        inputs.drive_position_meters = drive_position_radians * (WHEEL_DIAMETER_METERS);
+        inputs.drive_velocity_meters_per_second = drive_sim.getAngularVelocityRadPerSec() * (WHEEL_DIAMETER_METERS);
         inputs.drive_applied_volts = drive_applied_volts;
         inputs.drive_current_amps = new double[] {Math.abs(drive_sim.getCurrentDrawAmps())};
         inputs.drive_temp_celcius = new double[] {};
@@ -45,6 +50,8 @@ public class SwerveModuleSim extends SwerveModule {
         inputs.turn_applied_volts = turn_applied_volts;
         inputs.turn_current_amps = new double[] {Math.abs(turn_sim.getCurrentDrawAmps())};
         inputs.turn_temp_celcius = new double[] {};
+
+        inputs.sim_state = new SwerveModuleState(inputs.drive_position_meters, new Rotation2d(inputs.turn_position_radians));
     }
 
     @Override public void setDriveVoltage(double volts) {
@@ -60,5 +67,5 @@ public class SwerveModuleSim extends SwerveModule {
     @Override public void setDriveBrakeMode(boolean enable) {}
     @Override public void setTurnBrakeMode(boolean enable) {}
 
-    @Override public void setTurn(double value) { throw new UnsupportedOperationException("Unimplemented method 'setTurn'"); }
+    @Override public void setTurn(double value) { setTurnVoltage(value * 12); }
 }

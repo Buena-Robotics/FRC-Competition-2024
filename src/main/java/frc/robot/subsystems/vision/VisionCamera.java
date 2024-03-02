@@ -63,7 +63,7 @@ public abstract class VisionCamera {
     protected double previous_vision_result_timestamp = 0.0;
     public VisionCamera(String photon_camera_name, Transform3d robot_to_camera){
         this.photon_camera = new PhotonCamera(photon_camera_name);
-        this.photon_camera.setDriverMode(true);
+        this.photon_camera.setDriverMode(false);
         this.photon_pose_estimator = new PhotonPoseEstimator(field_layout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, photon_camera, robot_to_camera);
         this.photon_pose_estimator.setMultiTagFallbackStrategy(PoseStrategy.AVERAGE_BEST_TARGETS);
         this.photon_pose_estimator.setTagModel(TargetModel.kAprilTag36h11);

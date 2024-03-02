@@ -26,15 +26,11 @@ import frc.robot.subsystems.vision.VisionCamera.TimestampedVisionMeasurement;
 import frc.robot.utils.FieldVisualizer;
 import frc.robot.utils.Print;
 import frc.robot.utils.TimerUtil;
-import frc.robot.utils.TunableNumber;
 
 public class SwerveDrive extends SubsystemBase {
     public static final double PHYSICAL_MAX_SPEED_METERS_PER_SECOND = Units.feetToMeters(15.1);
     public static final double TELEOP_DRIVE_MAX_SPEED_METERS_PER_SECOND = Units.feetToMeters(15.1); // ?
-    public static final double TELEOP_DRIVE_MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI; // ?
-    
-    public static final TunableNumber max_linear_acceleration_per_second = new TunableNumber("Drive/MaxDriveLinearAcceleration", Units.feetToMeters(4));
-    public static final TunableNumber max_angular_acceleration_per_second = new TunableNumber("Drive/MaxDriveAngularAcceleration", Math.PI / 2);
+    public static final double TELEOP_DRIVE_MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI * 1.5; // ?
     
     private static final edu.wpi.first.wpilibj.SerialPort.Port NAVX_PORT = edu.wpi.first.wpilibj.SerialPort.Port.kUSB;
     private static final double CENTER_TO_MODULE = Units.inchesToMeters(10.75);
@@ -112,6 +108,7 @@ public class SwerveDrive extends SubsystemBase {
         // FieldVisualizer.getField().getObject("Cameras").setPoses(SubSystems.vision.getAllRobotToCameraPoses(robot_pose));
 
         Logger.recordOutput("Drive/Modules/States/Actual", getModuleStates());
+        Logger.recordOutput("Drive/Modules/States/Sim", getSimModuleStates());
         Logger.recordOutput("Drive/Modules/Positions", getModulePositions());
         Logger.recordOutput("PoseEstimation/Odometer", odometer.getPoseMeters());
         Logger.recordOutput("PoseEstimation/NavX-Displacement", navx.getPose3d());
@@ -134,15 +131,16 @@ public class SwerveDrive extends SubsystemBase {
         return closestValue;
     }
     public void postEnableSetup(){
-        navx.setStartPose(robot_pose);
-        setHeadingDefault();
+        // navx.setStartPose(robot_pose);
+        // setHeadingDefault();
     }
     public void setHeadingDefault(){
         Pose2d held_pose = robot_pose;
-        Print.error("Fix this gng?");
+        navx.reset();
+
         if(FieldConstants.isBlueAlliance()){
             Print.log("Heading Blue Alliance");
-            final double robot_rotation = robot_pose.getRotation().getDegrees();
+            final double robot_rotation = held_pose.getRotation().getDegrees();
             final double[] rotations = new double[]{-120.0, 180.0, -180.0, 120.0};
             final double target_rotation = getClosestToTarget(robot_rotation, rotations);
             switch ((int)target_rotation) {
@@ -154,21 +152,22 @@ public class SwerveDrive extends SubsystemBase {
             }
         } else { // Red Alliances
             Print.log("Heading Red Alliance Selected");
-            final double robot_rotation = robot_pose.getRotation().getDegrees();
+            final double robot_rotation = held_pose.getRotation().getDegrees();
             final double[] rotations = new double[]{-60.0, 0.0, 60.0};
             final double target_rotation = getClosestToTarget(robot_rotation, rotations);
             switch ((int)target_rotation) {
-                case -60: setHeading(Rotation2d.fromDegrees(180-60)); break;
-                case 0: setHeading(Rotation2d.fromDegrees(180)); break;
-                case 60: setHeading(Rotation2d.fromDegrees(180+60)); break;
+                case -60: setHeading(Rotation2d.fromDegrees(-60+180)); break;
+                case 0: setHeading(Rotation2d.fromDegrees(0)); break;
+                case 60: setHeading(Rotation2d.fromDegrees(+60-180)); break;
                 default: Print.error("Red Alliance Unknown Rotation"); break;
             }
+            Print.log("%f", target_rotation);
         }
-        odometer.resetPosition(navx.getRotation2d(), getWheelPositions(), held_pose);
-        pose_estimator.resetPosition(
-            navx.getRotation2d(),
-            getWheelPositions(),
-            held_pose);
+        // odometer.resetPosition(navx.getRotation2d(), getWheelPositions(), held_pose);
+        // pose_estimator.resetPosition(
+            // navx.getRotation2d(),
+            // getWheelPositions(),
+            // held_pose);
     }
     public void setHeading(Rotation2d rotation){ navx.setAngleAdjustment(rotation.getDegrees()); }
     public Rotation2d getHeading(){ return navx.getRotation2d(); }
@@ -182,6 +181,13 @@ public class SwerveDrive extends SubsystemBase {
                 modules[1].getState(),
                 modules[2].getState(),
                 modules[3].getState()};
+    }
+    private SwerveModuleState[] getSimModuleStates(){
+        return new SwerveModuleState[] {
+                modules[0].getSimState(),
+                modules[1].getSimState(),
+                modules[2].getSimState(),
+                modules[3].getSimState()};
     }
     public SwerveModulePosition[] getModulePositions(){
         return new SwerveModulePosition[] {

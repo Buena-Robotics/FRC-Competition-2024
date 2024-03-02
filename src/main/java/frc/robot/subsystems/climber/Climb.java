@@ -14,8 +14,10 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SubSystems;
+import frc.robot.utils.Print;
 
 public abstract class Climb extends SubsystemBase {
     @AutoLog public static class ClimbInputs {
@@ -78,14 +80,16 @@ public abstract class Climb extends SubsystemBase {
         Logger.recordOutput("Climb/Mecha/Arm Mechanism", arm_mechanism);
     }
 
+    public double getShooterAngleRadians(){ return inputs.bore_absolute_position_radians; }
+
     public void runSetpoint(Rotation2d setpoint){
         final Rotation2d measurement = new Rotation2d(inputs.bore_absolute_position_radians);
         
         double voltage = 0.0;
         if(measurement.minus(setpoint).getDegrees() < 0)
-            voltage = Math.sqrt(measurement.unaryMinus().plus(setpoint).getDegrees());
+            voltage = Math.sqrt(measurement.unaryMinus().plus(setpoint).getDegrees()) * 10;
         else 
-            voltage = -Math.sqrt(measurement.minus(setpoint).getDegrees());
+            voltage = -Math.sqrt(measurement.minus(setpoint).getDegrees()) * 10;
         voltage = MathUtil.clamp(voltage, -12, 12);
 
         if(inputs.winch_rotations < 4/64.0 && voltage < 0){
@@ -126,7 +130,7 @@ public abstract class Climb extends SubsystemBase {
             private final Rotation2d setpoint = rotation;
             private Rotation2d measurement = new Rotation2d(inputs.bore_absolute_position_radians);
             private Rotation2d prev_measurement = new Rotation2d(inputs.bore_absolute_position_radians);
-            private final int wrong_direction_period_counter_max = 20;
+            private final int wrong_direction_period_counter_max = 25;
             private int wrong_direction_counter = 0;
 
             @Override public void initialize() {
