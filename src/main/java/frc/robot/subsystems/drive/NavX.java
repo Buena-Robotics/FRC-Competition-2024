@@ -66,6 +66,7 @@ public abstract class NavX extends AHRS {
     protected double delta_time = 0;
     protected NavXInputsAutoLogged inputs = new NavXInputsAutoLogged();
     protected Pose2d start_pose = new Pose2d();
+    protected Rotation2d field_oriented_heading = new Rotation2d();
 
     public NavX(SerialPort.Port serial_port_id, Pose2d start_pose){
         this(serial_port_id);
@@ -107,6 +108,9 @@ public abstract class NavX extends AHRS {
     }
 
     public void setStartPose(Pose2d start_pose){ this.start_pose = start_pose; }
+    public void setFieldOrientedHeading(Rotation2d heading){ this.field_oriented_heading = heading; }
+
+    public Rotation2d getFieldOrientedHeading(){ return this.field_oriented_heading; }
 
     public double getRollRadians() { return inputs.roll_radians;  }
     public double getPitchRadians(){ return inputs.pitch_radians; }

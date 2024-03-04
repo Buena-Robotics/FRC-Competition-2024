@@ -5,7 +5,7 @@ import frc.robot.utils.Print;
 public final class RobotConfig {
     public static final boolean LOG_SIMULATION_TO_FILE = false;
     public static final boolean REPLAY = false;
-    public static final boolean FORCE_BLUE_ALLIANCE = true; // TODO: TURN OFF DURING COMPETITION
+    public static final boolean FORCE_BLUE_ALLIANCE = false; // TODO: TURN OFF DURING COMPETITION
 
     public static enum RobotMode {
         SIM,

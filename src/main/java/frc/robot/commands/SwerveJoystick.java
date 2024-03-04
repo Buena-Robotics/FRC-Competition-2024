@@ -8,7 +8,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.Robot;
 import frc.robot.Constants.IO;
 import frc.robot.subsystems.drive.SwerveDrive;
 import frc.robot.utils.TunableNumber;
@@ -76,7 +75,7 @@ public class SwerveJoystick extends Command {
         ChassisSpeeds chassis_speeds = new ChassisSpeeds(x_speed, y_speed, turn_speed);
 
         if(field_oriented_mode){
-            chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x_speed, y_speed, turn_speed, swerve_drive.getHeading());
+            chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x_speed, y_speed, turn_speed, swerve_drive.getHeading().minus(swerve_drive.getHeadingOffset()));
         }
 
         // final var best_aim_assist_target = FieldConstants.getBestAimAssistTarget(swerve_drive.getPose());

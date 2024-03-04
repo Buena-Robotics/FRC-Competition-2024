@@ -161,8 +161,8 @@ public class SwerveDrive extends SubsystemBase {
         return closestValue;
     }
     public void postEnableSetup(){
-        // navx.setStartPose(robot_pose);
-        // setHeadingDefault();
+        navx.setStartPose(robot_pose);
+        setHeadingDefault();
     }
     public void setHeadingDefault(){
         Pose2d held_pose = robot_pose;
@@ -174,33 +174,30 @@ public class SwerveDrive extends SubsystemBase {
             final double[] rotations = new double[]{-120.0, 180.0, -180.0, 120.0};
             final double target_rotation = getClosestToTarget(robot_rotation, rotations);
             switch ((int)target_rotation) {
-                case -120: setHeading(Rotation2d.fromDegrees(120)); break;
+                case -120: setHeading(Rotation2d.fromDegrees(-150)); break;
                 case -180:
                 case 180: setHeading(Rotation2d.fromDegrees(180)); break;
-                case 120: setHeading(Rotation2d.fromDegrees(-120)); break;
+                case 120: setHeading(Rotation2d.fromDegrees(120)); break;
                 default: Print.error("Blue Alliance Unknown Rotation"); break;
             }
+            Print.log("%f", target_rotation);
         } else { // Red Alliances
             Print.log("Heading Red Alliance Selected");
             final double robot_rotation = held_pose.getRotation().getDegrees();
             final double[] rotations = new double[]{-60.0, 0.0, 60.0};
             final double target_rotation = getClosestToTarget(robot_rotation, rotations);
             switch ((int)target_rotation) {
-                case -60: setHeading(Rotation2d.fromDegrees(-60+180)); break;
-                case 0: setHeading(Rotation2d.fromDegrees(0)); break;
-                case 60: setHeading(Rotation2d.fromDegrees(+60-180)); break;
+                case -60: setHeading(Rotation2d.fromDegrees(180-60)); break;
+                case 0: setHeading(Rotation2d.fromDegrees(180)); break;
+                case 60: setHeading(Rotation2d.fromDegrees(-180+60)); break;
                 default: Print.error("Red Alliance Unknown Rotation"); break;
             }
             Print.log("%f", target_rotation);
         }
-        // odometer.resetPosition(navx.getRotation2d(), getWheelPositions(), held_pose);
-        // pose_estimator.resetPosition(
-            // navx.getRotation2d(),
-            // getWheelPositions(),
-            // held_pose);
     }
-    public void setHeading(Rotation2d rotation){ navx.setAngleAdjustment(rotation.getDegrees()); }
+    public void setHeading(Rotation2d rotation){ navx.setFieldOrientedHeading(rotation); }
     public Rotation2d getHeading(){ return navx.getRotation2d(); }
+    public Rotation2d getHeadingOffset(){ return navx.getFieldOrientedHeading(); }
 
     private void resetPose(Pose2d pose){ /* TODO: REST ODOMERTRY POSE FOR PATHFINDING */ }
     private void driveRobotRelative(ChassisSpeeds speeds){ setModuleStates(kinematics.toSwerveModuleStates(speeds)); }

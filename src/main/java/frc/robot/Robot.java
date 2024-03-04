@@ -65,7 +65,6 @@ public class Robot extends LoggedRobot {
         if(!enabled_flag && DriverStation.isEnabled()){
             enabled_flag = true;
             SubSystems.swerve_drive.postEnableSetup();
-            // SubSystems.swerve_drive.setHeadingDefault();
         }
     }
 

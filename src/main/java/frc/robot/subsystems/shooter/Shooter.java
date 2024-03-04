@@ -61,7 +61,7 @@ public abstract class Shooter extends SubsystemBase {
         final double estimated_shooter_pitch = Math.atan2(speaker_height, distance_to_speaker);
 
         // if(inputs.holding_note_beam_broke)
-            SubSystems.climb.runSetpoint(new Rotation2d((Math.PI/2) - estimated_shooter_pitch));
+            // SubSystems.climb.runSetpoint(new Rotation2d((Math.PI/2) - estimated_shooter_pitch));
 
         final List<Pose3d> estimated_note_trajectory = new ArrayList<Pose3d>(2);
         estimated_note_trajectory.add(getShooterPose(estimated_shooter_pitch));
