@@ -51,7 +51,7 @@ public class SwerveModuleSim extends SwerveModule {
         inputs.turn_current_amps = new double[] {Math.abs(turn_sim.getCurrentDrawAmps())};
         inputs.turn_temp_celcius = new double[] {};
 
-        inputs.sim_state = new SwerveModuleState(inputs.drive_position_meters, new Rotation2d(inputs.turn_position_radians));
+        inputs.sim_module_state = new SwerveModuleState(inputs.drive_velocity_meters_per_second, new Rotation2d(inputs.turn_position_radians));
     }
 
     @Override public void setDriveVoltage(double volts) {

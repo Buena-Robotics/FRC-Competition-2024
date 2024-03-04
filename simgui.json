@@ -44,6 +44,7 @@
       "/SmartDashboard/Field": {
         "AprilTags": {
           "arrows": false,
+          "image": "C:\\dev\\FRC\\Competition-2024\\.Glass\\res\\tag-blue.png",
           "length": 0.30480000376701355,
           "selectable": false,
           "width": 0.30480000376701355
@@ -74,12 +75,12 @@
             255.0
           ],
           "length": 0.7365999817848206,
-          "selectable": false,
           "weight": 3.0,
           "width": 0.7365999817848206
         },
         "SwerveModules": {
           "arrows": false,
+          "image": "C:\\dev\\FRC\\Competition-2024\\.Glass\\res\\swerve_module.png",
           "length": 0.20319999754428864,
           "selectable": false,
           "width": 0.20319999754428864

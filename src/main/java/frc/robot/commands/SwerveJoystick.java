@@ -74,13 +74,9 @@ public class SwerveJoystick extends Command {
         turn_speed *= SwerveDrive.TELEOP_DRIVE_MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
 
         ChassisSpeeds chassis_speeds = new ChassisSpeeds(x_speed, y_speed, turn_speed);
-        if(Robot.isSimulation())
-            chassis_speeds = new ChassisSpeeds(-x_speed, -y_speed, -turn_speed);
 
         if(field_oriented_mode){
             chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x_speed, y_speed, turn_speed, swerve_drive.getHeading());
-            if(Robot.isSimulation())
-                chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x_speed, y_speed, -turn_speed, swerve_drive.getHeading());
         }
 
         // final var best_aim_assist_target = FieldConstants.getBestAimAssistTarget(swerve_drive.getPose());

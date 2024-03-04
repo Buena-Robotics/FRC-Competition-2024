@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.RobotState;
 import frc.robot.Constants.IO;
 import frc.robot.Constants.SubSystems;
 import frc.robot.subsystems.climber.Climb.ArmPosition;
@@ -44,7 +45,6 @@ public abstract class NoteArm extends SubsystemBase {
         public double compressor_current_amps = 0.0;
     }
 
-    private static final TunableNumber note_distance_threshold_mm = new TunableNumber("NoteArm/NoteDistanceThreshMM", 2000);
     private static final TunableNumber note_hue_lower_threshold = new TunableNumber("NoteArm/NoteHueLowerThresh", 10);
     private static final TunableNumber note_hue_upper_threshold = new TunableNumber("NoteArm/NoteHueUpperThresh", 90);
     private static final TunableNumber note_saturation_threshold = new TunableNumber("NoteArm/NoteSatThresh", 100);
@@ -110,6 +110,8 @@ public abstract class NoteArm extends SubsystemBase {
 
     }
 
+    public boolean hasNote(){ return !inputs.is_claw_open; }
+
     public boolean isClawOpen(){ return inputs.is_claw_open; }
     public boolean isArmUp()   { return inputs.is_arm_up; }
     public boolean isArmOut()  { return inputs.is_arm_out; }
@@ -118,7 +120,7 @@ public abstract class NoteArm extends SubsystemBase {
     public void moveArmUp() { arm_up_solenoid.set(Value.kForward); }
     public void moveArmOut(){ arm_out_solenoid.set(Value.kForward); }
 
-    public void closeClaw()  { if(!SubSystems.shooter.hasNote()) claw_solenoid.set(Value.kReverse); }
+    public void closeClaw()  { if(!RobotState.shooterHasNote()) claw_solenoid.set(Value.kReverse); }
     public void moveArmDown(){ arm_up_solenoid.set(Value.kReverse); }
     public void moveArmIn()  { arm_out_solenoid.set(Value.kReverse); }
 

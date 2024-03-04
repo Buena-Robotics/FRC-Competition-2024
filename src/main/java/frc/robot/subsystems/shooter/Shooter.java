@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.FieldConstants;
+import frc.robot.RobotState;
 import frc.robot.Constants.SubSystems;
 
 public abstract class Shooter extends SubsystemBase {
@@ -60,7 +61,7 @@ public abstract class Shooter extends SubsystemBase {
         final double estimated_shooter_pitch = Math.atan2(speaker_height, distance_to_speaker);
 
         // if(inputs.holding_note_beam_broke)
-            // SubSystems.climb.moveArmToPosition(new Rotation2d((Math.PI/2) - estimated_shooter_pitch)).schedule();
+            SubSystems.climb.runSetpoint(new Rotation2d((Math.PI/2) - estimated_shooter_pitch));
 
         final List<Pose3d> estimated_note_trajectory = new ArrayList<Pose3d>(2);
         estimated_note_trajectory.add(getShooterPose(estimated_shooter_pitch));
@@ -77,7 +78,7 @@ public abstract class Shooter extends SubsystemBase {
     }
 
     private Pose3d getShooterPose(double shooter_pitch_radians){
-        final Transform3d robot_to_shooter = new Transform3d(new Translation3d(Units.inchesToMeters(-14.5),0.0,Units.inchesToMeters(77/4.0)), new Rotation3d(0.0,-shooter_pitch_radians,0.0));
+        final Transform3d robot_to_shooter = new Transform3d(new Translation3d(Units.inchesToMeters(-14.5),0.0,Units.inchesToMeters(21.5)), new Rotation3d(0.0,-shooter_pitch_radians,0.0));
         final Pose3d robot_pose = new Pose3d(SubSystems.swerve_drive.getPose());
         final Pose3d shooter_pose = robot_pose.plus(robot_to_shooter);
         return shooter_pose;
@@ -89,8 +90,10 @@ public abstract class Shooter extends SubsystemBase {
 
     public Command intakeCommand() {
         return this.startEnd(() -> {
-            setFeedVoltage(INTAKE_FEED_SPEED * 12);
-            setLaunchVoltage(INTAKE_LAUNCH_SPEED * 12);
+            if(!RobotState.armHasNote()){
+                setFeedVoltage(INTAKE_FEED_SPEED * 12);
+                setLaunchVoltage(INTAKE_LAUNCH_SPEED * 12);
+            }
         }, () -> { stop(); });
     }
 

@@ -10,7 +10,15 @@ import frc.robot.commands.LaunchNote;
 import frc.robot.commands.PrepareLaunch;
 import frc.robot.commands.SwerveJoystick;
 import frc.robot.subsystems.climber.Climb.ArmPosition;
+import frc.robot.utils.NoteVisualizer;
+import frc.robot.utils.Print;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
@@ -36,10 +44,20 @@ public class RobotContainer {
         SubSystems.climb.setDefaultCommand(SubSystems.climb.moveArmTriggers(this::getClimberSpeed));
         IO.commandController.leftBumper().whileTrue(SubSystems.shooter.intakeCommand());
 
-        IO.commandController.rightBumper().whileTrue(new PrepareLaunch(SubSystems.shooter)
-                                                        .withTimeout(1)
-                                                        .andThen(new LaunchNote(SubSystems.shooter))
-                                                        .handleInterrupt(SubSystems.shooter::stop));
+        IO.commandController.rightBumper().whileTrue(NoteVisualizer.shoot(SubSystems.swerve_drive::getPose, SubSystems.climb::getShooterAngleRadians)
+                                                        .alongWith(
+                                                            new PrepareLaunch(SubSystems.shooter)
+                                                            .withTimeout(1)
+                                                            .andThen(new LaunchNote(SubSystems.shooter))
+                                                            .handleInterrupt(SubSystems.shooter::stop)));
+        
+        // IO.commandController.a().onTrue(new InstantCommand(()-> {
+        //     Print.log("%f, %f, Rotation2d.fromDegrees(%f)", 
+        //         SubSystems.swerve_drive.getPose().getX(), 
+        //         SubSystems.swerve_drive.getPose().getY(), 
+        //         SubSystems.swerve_drive.getPose().getRotation().getDegrees());
+        // } ));
+
         IO.commandController.a().onTrue(new InstantCommand(SubSystems.note_arm::openClaw));
         IO.commandController.b().onTrue(new InstantCommand(SubSystems.note_arm::closeClaw));
 
@@ -53,10 +71,23 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return SubSystems.climb.moveArmToPosition(ArmPosition.SPEAKER_CLOSE).andThen(
-            new PrepareLaunch(SubSystems.shooter).withTimeout(1)
-                                                    .andThen(new LaunchNote(SubSystems.shooter))
-                                                    .handleInterrupt(SubSystems.shooter::stop));
+        PathConstraints constraints = new PathConstraints(
+                3.0, 4.0,
+                Units.degreesToRadians(540), Units.degreesToRadians(720));
+
+        Command pathfindingCommand = AutoBuilder.pathfindToPose(
+                FieldConstants.getSpeakerCenterPathfindPose(),
+                constraints,
+                0.0, // Goal end velocity in meters/sec
+                0.0 // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate.
+        );
+
+        return pathfindingCommand;
+
+        // return SubSystems.climb.moveArmToPosition(ArmPosition.SPEAKER_CLOSE).andThen(
+        //     new PrepareLaunch(SubSystems.shooter).withTimeout(1)
+        //                                             .andThen(new LaunchNote(SubSystems.shooter))
+        //                                             .handleInterrupt(SubSystems.shooter::stop));
         // final double kPXController = 2;
         // final double kPYController = 2;
         // final double kPThetaController = 3;

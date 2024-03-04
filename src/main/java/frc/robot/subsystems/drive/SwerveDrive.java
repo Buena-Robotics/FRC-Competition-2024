@@ -2,6 +2,11 @@ package frc.robot.subsystems.drive;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -9,18 +14,21 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.constraint.SwerveDriveKinematicsConstraint;
 import frc.robot.FieldConstants;
 import frc.robot.Robot;
+import frc.robot.RobotState;
 import frc.robot.Constants.SubSystems;
 import frc.robot.subsystems.vision.VisionCamera.TimestampedVisionMeasurement;
 import frc.robot.utils.FieldVisualizer;
@@ -51,6 +59,14 @@ public class SwerveDrive extends SubsystemBase {
         back_left_position );
     private static final SwerveDriveKinematicsConstraint kinematics_constrait = new SwerveDriveKinematicsConstraint(kinematics, PHYSICAL_MAX_SPEED_METERS_PER_SECOND);
 
+    private static final HolonomicPathFollowerConfig config = new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
+                    4.5, // Max module speed, in m/s
+                    0.4, // Drive base radius in meters. Distance from robot center to furthest module.
+                    new ReplanningConfig() // Default path replanning config. See the API for the options here
+                    );
+
     private final NavX navx = Robot.isReal() ? new NavXReal(NAVX_PORT) : new NavXSim(NAVX_PORT);
     private final SwerveModule[] modules;
     private final SwerveDriveOdometry odometer;
@@ -79,6 +95,20 @@ public class SwerveDrive extends SubsystemBase {
             navx.reset();
             navx.resetDisplacement();
         }).start();
+        
+        //https://pathplanner.dev/pplib-build-an-auto.html#configure-autobuilder
+        AutoBuilder.configureHolonomic(
+            this::getPose, // Robot pose supplier
+            this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+            this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+            config, //HolonomicPathFollowerConfig
+            () -> { return RobotState.isRedAlliance(); // Should mirror path
+            },
+            this // Reference to this subsystem to set requirements
+        );
+
+        
         Logger.recordOutput("PoseEstimation/VisionMeasurement", new Pose2d());
     }
 
@@ -138,7 +168,7 @@ public class SwerveDrive extends SubsystemBase {
         Pose2d held_pose = robot_pose;
         navx.reset();
 
-        if(FieldConstants.isBlueAlliance()){
+        if(RobotState.isBlueAlliance()){
             Print.log("Heading Blue Alliance");
             final double robot_rotation = held_pose.getRotation().getDegrees();
             final double[] rotations = new double[]{-120.0, 180.0, -180.0, 120.0};
@@ -172,9 +202,11 @@ public class SwerveDrive extends SubsystemBase {
     public void setHeading(Rotation2d rotation){ navx.setAngleAdjustment(rotation.getDegrees()); }
     public Rotation2d getHeading(){ return navx.getRotation2d(); }
 
-    private SwerveDriveWheelPositions getWheelPositions(){
-        return new SwerveDriveWheelPositions(getModulePositions());
-    }
+    private void resetPose(Pose2d pose){ /* TODO: REST ODOMERTRY POSE FOR PATHFINDING */ }
+    private void driveRobotRelative(ChassisSpeeds speeds){ setModuleStates(kinematics.toSwerveModuleStates(speeds)); }
+    private ChassisSpeeds getRobotRelativeSpeeds(){ return kinematics.toChassisSpeeds(getModuleStates()); }
+
+    private SwerveDriveWheelPositions getWheelPositions(){ return new SwerveDriveWheelPositions(getModulePositions()); }
     private SwerveModuleState[] getModuleStates(){
         return new SwerveModuleState[] {
                 modules[0].getState(),
@@ -184,10 +216,10 @@ public class SwerveDrive extends SubsystemBase {
     }
     private SwerveModuleState[] getSimModuleStates(){
         return new SwerveModuleState[] {
-                modules[0].getSimState(),
-                modules[1].getSimState(),
-                modules[2].getSimState(),
-                modules[3].getSimState()};
+                modules[0].getSimModuleState(),
+                modules[1].getSimModuleState(),
+                modules[2].getSimModuleState(),
+                modules[3].getSimModuleState()};
     }
     public SwerveModulePosition[] getModulePositions(){
         return new SwerveModulePosition[] {
