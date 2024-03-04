@@ -39,26 +39,26 @@ public abstract class NavX extends AHRS {
         public double displacement_z = 0.0;
 
         public double update_count = 0.0;
-        public short acceleration_full_scale_range_g = 0;
-        public short get_gyro_full_scale_range_dps = 0;
-        public float compass_heading = 0.0;
-        public float fused_heading = 0.0;
+        public int acceleration_full_scale_range_g = 0;
+        public int get_gyro_full_scale_range_dps = 0;
+        public float compass_heading = 0.0f;
+        public float fused_heading = 0.0f;
 
-        public float raw_acceleration_x = 0.0;
-        public float raw_acceleration_y = 0.0;
-        public float raw_acceleration_z = 0.0;
+        public float raw_acceleration_x = 0.0f;
+        public float raw_acceleration_y = 0.0f;
+        public float raw_acceleration_z = 0.0f;
 
-        public float raw_gyro_x = 0.0;
-        public float raw_gyro_y = 0.0;
-        public float raw_gyro_z = 0.0;
+        public float raw_gyro_x = 0.0f;
+        public float raw_gyro_y = 0.0f;
+        public float raw_gyro_z = 0.0f;
         
-        public float raw_mag_x = 0.0;
-        public float raw_mag_y = 0.0;
-        public float raw_mag_z = 0.0;
+        public float raw_mag_x = 0.0f;
+        public float raw_mag_y = 0.0f;
+        public float raw_mag_z = 0.0f;
 
-        public float world_linear_acceleration_x = 0.0;
-        public float world_linear_acceleration_y = 0.0;
-        public float world_linear_acceleration_z = 0.0;
+        public float world_linear_acceleration_x = 0.0f;
+        public float world_linear_acceleration_y = 0.0f;
+        public float world_linear_acceleration_z = 0.0f;
         }
 
     private Pose2d estimated_pose = new Pose2d();
@@ -118,5 +118,5 @@ public abstract class NavX extends AHRS {
     public Rotation3d getRotation3d() { return new Rotation3d(getRollRadians(), getPitchRadians(), getYawRadians()); }
     public Translation3d getTranslation3d() { return new Translation3d(inputs.velocity_x, inputs.velocity_y, inputs.velocity_z); }
     public Pose3d getPose3d(){ return new Pose3d(getTranslation3d(), getRotation3d()).relativeTo(new Pose3d(start_pose)); }
-    public Pose2d getEstimatedPose(){ return inputs.estimated_pose; }
+    public Pose2d getEstimatedPose(){ return estimated_pose; }
 }
