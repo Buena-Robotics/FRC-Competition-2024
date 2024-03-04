@@ -38,8 +38,28 @@ public abstract class NavX extends AHRS {
         public double displacement_y = 0.0;
         public double displacement_z = 0.0;
 
-        public Pose2d estimated_pose = new Pose2d();
-    }
+        public double update_count = 0.0;
+        public short acceleration_full_scale_range_g = 0;
+        public short get_gyro_full_scale_range_dps = 0;
+        public float compass_heading = 0.0;
+        public float fused_heading = 0.0;
+
+        public float raw_acceleration_x = 0.0;
+        public float raw_acceleration_y = 0.0;
+        public float raw_acceleration_z = 0.0;
+
+        public float raw_gyro_x = 0.0;
+        public float raw_gyro_y = 0.0;
+        public float raw_gyro_z = 0.0;
+        
+        public float raw_mag_x = 0.0;
+        public float raw_mag_y = 0.0;
+        public float raw_mag_z = 0.0;
+
+        public float world_linear_acceleration_x = 0.0;
+        public float world_linear_acceleration_y = 0.0;
+        public float world_linear_acceleration_z = 0.0;
+        }
 
     private Pose2d estimated_pose = new Pose2d();
     protected double last_timestamp = Timer.getFPGATimestamp();
