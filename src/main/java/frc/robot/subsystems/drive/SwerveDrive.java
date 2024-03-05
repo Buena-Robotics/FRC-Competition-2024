@@ -198,9 +198,10 @@ public class SwerveDrive extends SubsystemBase {
     public void setHeading(Rotation2d rotation){ navx.setFieldOrientedHeading(rotation); }
     public Rotation2d getHeading(){ return navx.getRotation2d(); }
     public Rotation2d getHeadingOffset(){ return navx.getFieldOrientedHeading(); }
+    public NavX getNavX(){ return navx; }
 
     private void resetPose(Pose2d pose){ /* TODO: REST ODOMERTRY POSE FOR PATHFINDING */ }
-    private void driveRobotRelative(ChassisSpeeds speeds){ setModuleStates(kinematics.toSwerveModuleStates(speeds)); }
+    private void driveRobotRelative(ChassisSpeeds speeds){ setModuleStates(kinematics.toSwerveModuleStates(speeds.unaryMinus())); }
     private ChassisSpeeds getRobotRelativeSpeeds(){ return kinematics.toChassisSpeeds(getModuleStates()); }
 
     private SwerveDriveWheelPositions getWheelPositions(){ return new SwerveDriveWheelPositions(getModulePositions()); }

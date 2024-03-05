@@ -83,19 +83,25 @@ public abstract class NavX extends AHRS {
     public void periodic(){
         updateInputs();
         Logger.processInputs("Drive/NavX", inputs);
+        
+        updateDeltaTime();
         Logger.recordOutput("NavX/EstimatedPose", updatePose());
     }
+
+    private void updateDeltaTime(){
+        double timestamp = Timer.getFPGATimestamp();
+        delta_time = timestamp - last_timestamp; 
+        last_timestamp = timestamp;
+    }
+    public double getDeltaTime(){ return delta_time; }
 
     private Pose2d updatePose(){
         estimated_pose = estimated_pose.transformBy(
             new Transform2d(
-                inputs.velocity_x * delta_time, 
+                inputs.velocity_x * getDeltaTime(), 
                 0, 
                 Rotation2d.fromDegrees(inputs.angle_rate * delta_time)));
 
-        double timestamp = Timer.getFPGATimestamp();
-        delta_time = timestamp - last_timestamp; 
-        last_timestamp = timestamp;
         return estimated_pose.relativeTo(start_pose);
     }
 

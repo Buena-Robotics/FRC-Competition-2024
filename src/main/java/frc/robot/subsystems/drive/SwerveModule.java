@@ -53,7 +53,7 @@ public abstract class SwerveModule {
 
         this.drive_feedforward = new SimpleMotorFeedforward(1, 1.5);
         this.drive_feedback = new PIDController(1.5, 0.0, 0.05, Robot.defaultPeriodSecs);
-        this.turn_feedback  = new PIDController(0.2, 0.0, 0.0, Robot.defaultPeriodSecs);
+        this.turn_feedback  = new PIDController(0.4, 0.0, 0.0, Robot.defaultPeriodSecs);
         
         this.turn_feedback.enableContinuousInput(-Math.PI, Math.PI);
     }
@@ -98,8 +98,8 @@ public abstract class SwerveModule {
 
     public SwerveModuleState getSimModuleState(){ return inputs.sim_module_state; }
     public Rotation2d getAngle() { return new Rotation2d(inputs.turn_position_radians); }
-    public double getPositionMeters() { return inputs.drive_position_meters; }
-    public double getVelocityMetersPerSec() { return inputs.drive_velocity_meters_per_second; }
+    public double getPositionMeters() { return -inputs.drive_position_meters; }
+    public double getVelocityMetersPerSec() { return -inputs.drive_velocity_meters_per_second; }
     public SwerveModulePosition getPosition() { return new SwerveModulePosition(getPositionMeters(), getAngle()); }
     public SwerveModuleState getState() { return new SwerveModuleState(getVelocityMetersPerSec(), getAngle()); }
 }
