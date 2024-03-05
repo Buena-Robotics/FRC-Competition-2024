@@ -25,7 +25,7 @@ public class SwerveModuleReal extends SwerveModule {
         this.absolute_encoder_offset_radians = absolute_encoder_offset_radians;
 
         this.drive_motor = new CANSparkMax(drive_motor_id, MotorType.kBrushless);
-        this.turn_motor =  new CANSparkMax(turn_motor_id,  MotorType.kBrushless);
+        this.turn_motor = new CANSparkMax(turn_motor_id,  MotorType.kBrushless);
 
         this.drive_encoder = drive_motor.getEncoder();
         this.drive_encoder.setPositionConversionFactor(DRIVE_ENCODER_ROTATION_TO_METERS);
@@ -49,6 +49,9 @@ public class SwerveModuleReal extends SwerveModule {
     }
 
     @Override public void updateInputs() {
+        inputs.drive_position_raw = drive_encoder.getPosition() / DRIVE_ENCODER_ROTATION_TO_METERS;
+        inputs.drive_velocity_raw = drive_encoder.getVelocity() / DRIVE_ENCODER_RPM_TO_METERS_PER_SECOND;
+
         inputs.drive_position_meters = drive_encoder.getPosition();
         inputs.drive_velocity_meters_per_second = drive_encoder.getVelocity();
         inputs.drive_applied_volts = drive_motor.getAppliedOutput() * drive_motor.getBusVoltage();

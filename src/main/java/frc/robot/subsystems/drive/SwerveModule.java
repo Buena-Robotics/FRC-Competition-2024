@@ -14,6 +14,8 @@ import frc.robot.Robot;
 
 public abstract class SwerveModule {
     @AutoLog public static class SwerveModuleInputs {
+        public double drive_position_raw = 0.0;
+        public double drive_velocity_raw = 0.0;
         public double drive_position_meters = 0.0;
         public double drive_velocity_meters_per_second = 0.0;
         public double drive_applied_volts = 0.0;
@@ -86,6 +88,12 @@ public abstract class SwerveModule {
         return optimized_state;
     }
 
+    public void runCharacterization(double volts) {
+        setTurn( turn_feedback.calculate(inputs.turn_position_radians, 0));  
+        // Open loop drive control
+        setDriveVoltage(volts);
+    }
+
     public void stop() {
         setTurnVoltage(0.0);
         setDriveVoltage(0.0);
@@ -98,8 +106,8 @@ public abstract class SwerveModule {
 
     public SwerveModuleState getSimModuleState(){ return inputs.sim_module_state; }
     public Rotation2d getAngle() { return new Rotation2d(inputs.turn_position_radians); }
-    public double getPositionMeters() { return -inputs.drive_position_meters; }
-    public double getVelocityMetersPerSec() { return -inputs.drive_velocity_meters_per_second; }
+    public double getPositionMeters() { return inputs.drive_position_meters; }
+    public double getVelocityMetersPerSec() { return inputs.drive_velocity_meters_per_second; }
     public SwerveModulePosition getPosition() { return new SwerveModulePosition(getPositionMeters(), getAngle()); }
     public SwerveModuleState getState() { return new SwerveModuleState(getVelocityMetersPerSec(), getAngle()); }
 }

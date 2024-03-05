@@ -31,8 +31,7 @@ public class Robot extends LoggedRobot {
         super(Robot.defaultPeriodSecs);
     }
     @Override public void robotInit() {
-        Pathfinding.setPathfinder(new LocalADStarAK());
-        
+        Pathfinding.setPathfinder(new LocalADStarAK());        
 
         switch (RobotConfig.getRobotMode()) {
         case REAL:

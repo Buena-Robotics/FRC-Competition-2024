@@ -7,6 +7,7 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -21,8 +22,12 @@ import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Unit;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.constraint.SwerveDriveKinematicsConstraint;
@@ -74,6 +79,8 @@ public class SwerveDrive extends SubsystemBase {
 
     private Pose2d robot_pose = new Pose2d(1.567501, 5.380708, Rotation2d.fromDegrees(180));
 
+    private final SysIdRoutine sysId;
+
     public SwerveDrive(){
         modules = new SwerveModule[4];
         for(int i = 0; i < 4; i++)
@@ -108,7 +115,20 @@ public class SwerveDrive extends SubsystemBase {
             this // Reference to this subsystem to set requirements
         );
 
-        
+        sysId =
+            new SysIdRoutine(
+                new SysIdRoutine.Config(
+                    null, null, null,
+                    (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
+                new SysIdRoutine.Mechanism(
+                    (voltage) -> {
+                    for (int i = 0; i < 4; i++) {
+                        modules[i].runCharacterization(voltage.in(Volts));
+                    }
+                    },
+                    null,
+                    this));
+
         Logger.recordOutput("PoseEstimation/VisionMeasurement", new Pose2d());
     }
 
@@ -127,7 +147,7 @@ public class SwerveDrive extends SubsystemBase {
 
         robot_pose = pose_estimator.getEstimatedPosition();
 
-        FieldVisualizer.getField().setRobotPose(odometer.getPoseMeters());
+        FieldVisualizer.getField().setRobotPose(robot_pose);
         FieldVisualizer.getField().getObject("SwerveModules").setPoses(
             robot_pose.transformBy(new Transform2d(front_right_position, modules[0].getAngle())),
             robot_pose.transformBy(new Transform2d(front_left_position, modules[1].getAngle())),
@@ -147,6 +167,9 @@ public class SwerveDrive extends SubsystemBase {
         // Logger.recordOutput("DriverCamPose", 
             // new Pose3d(robot_pose).plus(SubSystems.vision.getCamera("DriverCam").getTransform()));
     }
+
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) { return sysId.quasistatic(direction); }
+    public Command sysIdDynamic(SysIdRoutine.Direction direction) { return sysId.dynamic(direction); }
 
     private double getClosestToTarget(double target, double[] values) {
         double closestValue = values[0];

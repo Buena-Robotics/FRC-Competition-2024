@@ -66,8 +66,13 @@
       }
     },
     "types": {
+      "/AdvantageKit/RealOutputs/Climb/Mecha/Arm Mechanism": "Mechanism2d",
+      "/AdvantageKit/RealOutputs/Climb/Mecha/Winch Mechansim": "Mechanism2d",
+      "/AdvantageKit/RealOutputs/NoteArm/ColorSensorMechanism": "Mechanism2d",
       "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Auto Choices": "String Chooser",
       "/SmartDashboard/Climb": "Mechanism2d",
+      "/SmartDashboard/Climb/Mechanism": "Mechanism2d",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/Nav-X": "Gyro",
       "/SmartDashboard/NoteArm": "Mechanism2d",
@@ -83,6 +88,11 @@
       "/SmartDashboard/navX-Sensor[4]": "Gyro"
     },
     "windows": {
+      "/SmartDashboard/Auto Choices": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/Climb": {
         "window": {
           "visible": true
@@ -197,14 +207,14 @@
   "NetworkTables Info": {
     "Connections": {
       "open": true
-    },
-    "visible": true
+    }
   },
   "NetworkTables Settings": {
     "clientName": "glasss",
     "dsClient": false,
     "mode": "Client (NT4)",
-    "serverTeam": "1726"
+    "serverTeam": "1726",
+    "visible": false
   },
   "Plots": {
     "Plot <0>": {
@@ -234,7 +244,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     }
   }
 }
