@@ -7,7 +7,9 @@ package frc.robot;
 import frc.robot.Constants.IO;
 import frc.robot.Constants.SubSystems;
 import frc.robot.commands.LaunchNote;
+import frc.robot.commands.PathFindToClosestPose;
 import frc.robot.commands.PrepareLaunch;
+import frc.robot.commands.RumbleFeedback;
 import frc.robot.commands.SwerveJoystick;
 import frc.robot.subsystems.climber.Climb.ArmPosition;
 import frc.robot.utils.NoteVisualizer;
@@ -16,12 +18,17 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 public class RobotContainer {
@@ -36,14 +43,24 @@ public class RobotContainer {
             target_path = poses.toArray(new Pose2d[poses.size()]);
             Logger.recordOutput("PathPlanner/TargetPath", target_path);
         });
-
-        auto_chooser = new LoggedDashboardChooser<Command>("Auto Choices");
+        auto_chooser = new LoggedDashboardChooser<Command>("Auto Choices", AutoBuilder.buildAutoChooser());
         { // SYSID
             auto_chooser.addOption("Drive SysId (Quasistatic Forward)", SubSystems.swerve_drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
             auto_chooser.addOption("Drive SysId (Quasistatic Reverse)", SubSystems.swerve_drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
             auto_chooser.addOption("Drive SysId (Dynamic Forward)", SubSystems.swerve_drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
             auto_chooser.addOption("Drive SysId (Dynamic Reverse)", SubSystems.swerve_drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
         }
+        
+        NamedCommands.registerCommand("retract_arm", new WaitCommand(2)); 
+        NamedCommands.registerCommand("prepare_launch", new WaitCommand(1)); 
+        NamedCommands.registerCommand("launch_note", new WaitCommand(1));
+        // NamedCommands.registerCommand("launch_note", 
+        //     NoteVisualizer.shoot(SubSystems.swerve_drive::getPose, SubSystems.climb::getShooterAngleRadians)
+        //         .alongWith(new LaunchNote(SubSystems.shooter))
+        //         .andThen(new WaitCommand(1))
+        //         .andThen(new InstantCommand(SubSystems.shooter::stop)) );
+        NamedCommands.registerCommand("lift_note", new WaitCommand(2));
+        NamedCommands.registerCommand("put_note", new WaitCommand(2));
 
         configureBindings();
     }
@@ -59,7 +76,7 @@ public class RobotContainer {
             SubSystems.swerve_drive, 
             () -> -IO.controller.getLeftY(), // Y-Axis 
             () -> -IO.controller.getLeftX(),  // X-Axis
-            () -> -IO.controller.getRightX()  // Rot-Axis
+            () -> -IO.controller.getRightX()   // Rot-Axis
         ));
         SubSystems.climb.setDefaultCommand(SubSystems.climb.moveArmTriggers(this::getClimberSpeed));
         IO.commandController.leftBumper().whileTrue(SubSystems.shooter.intakeCommand());
@@ -81,6 +98,13 @@ public class RobotContainer {
         IO.commandController.povDown().onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.SOURCE));
         IO.commandController.povLeft().onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.SPEAKER_CLOSE));
         IO.commandController.povRight().onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.SPEAKER_STAGE));
+
+        IO.shooterHasNoteTrigger.onTrue(new RumbleFeedback(IO.controller, RumbleType.kLeftRumble, 0.75, 100));
+        IO.noteArmHasNoteTrigger.onTrue(new RumbleFeedback(IO.controller, RumbleType.kRightRumble, 0.75, 100));
+
+        IO.commandController.start().onTrue(
+            new PathFindToClosestPose().pathFindToClosestPose(SubSystems.swerve_drive, SubSystems.swerve_drive::getPose));
+        IO.commandController.start().onFalse(Commands.runOnce(() -> {}, SubSystems.swerve_drive));
     }
 
     public Command getAutonomousCommand() {

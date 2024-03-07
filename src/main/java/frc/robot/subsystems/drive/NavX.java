@@ -59,7 +59,7 @@ public abstract class NavX extends AHRS {
         public float world_linear_acceleration_x = 0.0f;
         public float world_linear_acceleration_y = 0.0f;
         public float world_linear_acceleration_z = 0.0f;
-        }
+    }
 
     private Pose2d estimated_pose = new Pose2d();
     protected double last_timestamp = Timer.getFPGATimestamp();
@@ -114,9 +114,9 @@ public abstract class NavX extends AHRS {
     }
 
     public void setStartPose(Pose2d start_pose){ this.start_pose = start_pose; }
-    public void setFieldOrientedHeading(Rotation2d heading){ this.field_oriented_heading = heading; }
+    public void setFieldOrientedRotationOffset(Rotation2d heading){ this.field_oriented_heading = heading; }
 
-    public Rotation2d getFieldOrientedHeading(){ return this.field_oriented_heading; }
+    public Rotation2d getFieldOrientedRotationOffset(){ return this.field_oriented_heading; }
 
     public double getRollRadians() { return inputs.roll_radians;  }
     public double getPitchRadians(){ return inputs.pitch_radians; }

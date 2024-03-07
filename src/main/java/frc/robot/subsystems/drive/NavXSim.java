@@ -1,5 +1,7 @@
 package frc.robot.subsystems.drive;
 
+import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -27,7 +29,6 @@ public class NavXSim extends NavX {
         inputs.timestamp = (long)(Timer.getFPGATimestamp() * 100);
         inputs.angle_adjustment = super.getAngleAdjustment();
         inputs.temperature_celcius = 0.0;
-
         inputs.angle = sim_odometry.getRotation();
         inputs.roll_radians = 0.0;
         inputs.pitch_radians = 0.0;

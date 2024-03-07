@@ -2,13 +2,20 @@ package frc.robot.commands;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.IO;
+import frc.robot.Constants.SubSystems;
 import frc.robot.subsystems.drive.SwerveDrive;
 import frc.robot.utils.TunableNumber;
 
@@ -49,18 +56,65 @@ public class SwerveJoystick extends Command {
         return Rotation2d.fromRadians(Math.sqrt(distance_meters)/(2 * Math.PI)); 
     }
 
-    @Override public void execute(){
+    @Override public void execute() {
+        double linearMagnitude =
+                    MathUtil.applyDeadband(
+                        Math.hypot(x_speed_function.get(), y_speed_function.get()), left_joystick_deadband.get());
+        Rotation2d linearDirection =
+            new Rotation2d(x_speed_function.get(), y_speed_function.get());
+        double omega = MathUtil.applyDeadband(turn_speed_function.get(), right_joystick_deadband.get());
+
+        linearMagnitude = linearMagnitude * linearMagnitude;
+        omega = Math.copySign(omega * omega, omega);
+
+        // Calcaulate new linear velocity
+        Translation2d linearVelocity =
+            new Pose2d(new Translation2d(), linearDirection)
+                .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
+                .getTranslation();
+
+        double x_speed = linearVelocity.getX(),
+                    y_speed = linearVelocity.getY(), 
+                    omega_speed = omega;
+
+        x_speed *= Math.abs(Math.pow(x_speed,1));
+        y_speed *= Math.abs(Math.pow(y_speed,1));
+        omega_speed *= Math.abs(Math.pow(omega_speed,2));
+
+        x_speed *= SwerveDrive.PHYSICAL_MAX_SPEED_METERS_PER_SECOND;
+        y_speed *= SwerveDrive.PHYSICAL_MAX_SPEED_METERS_PER_SECOND;
+        omega_speed *= SwerveDrive.TELEOP_DRIVE_MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
+
+        ChassisSpeeds chassis_speeds = new ChassisSpeeds(x_speed, y_speed, omega_speed);
+
+        if(field_oriented_mode){
+            // System.out.println("[LOG] Rotation2d:     " + swerve_drive.getRotation2d());
+            // System.out.println("[LOG] RotationOffset: " + swerve_drive.getRotationOffset());
+            // System.out.println("[LOG] FullRotation:   " + swerve_drive.getRotationOffset().plus(swerve_drive.getRotation2d()));
+            chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x_speed, y_speed, omega_speed, swerve_drive.getRotation2d());
+        }
+
+        swerve_drive.driveRobotVelocity(chassis_speeds);
+
+        // drive.runVelocity(
+        //     ChassisSpeeds.fromFieldRelativeSpeeds(
+        //         linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+        //         linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+        //         omega * drive.getMaxAngularSpeedRadPerSec(),
+        //         isFlipped
+        //             ? drive.getRotation().plus(new Rotation2d(Math.PI))
+        //             : drive.getRotation()));
+
+    }
+
+    /*@Override public void execute(){
         double x_speed = x_speed_function.get();
         double y_speed = y_speed_function.get();
         double turn_speed = turn_speed_function.get();
 
-        if(Math.abs(x_speed) > 0.9)
-             y_speed = Math.abs(y_speed) > left_joystick_deadband.get() + LEFT_DEADBAND_MODIFIER ? y_speed : 0.0;
-        else y_speed = Math.abs(y_speed) > left_joystick_deadband.get() ? y_speed : 0.0;
+        y_speed = Math.abs(y_speed) > left_joystick_deadband.get() ? y_speed : 0.0;
 
-        if(Math.abs(y_speed) > 0.9)
-             x_speed = Math.abs(x_speed) > left_joystick_deadband.get() + LEFT_DEADBAND_MODIFIER ? x_speed : 0.0;
-        else x_speed = Math.abs(x_speed) > left_joystick_deadband.get() ? x_speed : 0.0;
+        x_speed = Math.abs(x_speed) > left_joystick_deadband.get() ? x_speed : 0.0;
 
         turn_speed = Math.abs(turn_speed) > right_joystick_deadband.get() ? turn_speed : 0.0;
 
@@ -102,7 +156,7 @@ public class SwerveJoystick extends Command {
 
         SwerveModuleState[] module_states = swerve_drive.getKinematics().toSwerveModuleStates(chassis_speeds);
         swerve_drive.setModuleStates(module_states);
-    }
+    }*/
     @Override public void end(boolean interrupted){ swerve_drive.stopModules(); }
     @Override public boolean isFinished(){ return false; }
 }

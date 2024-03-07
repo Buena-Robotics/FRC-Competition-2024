@@ -1,0 +1,67 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.309243119380694,
+      "y": 5.683359059025811
+    },
+    "rotation": 180.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "prepare_launch"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "launch_note"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BTopNote"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "lift_note"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BAmp"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "put_note"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "retract_arm"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

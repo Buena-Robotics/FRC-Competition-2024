@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.climber.Climb;
 import frc.robot.subsystems.climber.ClimbReal;
 import frc.robot.subsystems.climber.ClimbSim;
@@ -30,6 +31,9 @@ public final class Constants {
         //Controllers
         public static final CXboxController commandController = new CXboxController(XBOXCONTROLLERPORT);
         public static final XboxController controller = new XboxController(XBOXCONTROLLERPORT);
+
+        public static final Trigger shooterHasNoteTrigger = new Trigger(() -> RobotState.shooterHasNote());
+        public static final Trigger noteArmHasNoteTrigger = new Trigger(() -> RobotState.armHasNote());
     }
 
     public static class SubSystems{

@@ -11,6 +11,9 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Robot;
+import frc.robot.RobotConfig;
+import frc.robot.RobotState;
+import frc.robot.RobotConfig.RobotMode;
 
 public abstract class SwerveModule {
     @AutoLog public static class SwerveModuleInputs {
@@ -53,9 +56,14 @@ public abstract class SwerveModule {
         this.module_name = module_name;
         this.index = index;
 
-        this.drive_feedforward = new SimpleMotorFeedforward(1, 1.5);
-        this.drive_feedback = new PIDController(1.5, 0.0, 0.05, Robot.defaultPeriodSecs);
-        this.turn_feedback  = new PIDController(0.4, 0.0, 0.0, Robot.defaultPeriodSecs);
+        if(RobotConfig.getRobotMode() == RobotMode.REAL)
+            this.drive_feedforward = new SimpleMotorFeedforward(0.4, 0.45);
+        else if(RobotConfig.getRobotMode() == RobotMode.SIM)
+            this.drive_feedforward = new SimpleMotorFeedforward(0.0, 0.45);
+        else 
+            this.drive_feedforward = new SimpleMotorFeedforward(0.0, 0.0);
+        this.drive_feedback = new PIDController(10.0, 0.0, 0.05, Robot.defaultPeriodSecs);
+        this.turn_feedback  = new PIDController(7.0, 0.0, 0.0, Robot.defaultPeriodSecs);
         
         this.turn_feedback.enableContinuousInput(-Math.PI, Math.PI);
     }
@@ -79,7 +87,7 @@ public abstract class SwerveModule {
         }
         SwerveModuleState optimized_state = SwerveModuleState.optimize(state, getAngle());
 
-        setTurn( turn_feedback.calculate(inputs.turn_position_radians, optimized_state.angle.getRadians()));   
+        setTurnVoltage( turn_feedback.calculate(inputs.turn_position_radians, optimized_state.angle.getRadians()));   
 
         optimized_state.speedMetersPerSecond *= Math.cos(turn_feedback.getPositionError());
         setDriveVoltage(
@@ -89,7 +97,7 @@ public abstract class SwerveModule {
     }
 
     public void runCharacterization(double volts) {
-        setTurn( turn_feedback.calculate(inputs.turn_position_radians, 0));  
+        setTurnVoltage( turn_feedback.calculate(inputs.turn_position_radians, 0));  
         // Open loop drive control
         setDriveVoltage(volts);
     }
