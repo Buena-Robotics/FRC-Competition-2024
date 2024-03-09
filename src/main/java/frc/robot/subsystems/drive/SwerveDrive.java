@@ -49,7 +49,7 @@ public class SwerveDrive extends SubsystemBase {
     private static final Matrix<N3, N1> VISION_STD_DEV   = VecBuilder.fill(1, 1, 3);
     private static final int MAX_NAVX_CALIBRATION_TIME_MS = 20 * 1000;
     private static final String[] module_names = { "Front Right", "Front Left", "Back Right", "Back Left" };
-    private static final double[] abs_encoder_offsets = { 4.071693, 2.830042 + Math.PI, 5.274043, 1.992770};
+    private static final double[] abs_encoder_offsets = { 4.071693, 2.830042 + Math.PI, 5.274043, 1.992770 + Math.PI};
     
     private static final Translation2d front_right_position = new Translation2d(CENTER_TO_MODULE,  -CENTER_TO_MODULE); // (+, -)
     private static final Translation2d front_left_position  = new Translation2d(CENTER_TO_MODULE,   CENTER_TO_MODULE); // (+, +)
@@ -63,9 +63,9 @@ public class SwerveDrive extends SubsystemBase {
     private static final SwerveDriveKinematicsConstraint kinematics_constrait = new SwerveDriveKinematicsConstraint(kinematics, PHYSICAL_MAX_SPEED_METERS_PER_SECOND);
 
     private static final HolonomicPathFollowerConfig config = new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-                    new PIDConstants(5.0, 0.0, 0.05), // Translation PID constants
-                    new PIDConstants(3.0, 0.0, 0.05), // Rotation PID constants
-                    Units.feetToMeters(15.1), // Max module speed, in m/s
+                    new PIDConstants(0.4, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(3.3034, 0.0, 0.0), // Rotation PID constants
+                    Units.feetToMeters(12), // Max module speed, in m/s
                     CENTER_TO_MODULE, // Drive base radius in meters. Distance from robot center to furthest module.
                     new ReplanningConfig() // Default path replanning config. See the API for the options here
                     );
@@ -175,7 +175,7 @@ public class SwerveDrive extends SubsystemBase {
         setRotationOffset(RobotState.isBlueAlliance() ? getRotation2d() : held_pose.getRotation().unaryMinus());
     }
     public void setRotationOffset(Rotation2d rotation){ navx.setFieldOrientedRotationOffset(Rotation2d.fromDegrees(rotation.getDegrees())); }
-    public Rotation2d getRotation2d(){ return new Rotation2d(navx.getYawRadians()); }
+    public Rotation2d getRotation2d(){ return navx.getRotation2d(); }
     public Rotation2d getRotationOffset(){ return navx.getFieldOrientedRotationOffset(); }
     public NavX getNavX(){ return navx; }
 
@@ -184,7 +184,7 @@ public class SwerveDrive extends SubsystemBase {
         pose_estimator.resetPosition(getRotation2d(), getWheelPositions(), pose);
     }
     private ChassisSpeeds getRobotRelativeSpeeds(){ return kinematics.toChassisSpeeds(getModuleStates()); }
-    public void driveRobotVelocity(ChassisSpeeds speeds){ setModuleStates(kinematics.toSwerveModuleStates(speeds)); }
+    public void driveRobotVelocity(ChassisSpeeds speeds){ setModuleStates(kinematics.toSwerveModuleStates(speeds.unaryMinus())); }
 
     private SwerveDriveWheelPositions getWheelPositions(){ return new SwerveDriveWheelPositions(getModulePositions()); }
     private SwerveModuleState[] getModuleStates(){

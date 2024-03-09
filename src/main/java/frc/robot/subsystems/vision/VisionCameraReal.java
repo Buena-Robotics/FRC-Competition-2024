@@ -59,7 +59,7 @@ public class VisionCameraReal extends VisionCamera {
             if(previous_vision_result_timestamp == estimated_pose.timestampSeconds) return Optional.empty();
             previous_vision_result_timestamp = estimated_pose.timestampSeconds;
             return Optional.of(new TimestampedVisionMeasurement(
-                estimated_pose.estimatedPose.toPose2d(), 
+                estimated_pose.estimatedPose.transformBy(this.photon_pose_estimator.getRobotToCameraTransform()).toPose2d(), 
                 estimated_pose.timestampSeconds,
                 getEstimationStdDevs(estimated_pose.estimatedPose.toPose2d()),
                 estimated_pose.targetsUsed ));

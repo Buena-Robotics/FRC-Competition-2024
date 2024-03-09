@@ -88,7 +88,7 @@ public class RobotContainer {
 
     private boolean turretMode(){
         final double distance = SubSystems.swerve_drive.getPose().getTranslation().getDistance(FieldConstants.getSpeakerPoint().getTranslation());
-        return distance < 4; 
+        return distance < 4 && RobotState.shooterHasNote() && false;
     }
 
     private Rotation2d getEstimatedShooterRotation(){
@@ -149,8 +149,8 @@ public class RobotContainer {
         IO.commandController.povLeft().onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.SPEAKER_CLOSE));
         IO.commandController.povRight().onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.SPEAKER_STAGE));
 
-        IO.shooterHasNoteTrigger.onTrue(new RumbleFeedback(IO.controller, RumbleType.kLeftRumble, 0.75, 100));
-        IO.noteArmHasNoteTrigger.onTrue(new RumbleFeedback(IO.controller, RumbleType.kRightRumble, 0.75, 100));
+        IO.shooterHasNoteTrigger.onTrue(new RumbleFeedback(IO.controller, RumbleType.kLeftRumble, 1, 500));
+        IO.noteArmHasNoteTrigger.onTrue(new RumbleFeedback(IO.controller, RumbleType.kRightRumble, 1, 500));
 
         IO.commandController.start().onTrue(
             new PathFindToClosestPose().pathFindToClosestPose(SubSystems.swerve_drive, SubSystems.swerve_drive::getPose));

@@ -1,5 +1,7 @@
 package frc.robot.subsystems.notearm;
 
+import java.util.Queue;
+
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -119,6 +121,7 @@ public abstract class NoteArm extends SubsystemBase {
         return Math.pow(2, (-1/200.0) * (x - 1500)) + 8;
     }
 
+    private int last_note_end_beam_broke_counter = 0; 
     private boolean last_note_end_beam_broke = false;
     private void autoClawThreadedLoop(){
         while(true) {
@@ -135,16 +138,18 @@ public abstract class NoteArm extends SubsystemBase {
         }
 
         if(last_note_end_beam_broke // Back Intake
-                && inputs.note_end_beam_broke 
+                && !inputs.note_end_beam_broke 
                 && isClawOpen() 
                 && !RobotState.shooterHasNote()) closeClaw();
-        else if(inputs.color_sensor_proximity_mm < 10 // Front Intake
+        else if(inputs.color_sensor_proximity_mm < 30 // Front Intake
                 && inputs.note_end_beam_broke 
                 && isClawOpen() 
                 && !RobotState.shooterHasNote()) closeClaw();
 
         { // Update the previous inputs
             last_note_end_beam_broke = inputs.note_end_beam_broke;
+            if(last_note_end_beam_broke) last_note_end_beam_broke_counter++;
+            else last_note_end_beam_broke_counter = 0;
         }
     }
     }
@@ -201,13 +206,13 @@ public abstract class NoteArm extends SubsystemBase {
             .andThen(pullArmInCommand()))
             .andThen(new WaitCommand(0.10))
             .andThen(pushArmUpCommand())
-            .andThen(new WaitCommand(0.10))
+            .andThen(new WaitCommand(0.30))
             .andThen(pushArmOutCommand());
     }
     public Command releaseNoteFullCommand(){
-        return SubSystems.climb.moveArmToPosition(ArmPosition.UP)
-                .andThen(releaseNoteCommand())
-                .andThen(new WaitCommand(1.00))
+        return 
+                releaseNoteCommand()
+                .andThen(new WaitCommand(2.50))
                 .andThen(pullArmInCommand())
                 .andThen(new WaitCommand(0.50))
                 .andThen(pullArmDownCommand())

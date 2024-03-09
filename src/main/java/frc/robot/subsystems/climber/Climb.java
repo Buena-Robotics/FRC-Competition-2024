@@ -36,11 +36,11 @@ public abstract class Climb extends SubsystemBase {
         public double[] winch_temp_celcius = new double[] {};
     }
     public enum ArmPosition {
-        DOWN(new Rotation2d(1.57079632679)), 
-        SOURCE(new Rotation2d(1.11923695855)), 
-        SPEAKER_CLOSE(new Rotation2d(0.67147204082)),
-        SPEAKER_STAGE(new Rotation2d(0.861727450426)),
-        UP(new Rotation2d(0));
+        DOWN(new Rotation2d(1.57079632679 + 0.101)), 
+        SOURCE(new Rotation2d(1.11923695855 + 0.101)), 
+        SPEAKER_CLOSE(new Rotation2d(0.67147204082 + 0.101)),
+        SPEAKER_STAGE(new Rotation2d(0.861727450426 + 0.101)),
+        UP(new Rotation2d(0 + 0.101));
 
         private Rotation2d rotation;
         private ArmPosition(Rotation2d rotation) { this.rotation = rotation; }
@@ -90,7 +90,7 @@ public abstract class Climb extends SubsystemBase {
             voltage = Math.sqrt(measurement.unaryMinus().plus(setpoint).getDegrees());
         else 
             voltage = -Math.sqrt(measurement.minus(setpoint).getDegrees());
-        voltage = MathUtil.clamp(voltage, -12, 12);
+        voltage = MathUtil.clamp(voltage * 2, -12, 12);
 
         if(inputs.winch_rotations < 4/64.0 && voltage < 0){
             setWinchVoltage(0);
