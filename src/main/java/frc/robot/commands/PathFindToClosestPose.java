@@ -50,7 +50,7 @@ public class PathFindToClosestPose {
 
     private Command pathFindToClosestPoseCommand(){
         PathConstraints constraints = new PathConstraints(
-                3.0, 4.0,
+                3.5, 4.0,
                 Units.degreesToRadians(540), Units.degreesToRadians(720));
         Command pathfindingCommand = AutoBuilder.pathfindToPoseFlipped(
             getClosestPose(robot_pose_function.get()),

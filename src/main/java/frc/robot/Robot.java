@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.robot.Constants.IO;
 import frc.robot.Constants.SubSystems;
+import frc.robot.subsystems.drive.SwerveDrive;
 
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -34,7 +35,6 @@ public class Robot extends LoggedRobot {
         super(Robot.defaultPeriodSecs);
     }
     @Override public void robotInit() {
-        SubSystems.swerve_drive.hashCode(); //To call SwerveDrive Constructor First
         Pathfinding.setPathfinder(new LocalADStarAK());        
 
         switch (RobotConfig.getRobotMode()) {

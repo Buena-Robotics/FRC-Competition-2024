@@ -14,38 +14,36 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.FieldConstants;
+import frc.robot.RobotState;
 import frc.robot.Constants.IO;
 import frc.robot.Constants.SubSystems;
 import frc.robot.subsystems.drive.SwerveDrive;
+import frc.robot.utils.Print;
 import frc.robot.utils.TunableNumber;
 
 public class SwerveJoystick extends Command {
     private static final TunableNumber left_joystick_deadband  = new TunableNumber("Joystick/LeftDeadband",0.1);
     private static final TunableNumber right_joystick_deadband = new TunableNumber("Joystick/RightDeadband",0.1);
-    private static final double LEFT_DEADBAND_MODIFIER = 0.075;
 
     private final SwerveDrive swerve_drive;
 
     private final PIDController turret_turn_feedback;
-    // private final PIDController aim_assist_x_feedback, aim_assist_y_feedback;
     private final Supplier<Double> x_speed_function, y_speed_function, turn_speed_function;
-    // private final Supplier<Boolean> turret_mode;
-    private boolean field_oriented_mode = false;
+    private final Supplier<Boolean> turret_mode;
+    private final Supplier<Boolean> field_oriented_mode;
     
-    public SwerveJoystick(SwerveDrive swerve_drive, Supplier<Double> x_speed_function, Supplier<Double> y_speed_function, Supplier<Double> turn_speed_function){
+    public SwerveJoystick(SwerveDrive swerve_drive, Supplier<Double> x_speed_function, Supplier<Double> y_speed_function, Supplier<Double> turn_speed_function, Supplier<Boolean> field_oriented_mode, Supplier<Boolean> turret_mode){
         this.swerve_drive = swerve_drive;
         
-        this.turret_turn_feedback = new PIDController(5, 0, 0.1);
+        this.turret_turn_feedback = new PIDController(1, 0, 0);
         this.turret_turn_feedback.enableContinuousInput(-Math.PI, Math.PI);
-        // this.aim_assist_x_feedback = new PIDController(0.75, 0, 0);
-        // this.aim_assist_y_feedback = new PIDController(0.75, 0, 0);
         this.x_speed_function    = x_speed_function;
         this.y_speed_function    = y_speed_function;
         this.turn_speed_function = turn_speed_function;
+        this.field_oriented_mode = field_oriented_mode;
         
-        // this.turret_mode = Constants.IO.controller::getStartButton;
-        IO.commandController.back().onTrue(new InstantCommand(
-            () -> { field_oriented_mode = !field_oriented_mode; }));
+        this.turret_mode = turret_mode;
 
         addRequirements(swerve_drive);
     }
@@ -57,25 +55,25 @@ public class SwerveJoystick extends Command {
     }
 
     @Override public void execute() {
-        double linearMagnitude =
+        double linear_magnitude =
                     MathUtil.applyDeadband(
                         Math.hypot(x_speed_function.get(), y_speed_function.get()), left_joystick_deadband.get());
-        Rotation2d linearDirection =
+        Rotation2d linear_direction =
             new Rotation2d(x_speed_function.get(), y_speed_function.get());
         double omega = MathUtil.applyDeadband(turn_speed_function.get(), right_joystick_deadband.get());
 
-        linearMagnitude = linearMagnitude * linearMagnitude;
+        linear_magnitude *= linear_magnitude;
         omega = Math.copySign(omega * omega, omega);
 
         // Calcaulate new linear velocity
-        Translation2d linearVelocity =
-            new Pose2d(new Translation2d(), linearDirection)
-                .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
+        Translation2d linear_velocity =
+            new Pose2d(new Translation2d(), linear_direction)
+                .transformBy(new Transform2d(linear_magnitude, 0.0, new Rotation2d()))
                 .getTranslation();
 
-        double x_speed = linearVelocity.getX(),
-                    y_speed = linearVelocity.getY(), 
-                    omega_speed = omega;
+        double x_speed = linear_velocity.getX(),
+                y_speed = linear_velocity.getY(), 
+                omega_speed = omega;
 
         x_speed *= Math.abs(Math.pow(x_speed,1));
         y_speed *= Math.abs(Math.pow(y_speed,1));
@@ -87,76 +85,23 @@ public class SwerveJoystick extends Command {
 
         ChassisSpeeds chassis_speeds = new ChassisSpeeds(x_speed, y_speed, omega_speed);
 
-        if(field_oriented_mode){
-            // System.out.println("[LOG] Rotation2d:     " + swerve_drive.getRotation2d());
-            // System.out.println("[LOG] RotationOffset: " + swerve_drive.getRotationOffset());
-            // System.out.println("[LOG] FullRotation:   " + swerve_drive.getRotationOffset().plus(swerve_drive.getRotation2d()));
+        if(turret_mode.get()){
+            final Rotation2d measurement = swerve_drive.getPose().getRotation();
+            final double y = FieldConstants.getSpeakerPoint().getY() - swerve_drive.getPose().getY();
+            final double x = FieldConstants.getSpeakerPoint().getX() - swerve_drive.getPose().getX();
+            final Rotation2d setpoint = new Rotation2d(Math.atan2(y, x)).minus(Rotation2d.fromDegrees(7));
+            omega_speed = turret_turn_feedback.calculate(measurement.getRadians(), setpoint.getRadians());
+            omega_speed /= Math.PI; // 
+            omega_speed *= 3;
+            omega_speed *= SwerveDrive.TELEOP_DRIVE_MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
+            chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x_speed, y_speed, omega_speed, swerve_drive.getRotation2d());
+        } else if(field_oriented_mode.get()){
             chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x_speed, y_speed, omega_speed, swerve_drive.getRotation2d());
         }
 
         swerve_drive.driveRobotVelocity(chassis_speeds);
-
-        // drive.runVelocity(
-        //     ChassisSpeeds.fromFieldRelativeSpeeds(
-        //         linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-        //         linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-        //         omega * drive.getMaxAngularSpeedRadPerSec(),
-        //         isFlipped
-        //             ? drive.getRotation().plus(new Rotation2d(Math.PI))
-        //             : drive.getRotation()));
-
     }
 
-    /*@Override public void execute(){
-        double x_speed = x_speed_function.get();
-        double y_speed = y_speed_function.get();
-        double turn_speed = turn_speed_function.get();
-
-        y_speed = Math.abs(y_speed) > left_joystick_deadband.get() ? y_speed : 0.0;
-
-        x_speed = Math.abs(x_speed) > left_joystick_deadband.get() ? x_speed : 0.0;
-
-        turn_speed = Math.abs(turn_speed) > right_joystick_deadband.get() ? turn_speed : 0.0;
-
-        x_speed *= Math.abs(Math.pow(x_speed,3));
-        y_speed *= Math.abs(Math.pow(y_speed,3));
-        turn_speed *= Math.abs(Math.pow(turn_speed,5));
-
-        x_speed *= SwerveDrive.TELEOP_DRIVE_MAX_SPEED_METERS_PER_SECOND;
-        y_speed *= SwerveDrive.TELEOP_DRIVE_MAX_SPEED_METERS_PER_SECOND;
-        turn_speed *= SwerveDrive.TELEOP_DRIVE_MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
-
-        ChassisSpeeds chassis_speeds = new ChassisSpeeds(x_speed, y_speed, turn_speed);
-
-        if(field_oriented_mode){
-            chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x_speed, y_speed, turn_speed, swerve_drive.getHeading().minus(swerve_drive.getHeadingOffset()));
-        }
-
-        // final var best_aim_assist_target = FieldConstants.getBestAimAssistTarget(swerve_drive.getPose());
-        // if(best_aim_assist_target.getFirst() != null){
-        //     final Pose2d robot_pose = swerve_drive.getPose();
-        //     final Pose2d target_pose = best_aim_assist_target.getFirst().pose;
-        //     final double distance_to_target = best_aim_assist_target.getSecond();
-        //     if(distance_to_target < 1.5){
-        //         final double rotation_offset = target_pose.getRotation().minus(robot_pose.getRotation()).getDegrees();
-        //         if(Math.abs(rotation_offset) < 10){
-        //             final double x_distance = target_pose.getX() - robot_pose.getX();
-        //             final double y_distance = target_pose.getY() - robot_pose.getY();
-
-        //             double x_slow = Math.abs(aim_assist_x_feedback.calculate(0, x_distance));                                        
-        //             double y_slow = Math.abs(aim_assist_y_feedback.calculate(0, y_distance));
-        //             x_slow = MathUtil.clamp(x_slow, 0.05, 1);
-        //             y_slow = MathUtil.clamp(y_slow, 0.05, 1);
-
-        //             chassis_speeds = new ChassisSpeeds(x_speed * y_slow, y_speed * x_slow, turn_speed );
-        //         }
-
-        //     }
-        // }
-
-        SwerveModuleState[] module_states = swerve_drive.getKinematics().toSwerveModuleStates(chassis_speeds);
-        swerve_drive.setModuleStates(module_states);
-    }*/
     @Override public void end(boolean interrupted){ swerve_drive.stopModules(); }
     @Override public boolean isFinished(){ return false; }
 }

@@ -90,7 +90,7 @@ public abstract class Climb extends SubsystemBase {
             voltage = Math.sqrt(measurement.unaryMinus().plus(setpoint).getDegrees());
         else 
             voltage = -Math.sqrt(measurement.minus(setpoint).getDegrees());
-        voltage = MathUtil.clamp(voltage * 3, -12, 12);
+        voltage = MathUtil.clamp(voltage, -12, 12);
 
         if(inputs.winch_rotations < 4/64.0 && voltage < 0){
             setWinchVoltage(0);

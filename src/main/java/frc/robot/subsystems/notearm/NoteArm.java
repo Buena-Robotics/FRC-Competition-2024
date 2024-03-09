@@ -4,6 +4,13 @@ import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.ColorSensorV3;
+import com.revrobotics.ColorSensorV3.ColorSensorMeasurementRate;
+import com.revrobotics.ColorSensorV3.ColorSensorResolution;
+import com.revrobotics.ColorSensorV3.GainFactor;
+import com.revrobotics.ColorSensorV3.LEDCurrent;
+import com.revrobotics.ColorSensorV3.LEDPulseFrequency;
+import com.revrobotics.ColorSensorV3.ProximitySensorMeasurementRate;
+import com.revrobotics.ColorSensorV3.ProximitySensorResolution;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -77,24 +84,19 @@ public abstract class NoteArm extends SubsystemBase {
         claw_solenoid.set(Value.kOff);
         arm_up_solenoid.set(Value.kOff);
         arm_out_solenoid.set(Value.kOff);
+
+        color_sensor.configureProximitySensor(ProximitySensorResolution.kProxRes11bit, ProximitySensorMeasurementRate.kProxRate6ms);
+        color_sensor.configureColorSensor(ColorSensorResolution.kColorSensorRes13bit, ColorSensorMeasurementRate.kColorRate25ms, GainFactor.kGain1x);
+
         SmartDashboard.putData("NoteArm/ColorSensor", color_sensor_mechanism);
         openClaw();
+        new Thread(() -> this.autoClawThreadedLoop()).start();
     }
 
     protected void updateInputs(){
         inputs.is_claw_open = claw_solenoid.get() == Value.kForward;
         inputs.is_arm_out = arm_out_solenoid.get() == Value.kForward;
         inputs.is_arm_up = arm_up_solenoid.get() == Value.kForward;
-
-        inputs.note_end_beam_broke = !note_end_beam_breaker.get();
-
-        inputs.color_sensor_color = new double[]{color_sensor.getColor().red, color_sensor.getColor().green, color_sensor.getColor().blue};
-        inputs.color_sensor_red_raw = color_sensor.getRed();
-        inputs.color_sensor_green_raw = color_sensor.getGreen();
-        inputs.color_sensor_blue_raw = color_sensor.getBlue();
-        inputs.color_sensor_ir_raw = color_sensor.getIR();
-        inputs.color_sensor_proximity_raw = color_sensor.getProximity();
-        inputs.color_sensor_proximity_mm = color_sensor.getProximity() / 60;
 
         inputs.compressor_applied_volts = compressor.getAnalogVoltage();
         inputs.compressor_current_amps = compressor.getCurrent();
@@ -103,11 +105,48 @@ public abstract class NoteArm extends SubsystemBase {
     @Override public void periodic() {
         updateInputs();
         Logger.processInputs("NoteArm", inputs);
-        if(noteDetected() && IO.controller.getStartButton()) closeClaw();
+        // if(noteDetected() && IO.controller.getStartButton()) closeClaw();
 
         color_sensor_mechanism.setBackgroundColor(new Color8Bit(getColor()));
         Logger.recordOutput("NoteArm/ColorSensorMechanism", color_sensor_mechanism);
 
+    }
+
+    private double proximityToMM(double x){
+        if(x < 396) return 150.0;
+        else if(x <= 444) return -2 * (x-473);
+        else if(x <= 530) return -1/4.0 * (x - 680.0);
+        return Math.pow(2, (-1/200.0) * (x - 1500)) + 8;
+    }
+
+    private boolean last_note_end_beam_broke = false;
+    private void autoClawThreadedLoop(){
+        while(true) {
+        { // Update the necessary inputs
+            inputs.note_end_beam_broke = !note_end_beam_breaker.get();
+    
+            inputs.color_sensor_color = new double[]{color_sensor.getColor().red, color_sensor.getColor().green, color_sensor.getColor().blue};
+            inputs.color_sensor_red_raw = color_sensor.getRed();
+            inputs.color_sensor_green_raw = color_sensor.getGreen();
+            inputs.color_sensor_blue_raw = color_sensor.getBlue();
+            inputs.color_sensor_ir_raw = color_sensor.getIR();
+            inputs.color_sensor_proximity_raw = color_sensor.getProximity();
+            inputs.color_sensor_proximity_mm = proximityToMM(color_sensor.getProximity());
+        }
+
+        if(last_note_end_beam_broke // Back Intake
+                && inputs.note_end_beam_broke 
+                && isClawOpen() 
+                && !RobotState.shooterHasNote()) closeClaw();
+        else if(inputs.color_sensor_proximity_mm < 10 // Front Intake
+                && inputs.note_end_beam_broke 
+                && isClawOpen() 
+                && !RobotState.shooterHasNote()) closeClaw();
+
+        { // Update the previous inputs
+            last_note_end_beam_broke = inputs.note_end_beam_broke;
+        }
+    }
     }
 
     public boolean hasNote(){ return !inputs.is_claw_open; }
@@ -130,12 +169,6 @@ public abstract class NoteArm extends SubsystemBase {
         return new int[]{(int)(color.red*255), (int)(color.green*255), (int)(color.blue*255)};
     }
 
-    public double milimetersFromObject(){
-        final int proximity_11bit = 2047 - inputs.color_sensor_proximity_raw;
-        SmartDashboard.putNumber("NoteArm/MMFromObject", (double)proximity_11bit / 60);
-        SmartDashboard.putNumber("NoteArm/CMFromObject", (double)proximity_11bit / 600);
-        return (double)proximity_11bit;
-    }
 
     public boolean detectingNoteColor(){
         int[] rgb = getColorSensorRGB();
@@ -154,10 +187,6 @@ public abstract class NoteArm extends SubsystemBase {
         return false;
     }
 
-    public boolean noteDetected(){
-        return inputs.note_end_beam_broke;
-    }
-
     public Command grabNoteCommand()  { return this.runOnce(() -> { closeClaw(); }); }
     public Command pushArmUpCommand() { return this.runOnce(() -> { moveArmUp(); }); }
     public Command pushArmOutCommand(){ return this.runOnce(() -> { moveArmOut(); }); }
@@ -170,15 +199,15 @@ public abstract class NoteArm extends SubsystemBase {
         return grabNoteCommand()
             .andThen(new WaitCommand(0.65)
             .andThen(pullArmInCommand()))
-            .andThen(new WaitCommand(0.20))
+            .andThen(new WaitCommand(0.10))
             .andThen(pushArmUpCommand())
-            .andThen(new WaitCommand(0.40))
+            .andThen(new WaitCommand(0.10))
             .andThen(pushArmOutCommand());
     }
     public Command releaseNoteFullCommand(){
         return SubSystems.climb.moveArmToPosition(ArmPosition.UP)
                 .andThen(releaseNoteCommand())
-                .andThen(new WaitCommand(1.50))
+                .andThen(new WaitCommand(1.00))
                 .andThen(pullArmInCommand())
                 .andThen(new WaitCommand(0.50))
                 .andThen(pullArmDownCommand())
