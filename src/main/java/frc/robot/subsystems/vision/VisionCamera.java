@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
@@ -20,21 +21,29 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import frc.robot.Constants.SubSystems;
 
 public abstract class VisionCamera {
     public static final AprilTagFieldLayout field_layout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
     @AutoLog public static class VisionCameraInputs {
-        public PhotonPipeline pipeline;
-        public boolean driver_mode;
-        public Pose3d camera_pose;
-        // public PhotonTrackedTarget[] tracked_targets = new PhotonTrackedTarget[] {};
+        public PhotonPipeline pipeline = PhotonPipeline.APRILTAG;
+        public boolean driver_mode = false;
+        
+        public double result_timestamp_seconds = 0.0;
+        public double result_latency_ms = 0.0;
+        public double result_best_area = 0.0;
+        public double result_best_ambiguity = 0.0;
+        public double result_best_yaw = 0.0;
+        public double result_best_pitch = 0.0;
+        public double result_best_skew = 0.0;
+        public int result_best_fidicual_id = -1;
     }
     public static class TimestampedVisionMeasurement {
-        public final Pose2d pose;
+        public final Pose3d pose;
         public final double timestamp;
         public final Matrix<N3, N1> std_devs;
         public final List<PhotonTrackedTarget> targets;
-        public TimestampedVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> std_devs, List<PhotonTrackedTarget> targets){ 
+        public TimestampedVisionMeasurement(Pose3d pose, double timestamp, Matrix<N3, N1> std_devs, List<PhotonTrackedTarget> targets){ 
             this.pose = pose; this.timestamp = timestamp; this.std_devs = std_devs; this.targets = targets;
         }
     }
@@ -70,13 +79,30 @@ public abstract class VisionCamera {
     public abstract Optional<TimestampedVisionMeasurement> getVisionMeasurement();
     public abstract Optional<PhotonPipelineResult> getNoteDetection();
 
-    // public void updateInputs(){
-        // inputs.camera_pose = getCameraPoseOnRobot(SubSystems.swerve_drive.getPose());
-        // inputs.pipeline = 
-    // }
+    public void updateInputs(){
+        inputs.pipeline = PhotonPipeline.APRILTAG;
+        inputs.driver_mode = false;
+        
+        final PhotonPipelineResult result = photon_camera.getLatestResult();
+        
+        inputs.result_timestamp_seconds = result.getTimestampSeconds();
+        inputs.result_latency_ms = result.getLatencyMillis();
+
+        if(result.hasTargets()){
+            final PhotonTrackedTarget result_best = result.getBestTarget();
+            inputs.result_best_area = result_best.getArea();
+            inputs.result_best_ambiguity = result_best.getPoseAmbiguity();
+            inputs.result_best_yaw = result_best.getYaw();
+            inputs.result_best_pitch = result_best.getPitch();
+            inputs.result_best_skew = result_best.getSkew();
+            inputs.result_best_fidicual_id = result_best.getFiducialId();
+        }
+    }
 
     public void periodic(){
-        
+        updateInputs();
+        Logger.processInputs("Vision/VisionCamera-" + photon_camera.getName(), inputs);
+        Logger.recordOutput("Vision/VisionCamera-" + photon_camera.getName() + "/CameraPose", getCameraPoseOnRobot(SubSystems.swerve_drive.getPose()));
     }
 
     public void setPipeline(int index){ pipeline = PhotonPipeline.fromIndex(index); photon_camera.setPipelineIndex(index); }

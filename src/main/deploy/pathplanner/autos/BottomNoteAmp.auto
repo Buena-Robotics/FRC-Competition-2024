@@ -1,0 +1,49 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.7805585557503859,
+      "y": 4.523190155503746
+    },
+    "rotation": 125.12075250666084
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "launch_note"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BottomNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ThroughStage"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AmpToCenterSource"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

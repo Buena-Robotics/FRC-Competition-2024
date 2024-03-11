@@ -6,7 +6,6 @@ package frc.robot;
 
 import frc.robot.Constants.IO;
 import frc.robot.Constants.SubSystems;
-import frc.robot.subsystems.drive.SwerveDrive;
 
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -82,7 +81,7 @@ public class Robot extends LoggedRobot {
         autonomous_command = robot_container.getAutonomousCommand();
 
         if (autonomous_command != null)
-        autonomous_command.schedule();
+            autonomous_command.schedule();
     }
 
     @Override public void autonomousPeriodic() {}

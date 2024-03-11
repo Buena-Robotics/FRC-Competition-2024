@@ -1,7 +1,5 @@
 package frc.robot.subsystems.drive;
 
-import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -43,6 +41,10 @@ public class NavXSim extends NavX {
         inputs.displacement_z = 0.0;
     }
 
+    @Override public void zeroYaw() {
+        sim_odometry = new Pose2d();
+    }
+
     private void updateSim() {
         last_sim_odometry = sim_odometry;
         SubSystems.swerve_drive.getModules();
@@ -66,5 +68,5 @@ public class NavXSim extends NavX {
                 speeds.omegaRadiansPerSecond);
         sim_odometry = sim_odometry.exp(twist);
     }
-    @Override public Rotation2d getRotation2d() { return inputs.angle.plus(Rotation2d.fromDegrees(inputs.angle_adjustment)); }
+    @Override public Rotation2d getRotation2d() { return sim_odometry.getRotation(); }
 }

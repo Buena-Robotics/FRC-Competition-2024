@@ -13,37 +13,45 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.DriverStation;
 
 public class VisionCameraReal extends VisionCamera {
-    public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
+    public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 8, 16);
     public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
 
     public VisionCameraReal(String photon_camera_name, Transform3d robot_to_camera){
         super(photon_camera_name, robot_to_camera);
     }
 
-    private Matrix<N3, N1> getEstimationStdDevs(Pose2d estimatedPose) {
-        Matrix<N3, N1> estStdDevs = kSingleTagStdDevs;
-        List<PhotonTrackedTarget> targets = photon_camera.getLatestResult().getTargets();
-        int numTags = 0;
-        double avgDist = 0;
-        for (PhotonTrackedTarget target : targets) {
-            var tagPose = photon_pose_estimator.getFieldTags().getTagPose(target.getFiducialId());
-            if (tagPose.isEmpty()) continue;
-            numTags++;
-            avgDist +=
-                    tagPose.get().toPose2d().getTranslation().getDistance(estimatedPose.getTranslation());
+    private Matrix<N3, N1> getEstimationStdDevs(Pose2d estimated_pose) {
+        if(DriverStation.isDisabled()){
+            return VecBuilder.fill(0.5, 0.5, 2); // Not moving
         }
-        if (numTags == 0) return estStdDevs;
-        avgDist /= numTags;
-        // Decrease std devs if multiple targets are visible
-        if (numTags > 1) estStdDevs = kMultiTagStdDevs;
-        // Increase std devs based on (average) distance
-        if (numTags == 1 && avgDist > 4)
-            estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-        else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+        List<PhotonTrackedTarget> targets = photon_camera.getLatestResult().getTargets();
+        int tag_count = 0;
+        double average_distance = 0;
+        double average_ambiguity = 0;
+        for (PhotonTrackedTarget target : targets) {
+            var tag_pose = photon_pose_estimator.getFieldTags().getTagPose(target.getFiducialId());
+            if (tag_pose.isEmpty()) continue;
+            tag_count++;
+            average_distance += tag_pose.get().toPose2d().getTranslation().getDistance(estimated_pose.getTranslation());
+            average_ambiguity += target.getPoseAmbiguity() == -1 ? 1 : target.getPoseAmbiguity();
+        }
+        // Should be unreachable
+        if (tag_count == 0) return VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+        average_distance /= tag_count;
+        average_ambiguity /= tag_count;
 
-        return estStdDevs;
+        final double ambiguity_factor = average_ambiguity > 0.2 ? average_ambiguity * 16 : 0.8;
+
+        // Multi-tag
+        if (tag_count > 1) 
+            return VecBuilder.fill(0.5 * ambiguity_factor, 0.5 * ambiguity_factor * 1.25, 1 * ambiguity_factor * 1.5);
+        // Single tag > 4 meters away
+        if (tag_count == 1 && average_distance > 4)
+            return VecBuilder.fill(4 * ambiguity_factor, 8 * ambiguity_factor, 16 * ambiguity_factor);
+        return VecBuilder.fill(2 * ambiguity_factor, 3 * ambiguity_factor, 6 * ambiguity_factor);
     }
 
     @Override public Optional<TimestampedVisionMeasurement> getVisionMeasurement(){
@@ -59,7 +67,7 @@ public class VisionCameraReal extends VisionCamera {
             if(previous_vision_result_timestamp == estimated_pose.timestampSeconds) return Optional.empty();
             previous_vision_result_timestamp = estimated_pose.timestampSeconds;
             return Optional.of(new TimestampedVisionMeasurement(
-                estimated_pose.estimatedPose.transformBy(this.photon_pose_estimator.getRobotToCameraTransform()).toPose2d(), 
+                estimated_pose.estimatedPose, 
                 estimated_pose.timestampSeconds,
                 getEstimationStdDevs(estimated_pose.estimatedPose.toPose2d()),
                 estimated_pose.targetsUsed ));

@@ -9,17 +9,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.FieldConstants;
-import frc.robot.RobotState;
-import frc.robot.Constants.IO;
-import frc.robot.Constants.SubSystems;
 import frc.robot.subsystems.drive.SwerveDrive;
-import frc.robot.utils.Print;
 import frc.robot.utils.TunableNumber;
 
 public class SwerveJoystick extends Command {
@@ -89,14 +81,14 @@ public class SwerveJoystick extends Command {
             final Rotation2d measurement = swerve_drive.getPose().getRotation();
             final double y = FieldConstants.getSpeakerPoint().getY() - swerve_drive.getPose().getY();
             final double x = FieldConstants.getSpeakerPoint().getX() - swerve_drive.getPose().getX();
-            final Rotation2d setpoint = new Rotation2d(Math.atan2(y, x)).minus(Rotation2d.fromDegrees(7));
+            final Rotation2d setpoint = new Rotation2d(Math.atan2(y, x)).minus(Rotation2d.fromDegrees(15));
             omega_speed = turret_turn_feedback.calculate(measurement.getRadians(), setpoint.getRadians());
             omega_speed /= Math.PI; // 
             omega_speed *= 3;
             omega_speed *= SwerveDrive.TELEOP_DRIVE_MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
-            chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x_speed, y_speed, omega_speed, swerve_drive.getRotation2d());
+            chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x_speed, y_speed, omega_speed, swerve_drive.getRotation2d().plus(swerve_drive.getRotationOffset()));
         } else if(field_oriented_mode.get()){
-            chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x_speed, y_speed, omega_speed, swerve_drive.getRotation2d());
+            chassis_speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x_speed, y_speed, omega_speed, swerve_drive.getRotation2d().plus(swerve_drive.getRotationOffset()));
         }
 
         swerve_drive.driveRobotVelocity(chassis_speeds);

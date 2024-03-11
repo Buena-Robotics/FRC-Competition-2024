@@ -1,7 +1,5 @@
 package frc.robot.subsystems.notearm;
 
-import java.util.Queue;
-
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -9,8 +7,6 @@ import com.revrobotics.ColorSensorV3;
 import com.revrobotics.ColorSensorV3.ColorSensorMeasurementRate;
 import com.revrobotics.ColorSensorV3.ColorSensorResolution;
 import com.revrobotics.ColorSensorV3.GainFactor;
-import com.revrobotics.ColorSensorV3.LEDCurrent;
-import com.revrobotics.ColorSensorV3.LEDPulseFrequency;
 import com.revrobotics.ColorSensorV3.ProximitySensorMeasurementRate;
 import com.revrobotics.ColorSensorV3.ProximitySensorResolution;
 
@@ -26,10 +22,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotState;
-import frc.robot.Constants.IO;
 import frc.robot.Constants.SubSystems;
 import frc.robot.subsystems.climber.Climb.ArmPosition;
 import frc.robot.utils.TunableNumber;
@@ -48,7 +44,6 @@ public abstract class NoteArm extends SubsystemBase {
         public int color_sensor_blue_raw = 0;
         public int color_sensor_ir_raw = 0;
         public int color_sensor_proximity_raw = 2047;
-        public double color_sensor_proximity_mm = 30.0;
 
         public double compressor_applied_volts = 0.0;
         public double compressor_current_amps = 0.0;
@@ -107,7 +102,6 @@ public abstract class NoteArm extends SubsystemBase {
     @Override public void periodic() {
         updateInputs();
         Logger.processInputs("NoteArm", inputs);
-        // if(noteDetected() && IO.controller.getStartButton()) closeClaw();
 
         color_sensor_mechanism.setBackgroundColor(new Color8Bit(getColor()));
         Logger.recordOutput("NoteArm/ColorSensorMechanism", color_sensor_mechanism);
@@ -121,8 +115,8 @@ public abstract class NoteArm extends SubsystemBase {
         return Math.pow(2, (-1/200.0) * (x - 1500)) + 8;
     }
 
-    private int last_note_end_beam_broke_counter = 0; 
     private boolean last_note_end_beam_broke = false;
+    private double color_sensor_proximity_mm = 150.0;
     private void autoClawThreadedLoop(){
         while(true) {
         { // Update the necessary inputs
@@ -134,23 +128,30 @@ public abstract class NoteArm extends SubsystemBase {
             inputs.color_sensor_blue_raw = color_sensor.getBlue();
             inputs.color_sensor_ir_raw = color_sensor.getIR();
             inputs.color_sensor_proximity_raw = color_sensor.getProximity();
-            inputs.color_sensor_proximity_mm = proximityToMM(color_sensor.getProximity());
+            color_sensor_proximity_mm = proximityToMM(color_sensor.getProximity());
         }
 
         if(last_note_end_beam_broke // Back Intake
                 && !inputs.note_end_beam_broke 
                 && isClawOpen() 
-                && !RobotState.shooterHasNote()) closeClaw();
-        else if(inputs.color_sensor_proximity_mm < 30 // Front Intake
+                && !RobotState.shooterHasNote()) 
+            {
+                SubSystems.swerve_drive.xStopModules();
+                closeClaw();
+            }
+        else if(color_sensor_proximity_mm < 30 // Front Intake
                 && inputs.note_end_beam_broke 
                 && isClawOpen() 
-                && !RobotState.shooterHasNote()) closeClaw();
+                && !RobotState.shooterHasNote())
+            {
+                SubSystems.swerve_drive.xStopModules();
+                closeClaw();
+            }
 
         { // Update the previous inputs
             last_note_end_beam_broke = inputs.note_end_beam_broke;
-            if(last_note_end_beam_broke) last_note_end_beam_broke_counter++;
-            else last_note_end_beam_broke_counter = 0;
         }
+        Logger.recordOutput("Color Sensor Proximity MM", color_sensor_proximity_mm);
     }
     }
 
@@ -202,21 +203,30 @@ public abstract class NoteArm extends SubsystemBase {
 
     public Command grabNoteFullCommand(){
         return grabNoteCommand()
-            .andThen(new WaitCommand(0.65)
-            .andThen(pullArmInCommand()))
-            .andThen(new WaitCommand(0.10))
-            .andThen(pushArmUpCommand())
-            .andThen(new WaitCommand(0.30))
-            .andThen(pushArmOutCommand());
+            .andThen(
+                new ParallelCommandGroup(
+                    SubSystems.climb.moveArmToPosition(ArmPosition.UP),
+                    new WaitCommand(0.65)
+                ),
+                pullArmInCommand(),
+                new WaitCommand(0.10),
+                pushArmUpCommand(),
+                new WaitCommand(0.30),
+                pushArmOutCommand()
+            );
     }
     public Command releaseNoteFullCommand(){
-        return 
-                releaseNoteCommand()
-                .andThen(new WaitCommand(2.50))
-                .andThen(pullArmInCommand())
-                .andThen(new WaitCommand(0.50))
-                .andThen(pullArmDownCommand())
-                .andThen(new WaitCommand(0.05))
-                .andThen(pushArmOutCommand());
+        return releaseNoteCommand()
+                .andThen(
+                    new ParallelCommandGroup(
+                        SubSystems.climb.moveArmToPosition(ArmPosition.UP), 
+                        new WaitCommand(2.00)
+                    ),
+                    pullArmInCommand(),
+                    new WaitCommand(0.50),
+                    pullArmDownCommand(),
+                    new WaitCommand(0.05),
+                    pushArmOutCommand()
+                );
     }
 }

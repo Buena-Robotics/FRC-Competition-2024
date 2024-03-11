@@ -19,7 +19,7 @@ public class NavXReal extends NavX {
         inputs.temperature_celcius = super.getTempC();
 
         inputs.angle = super.getRotation2d();
-        inputs.angle_rate = super.getRate(); //TODO: Add to this Sim
+        inputs.angle_rate = super.getRate();
         inputs.roll_radians = Units.degreesToRadians(super.getRoll());
         inputs.pitch_radians = Units.degreesToRadians(super.getPitch());
         inputs.yaw_radians = Units.degreesToRadians(super.getYaw());

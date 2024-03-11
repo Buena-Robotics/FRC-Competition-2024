@@ -1,24 +1,18 @@
 package frc.robot.commands;
 
 import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.FieldConstants;
-import frc.robot.Constants.IO;
-import frc.robot.Constants.SubSystems;
 import frc.robot.subsystems.drive.SwerveDrive;
-import frc.robot.utils.TunableNumber;
 
 public class PathFindToClosestPose {
     private Supplier<Pose2d> robot_pose_function;

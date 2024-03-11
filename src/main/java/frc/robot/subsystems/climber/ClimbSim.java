@@ -4,7 +4,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.Robot;
-import frc.robot.utils.Print;
 
 public class ClimbSim extends Climb {
     private final FlywheelSim winch_sim = new FlywheelSim(DCMotor.getNEO(1), 1 / WINCH_MOTOR_GEAR_RATIO, 0.00025);
@@ -15,7 +14,6 @@ public class ClimbSim extends Climb {
     }
 
     @Override public void updateInputs() {
-        //TODO: Make Simulated limit switches :3
         inputs.winch_top_limit_switch_triggered = false;
         inputs.winch_bottom_limit_switch_triggered = false;
 
@@ -26,10 +24,11 @@ public class ClimbSim extends Climb {
         inputs.winch_applied_volts = winch_applied_volts;
         inputs.winch_current_amps = new double[] {winch_sim.getCurrentDrawAmps()};
         inputs.winch_temp_celcius = new double[] {};
-        inputs.bore_absolute_position_radians =  (inputs.winch_rotations/WINCH_TOTAL_FULL_ROTATIONS) * (Math.PI/2);
+        inputs.bore_absolute_position_radians = (inputs.winch_rotations/WINCH_TOTAL_FULL_ROTATIONS) * (Math.PI/2);
     }
     @Override public void setWinchVoltage(double volts) {
         winch_applied_volts = MathUtil.clamp(volts, -12.0, 12.0);
+
         winch_sim.setInputVoltage(winch_applied_volts);
     }
 

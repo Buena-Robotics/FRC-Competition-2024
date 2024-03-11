@@ -8,16 +8,13 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SubSystems;
-import frc.robot.utils.Print;
 
 public abstract class Climb extends SubsystemBase {
     @AutoLog public static class ClimbInputs {
@@ -39,8 +36,8 @@ public abstract class Climb extends SubsystemBase {
         DOWN(new Rotation2d(1.57079632679 + 0.101)), 
         SOURCE(new Rotation2d(1.11923695855 + 0.101)), 
         SPEAKER_CLOSE(new Rotation2d(0.67147204082 + 0.101)),
-        SPEAKER_STAGE(new Rotation2d(0.861727450426 + 0.101)),
-        UP(new Rotation2d(0 + 0.101));
+        SPEAKER_STAGE(new Rotation2d(0.931888672229181 + 0.101)),
+        UP(new Rotation2d());
 
         private Rotation2d rotation;
         private ArmPosition(Rotation2d rotation) { this.rotation = rotation; }
@@ -53,17 +50,16 @@ public abstract class Climb extends SubsystemBase {
     protected static final double WINCH_TOTAL_FULL_ROTATIONS = 1.853;
     
     protected ClimbInputsAutoLogged inputs = new ClimbInputsAutoLogged();
-    
-    private final Mechanism2d winch_mechanism = new Mechanism2d(60, 60);
-    private final Mechanism2d arm_mechanism = new Mechanism2d(60, 60);
-    private final MechanismLigament2d winch_ligament = new MechanismLigament2d("winch_ligament", 5, 70, 4, new Color8Bit("#5050FF"));
-    private final MechanismLigament2d arm_ligament = new MechanismLigament2d("arm_ligament", 20, 86, 4, new Color8Bit("#802020"));
+
+    private final Mechanism2d arm_mechanism = new Mechanism2d(Units.inchesToMeters(29), Units.inchesToMeters(29));
+    private final MechanismLigament2d arm_ligament = new MechanismLigament2d("arm_ligament", Units.inchesToMeters(29), 86, 6, new Color8Bit("#802020"));
 
     public Climb(){
-        winch_mechanism.getRoot("winch_root", 6, 6).append(winch_ligament);
-        arm_mechanism.getRoot("arm_root", 5, 30).append(arm_ligament);
-        SmartDashboard.putData("Climb/Mechanism", winch_mechanism);
-        SmartDashboard.putData("Climb/Mechanism", arm_mechanism);
+        arm_mechanism.getRoot("arm_root", Units.inchesToMeters(-2), 0)
+            .append(new MechanismLigament2d("fixed", Units.inchesToMeters(21.5), 90))
+            .append(arm_ligament);
+
+        SmartDashboard.putData("Climb/ArmVisualization", arm_mechanism);
     }
 
     public abstract void updateInputs();
@@ -73,16 +69,14 @@ public abstract class Climb extends SubsystemBase {
         updateInputs();
         Logger.processInputs("Climb", inputs);
 
-        winch_ligament.setAngle(70 + -inputs.winch_rotations*360);
-        arm_ligament.setAngle(Units.radiansToDegrees((Math.PI/2) - inputs.bore_absolute_position_radians));
+        arm_ligament.setAngle(Units.radiansToDegrees(-inputs.bore_absolute_position_radians));
         
-        Logger.recordOutput("Climb/Mecha/Winch Mechansim", winch_mechanism);
         Logger.recordOutput("Climb/Mecha/Arm Mechanism", arm_mechanism);
     }
 
     public double getShooterAngleRadians(){ return inputs.bore_absolute_position_radians; }
 
-    public void runSetpoint(Rotation2d setpoint){
+    public boolean runSetpoint(Rotation2d setpoint){
         final Rotation2d measurement = new Rotation2d(inputs.bore_absolute_position_radians);
         
         double voltage = 0.0;
@@ -90,17 +84,18 @@ public abstract class Climb extends SubsystemBase {
             voltage = Math.sqrt(measurement.unaryMinus().plus(setpoint).getDegrees());
         else 
             voltage = -Math.sqrt(measurement.minus(setpoint).getDegrees());
-        voltage = MathUtil.clamp(voltage * 2, -12, 12);
+        voltage = MathUtil.clamp(voltage * 3, -12, 12);
 
         if(inputs.winch_rotations < 4/64.0 && voltage < 0){
             setWinchVoltage(0);
-            return;
+            return false;
         }
         else if(inputs.winch_rotations > 112/64.0 && voltage > 0){
             setWinchVoltage(0);
-            return;
+            return false;
         }
         setWinchVoltage(voltage);
+        return true;
     }
 
     public Command moveArmTriggers(Supplier<Double> speed_function){
@@ -129,9 +124,9 @@ public abstract class Climb extends SubsystemBase {
         return new Command() {
             private final Rotation2d setpoint = rotation;
             private Rotation2d measurement = new Rotation2d(inputs.bore_absolute_position_radians);
-            private Rotation2d prev_measurement = new Rotation2d(inputs.bore_absolute_position_radians);
-            private final int wrong_direction_period_counter_max = 25;
-            private int wrong_direction_counter = 0;
+            private boolean setpoint_good = true;
+
+            { addRequirements(SubSystems.climb); }
 
             @Override public void initialize() {
                 Logger.recordOutput("Climb/Preset/Setpoint", setpoint);
@@ -139,8 +134,7 @@ public abstract class Climb extends SubsystemBase {
             }
 
             @Override public void execute() {
-                if(wrong_direction_counter % wrong_direction_period_counter_max == wrong_direction_period_counter_max-1) this.prev_measurement = measurement;
-                runSetpoint(setpoint);
+                setpoint_good = runSetpoint(setpoint);
                 this.measurement = new Rotation2d(inputs.bore_absolute_position_radians);
                 Logger.recordOutput("Climb/Preset/Measurement", measurement);
             }
@@ -150,12 +144,7 @@ public abstract class Climb extends SubsystemBase {
                 Logger.recordOutput("Climb/Preset/Measurement", new Rotation2d(-1.0));
             }
             @Override public boolean isFinished() {
-                boolean wrong_direction = false;
-                if(wrong_direction_counter++ % wrong_direction_period_counter_max == wrong_direction_period_counter_max-1)
-                    wrong_direction = Math.abs(measurement.minus(setpoint).getRadians()) > Math.abs(prev_measurement.minus(setpoint).getRadians());
-                if(wrong_direction) DriverStation.reportWarning("move arm to position cmd wrong direction", false);
-                return wrong_direction
-                    || Math.abs(setpoint.minus(measurement).getDegrees()) < 3;
+                return Math.abs(setpoint.minus(measurement).getDegrees()) < 2 || !setpoint_good;
             }
         };
     }

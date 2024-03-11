@@ -1,14 +1,6 @@
 package frc.robot.subsystems.servo;
 
-import java.util.ArrayList;
-
-import org.photonvision.PhotonUtils;
-import org.photonvision.targeting.PhotonTrackedTarget;
-
-import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.utils.TimerUtil;
 
 public class ServoSub extends SubsystemBase {
     

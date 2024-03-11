@@ -2,5 +2,8 @@
   "download": {
     "remoteDir": "/tmp",
     "serverTeam": "1726"
+  },
+  "output": {
+    "outputFolder": "C:\\AdvantageKit-ReplayLogs"
   }
 }

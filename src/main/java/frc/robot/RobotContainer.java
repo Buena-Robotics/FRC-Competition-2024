@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.robot.Constants.SubSystems;
 import frc.robot.Constants.IO;
+import frc.robot.commands.DriveForTime;
 import frc.robot.commands.LaunchNote;
 import frc.robot.commands.PathFindToClosestPose;
 import frc.robot.commands.PrepareLaunch;
@@ -13,27 +14,16 @@ import frc.robot.commands.RumbleFeedback;
 import frc.robot.commands.ShooterTurret;
 import frc.robot.commands.SwerveJoystick;
 import frc.robot.subsystems.climber.Climb.ArmPosition;
-import frc.robot.subsystems.climber.ClimbReal;
-import frc.robot.subsystems.climber.ClimbSim;
-import frc.robot.subsystems.drive.SwerveDrive;
-import frc.robot.subsystems.notearm.NoteArm;
-import frc.robot.subsystems.notearm.NoteArmReal;
-import frc.robot.subsystems.notearm.NoteArmSim;
-import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterReal;
-import frc.robot.subsystems.shooter.ShooterSim;
+import frc.robot.subsystems.climber.Climb;
+import frc.robot.utils.FieldVisualizer;
 import frc.robot.utils.NoteVisualizer;
-import frc.robot.utils.Print;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -43,44 +33,51 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 public class RobotContainer {
+    private final LoggedDashboardNumber delay_chooser;
     private final LoggedDashboardChooser<Command> auto_chooser;
     private boolean field_oriented_mode = false;
 
     public RobotContainer() {
-        NamedCommands.registerCommand("retract_arm", new WaitCommand(2)); 
-        NamedCommands.registerCommand("launch_note",
-            new ParallelCommandGroup(
-                new PrepareLaunch(SubSystems.shooter)
-                    .withTimeout(1),
-                SubSystems.climb.moveArmToPosition(ArmPosition.SPEAKER_CLOSE) )
-                .andThen(new LaunchNote(SubSystems.shooter).withTimeout(0.25))
-                .andThen(NoteVisualizer.shoot(SubSystems.swerve_drive::getPose, SubSystems.climb::getShooterAngleRadians)));
-        NamedCommands.registerCommand("lift_note", SubSystems.note_arm.grabNoteFullCommand());
-        NamedCommands.registerCommand("put_note", SubSystems.note_arm.releaseNoteFullCommand());
 
-        PathPlannerLogging.setLogCurrentPoseCallback((pose) -> { Logger.recordOutput("PathPlanner/RobotPose", pose); });
-        PathPlannerLogging.setLogTargetPoseCallback((pose) -> { Logger.recordOutput("PathPlanner/TargetPose", pose); });
-        PathPlannerLogging.setLogActivePathCallback((poses) -> {
-            Pose2d[] target_path;
-            target_path = poses.toArray(new Pose2d[poses.size()]);
-            Logger.recordOutput("PathPlanner/TargetPath", target_path);
-        });
-        auto_chooser = new LoggedDashboardChooser<Command>("Auto Choices", AutoBuilder.buildAutoChooser("New Auto"));
-        { // SYSID
+        { // Named Commands
+            NamedCommands.registerCommand("retract_arm", new WaitCommand(2)); 
+            NamedCommands.registerCommand("launch_note", aimLaunchNoteReset());
+            NamedCommands.registerCommand("lift_note", SubSystems.note_arm.grabNoteFullCommand());
+            NamedCommands.registerCommand("put_note", SubSystems.note_arm.releaseNoteFullCommand());
+        }
+
+        { // PathPlanner Logging
+            PathPlannerLogging.setLogCurrentPoseCallback((pose) -> { Logger.recordOutput("PathPlanner/RobotPose", pose); });
+            PathPlannerLogging.setLogTargetPoseCallback((pose) -> { Logger.recordOutput("PathPlanner/TargetPose", pose); });
+            PathPlannerLogging.setLogActivePathCallback((poses) -> {
+                Pose2d[] target_path;
+                target_path = poses.toArray(new Pose2d[poses.size()]);
+                Logger.recordOutput("PathPlanner/TargetPath", target_path);
+                FieldVisualizer.getField().getObject("Trajectory").setPoses(poses);
+            });
+        }
+        
+        auto_chooser = new LoggedDashboardChooser<Command>("Auto Choices", AutoBuilder.buildAutoChooser());
+        delay_chooser = new LoggedDashboardNumber("Auto Delay", 0);
+
+        if( !DriverStation.isFMSAttached() ) { // SYSID
             auto_chooser.addOption("Drive SysId (Quasistatic Forward)", SubSystems.swerve_drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
             auto_chooser.addOption("Drive SysId (Quasistatic Reverse)", SubSystems.swerve_drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
             auto_chooser.addOption("Drive SysId (Dynamic Forward)", SubSystems.swerve_drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
             auto_chooser.addOption("Drive SysId (Dynamic Reverse)", SubSystems.swerve_drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        }
+        { // Simple Autos
+            auto_chooser.addDefaultOption("Simple Auto", emptyCommand());
         }
 
         configureBindings();
@@ -88,26 +85,20 @@ public class RobotContainer {
 
     private boolean turretMode(){
         final double distance = SubSystems.swerve_drive.getPose().getTranslation().getDistance(FieldConstants.getSpeakerPoint().getTranslation());
-        return distance < 4 && RobotState.shooterHasNote() && false;
+        return distance < 3.5 && RobotState.shooterHasNote();
     }
-
     private Rotation2d getEstimatedShooterRotation(){
         final Transform3d robot_to_shooter = new Transform3d(new Translation3d(Units.inchesToMeters(-14.5),0.0,Units.inchesToMeters(21.5)), new Rotation3d());
         final Pose3d robot_pose = new Pose3d(SubSystems.swerve_drive.getPose());
         final Pose3d shooter_pose = robot_pose.plus(robot_to_shooter);
         
-        final double speaker_height = Units.feetToMeters(6 + (8/12.0)) - Units.inchesToMeters(21.5);
         final double distance_to_speaker = shooter_pose.toPose2d().getTranslation().getDistance(FieldConstants.getSpeakerPoint().getTranslation());
 
-        final double speaker_height_increase = distance_to_speaker < 1.5 ? 0 : distance_to_speaker / 8.0;
-
-        final double estimated_shooter_pitch = Math.atan2(speaker_height + speaker_height_increase, distance_to_speaker);
-
-        final Rotation2d estimated_rotation = new Rotation2d((Math.PI/2) - estimated_shooter_pitch);
+        final double bound = (distance_to_speaker - 1.646722) / (3.450181 - 1.646722);
+        final Rotation2d estimated_rotation = Climb.ArmPosition.SPEAKER_CLOSE.getRotation().interpolate(Climb.ArmPosition.SPEAKER_STAGE.getRotation(), bound);  
 
         return estimated_rotation;
     }
-
     private double getClimberSpeed() {
         if (IO.controller.getLeftTriggerAxis() > 0.01) 
             return -IO.controller.getLeftTriggerAxis();
@@ -131,12 +122,7 @@ public class RobotContainer {
         IO.commandController.back().onTrue(new InstantCommand(() -> { field_oriented_mode = !field_oriented_mode; }));
         IO.commandController.leftBumper().whileTrue(SubSystems.shooter.intakeCommand());
 
-        IO.commandController.rightBumper().whileTrue(NoteVisualizer.shoot(SubSystems.swerve_drive::getPose, SubSystems.climb::getShooterAngleRadians)
-                                                        .alongWith(
-                                                            new PrepareLaunch(SubSystems.shooter)
-                                                            .withTimeout(1)
-                                                            .andThen(new LaunchNote(SubSystems.shooter))
-                                                            .handleInterrupt(SubSystems.shooter::stop)));
+        IO.commandController.rightBumper().whileTrue(launchNote());
 
         IO.commandController.a().onTrue(new InstantCommand(SubSystems.note_arm::openClaw));
         IO.commandController.b().onTrue(new InstantCommand(SubSystems.note_arm::closeClaw));
@@ -149,27 +135,49 @@ public class RobotContainer {
         IO.commandController.povLeft().onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.SPEAKER_CLOSE));
         IO.commandController.povRight().onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.SPEAKER_STAGE));
 
-        IO.shooterHasNoteTrigger.onTrue(new RumbleFeedback(IO.controller, RumbleType.kLeftRumble, 1, 500));
-        IO.noteArmHasNoteTrigger.onTrue(new RumbleFeedback(IO.controller, RumbleType.kRightRumble, 1, 500));
+        IO.shooterHasNoteTrigger.debounce(0.4).onTrue(
+            new RumbleFeedback(IO.controller, RumbleType.kLeftRumble, 1, 500)
+                .alongWith(SubSystems.climb.moveArmToPosition(ArmPosition.DOWN)));
+        IO.noteArmHasNoteTrigger.debounce(0.6).onTrue(new RumbleFeedback(IO.controller, RumbleType.kRightRumble, 1, 500));
 
         IO.commandController.start().onTrue(
             new PathFindToClosestPose().pathFindToClosestPose(SubSystems.swerve_drive, SubSystems.swerve_drive::getPose));
         IO.commandController.start().onFalse(Commands.runOnce(() -> {}, SubSystems.swerve_drive));
     }
+    
+    public Command emptyCommand(){
+        Command empty = Commands.none();
+        empty.setName("empty");
+        return empty;
+    }
+    public Command launchNote(){
+        return new PrepareLaunch(SubSystems.shooter)
+            .withTimeout(1)
+            .andThen(
+                new LaunchNote(SubSystems.shooter).withTimeout(0.25),
+                NoteVisualizer.shoot(SubSystems.swerve_drive::getPose, SubSystems.climb::getShooterAngleRadians)
+            )
+            .handleInterrupt(SubSystems.shooter::stop);
+    }
+    public Command aimLaunchNoteReset(){
+        return SubSystems.climb.moveArmToPosition(ArmPosition.SPEAKER_CLOSE).andThen(launchNote(), new WaitCommand(0.2), SubSystems.climb.moveArmToPosition(ArmPosition.UP));
+    }
+    public Command simpleAuto(Rotation2d direction, long time_ms){
+        return aimLaunchNoteReset().andThen(new DriveForTime(SubSystems.swerve_drive, direction, time_ms));
+    }
 
     public Command getAutonomousCommand() {
-        return auto_chooser.get();
-        // PathConstraints constraints = new PathConstraints(
-        //         3.0, 4.0,
-        //         Units.degreesToRadians(540), Units.degreesToRadians(720));
+        final Command auto_command = auto_chooser.get();
+        final boolean use_simple_auto = emptyCommand().getName().equals(auto_command.getName());
 
-        // Command pathfindingCommand = AutoBuilder.pathfindToPoseFlipped(
-        //     FieldConstants.getSpeakerCenterPathfindPose(),
-        //     constraints,
-        //     0.0, // Goal end velocity in meters/sec
-        //     0.0 // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate.
-        // );
+        if(use_simple_auto) {
+            final Pose2d robot_pose = SubSystems.swerve_drive.getPose();
+            if(RobotState.isBlueAlliance())
+                return simpleAuto(robot_pose.getRotation().unaryMinus(), 1000);
+            else // Red Alliance
+                return simpleAuto(robot_pose.getRotation().plus(Rotation2d.fromDegrees(180)).unaryMinus(), 1000);
+        }
 
-        // return pathfindingCommand;
+        return new WaitCommand(delay_chooser.get()).andThen(auto_command); 
     }
 }

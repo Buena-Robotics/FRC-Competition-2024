@@ -21,12 +21,14 @@
   "NTProvider": {
     "types": {
       "/AdvantageKit/RealOutputs/Climb/Mecha/Arm Mechanism": "Mechanism2d",
+      "/AdvantageKit/RealOutputs/Climb/Mecha/Arm Visualization": "Mechanism2d",
       "/AdvantageKit/RealOutputs/Climb/Mecha/Winch Mechansim": "Mechanism2d",
       "/AdvantageKit/RealOutputs/NoteArm/ColorSensorMechanism": "Mechanism2d",
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Auto Choices": "String Chooser",
       "/SmartDashboard/Climb": "Mechanism2d",
       "/SmartDashboard/Climb/Arm Mechanism": "Mechanism2d",
+      "/SmartDashboard/Climb/ArmVisualization": "Mechanism2d",
       "/SmartDashboard/Climb/Mecha": "Mechanism2d",
       "/SmartDashboard/Climb/Mecha/Arm Mechanism": "Mechanism2d",
       "/SmartDashboard/Climb/Mecha/Winch Mechansim": "Mechanism2d",
@@ -34,6 +36,7 @@
       "/SmartDashboard/Climb/Winch Mechansim": "Mechanism2d",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/NoteArm/ColorSensor": "Mechanism2d",
+      "/SmartDashboard/VisionSystemSim-Microsoft_LifeCam_HD-3000 (1)_sim/Sim Field": "Field2d",
       "/SmartDashboard/VisionSystemSim-VisionSim/Sim Field": "Field2d"
     },
     "windows": {
@@ -42,7 +45,7 @@
           "visible": true
         }
       },
-      "/SmartDashboard/Climb/Mechanism": {
+      "/SmartDashboard/Climb/ArmVisualization": {
         "window": {
           "visible": true
         }
@@ -133,9 +136,6 @@
         "open": true
       },
       "SmartDashboard": {
-        "Climb": {
-          "open": true
-        },
         "NoteArm": {
           "double[]##v_/SmartDashboard/NoteArm/ColorHSV": {
             "open": true
@@ -165,8 +165,7 @@
               "open": false
             },
             "open": true
-          },
-          "open": true
+          }
         },
         "open": true
       },

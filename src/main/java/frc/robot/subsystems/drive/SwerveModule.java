@@ -1,7 +1,6 @@
 package frc.robot.subsystems.drive;
 
 import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -12,7 +11,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Robot;
 import frc.robot.RobotConfig;
-import frc.robot.RobotState;
 import frc.robot.RobotConfig.RobotMode;
 
 public abstract class SwerveModule {
@@ -45,7 +43,6 @@ public abstract class SwerveModule {
     private static final double SET_STATE_SPEED_METERS_PER_SECOND_DEADBAND = 0.001;
 
     private SimpleMotorFeedforward drive_feedforward;
-    private final PIDController drive_feedback;
     private final PIDController turn_feedback;
     protected final String module_name;
     protected final int index;
@@ -56,14 +53,19 @@ public abstract class SwerveModule {
         this.module_name = module_name;
         this.index = index;
 
-        if(RobotConfig.getRobotMode() == RobotMode.REAL)
-            this.drive_feedforward = new SimpleMotorFeedforward(0.029828, 2.599, 0.35074);
-        else if(RobotConfig.getRobotMode() == RobotMode.SIM)
-            this.drive_feedforward = new SimpleMotorFeedforward(0.0, 0.45);
-        else 
-            this.drive_feedforward = new SimpleMotorFeedforward(0.0, 0.0);
-        this.drive_feedback = new PIDController(2.5, 0.0, 0.0, Robot.defaultPeriodSecs);
-        this.turn_feedback  = new PIDController(0.4, 0.0, 0.0, Robot.defaultPeriodSecs);
+        if(RobotConfig.getRobotMode() == RobotMode.REAL){            
+            switch (index) {
+                case 0: this.drive_feedforward = new SimpleMotorFeedforward(0.033927, 2.597, 0.34768); break;
+                case 1: this.drive_feedforward = new SimpleMotorFeedforward(0.019646, 2.5956, 0.39179); break;
+                case 2: this.drive_feedforward = new SimpleMotorFeedforward(0.010468, 2.7216, 0.40463); break;
+                case 3: this.drive_feedforward = new SimpleMotorFeedforward(0.002596, 2.5386, 0.39606); break;
+                default: this.drive_feedforward = new SimpleMotorFeedforward(0, 0, 0); break;
+            }
+        }
+        else {
+            this.drive_feedforward = new SimpleMotorFeedforward(0, 1.35);
+        }
+        this.turn_feedback  = new PIDController(0.7, 0.0, 0.0, Robot.defaultPeriodSecs);
         
         this.turn_feedback.enableContinuousInput(-Math.PI, Math.PI);
     }
@@ -90,9 +92,9 @@ public abstract class SwerveModule {
         setTurn( turn_feedback.calculate(inputs.turn_position_radians, optimized_state.angle.getRadians()));   
 
         optimized_state.speedMetersPerSecond *= Math.cos(turn_feedback.getPositionError());
-        setDriveVoltage(
-            drive_feedforward.calculate(optimized_state.speedMetersPerSecond)
-                + drive_feedback.calculate(inputs.drive_velocity_meters_per_second, optimized_state.speedMetersPerSecond));
+
+        setDriveVoltage(drive_feedforward.calculate(optimized_state.speedMetersPerSecond));
+
         return optimized_state;
     }
 

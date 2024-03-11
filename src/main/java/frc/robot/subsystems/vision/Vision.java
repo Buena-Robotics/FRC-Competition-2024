@@ -22,11 +22,6 @@ public class Vision extends SubsystemBase {
         }
     }
     private final Map<String, VisionCamera> camera_map = new HashMap<String, VisionCamera>();
-    // public final Transform3d camera_pose = new Transform3d(
-    //             Units.inchesToMeters(14.5),
-    //             Units.inchesToMeters(14.5),
-    //             Units.inchesToMeters(69/4.0),
-    //             new Rotation3d(0,Units.degreesToRadians(-20), 0));
 
     public Vision(CameraData... camera_datas){
         FieldVisualizer.setAprilTags(VisionCamera.field_layout);
@@ -39,15 +34,17 @@ public class Vision extends SubsystemBase {
     }
 
     @Override public void periodic() {
-        for(VisionCamera camera : getAllCameras()) camera.periodic();
+        List<VisionCamera> all_cameras = getAllCameras();
+        for(int i = 0; i < all_cameras.size(); i++) all_cameras.get(i).periodic();
     }
 
     public VisionCamera getCamera(String key){ return camera_map.get(key); }
-    public List<VisionCamera> getAllCameras(){ return new ArrayList<>(camera_map.values()); }
+    public List<VisionCamera> getAllCameras(){ return new ArrayList<VisionCamera>(camera_map.values()); }
     public List<TimestampedVisionMeasurement> getAllVisionMeasurements(){
         ArrayList<TimestampedVisionMeasurement> vision_measurements = new ArrayList<TimestampedVisionMeasurement>();
-        for(VisionCamera camera : getAllCameras()){
-            var optional_measurement = camera.getVisionMeasurement();
+        List<VisionCamera> all_cameras = getAllCameras();
+        for(int i = 0; i < all_cameras.size(); i++){
+            var optional_measurement = all_cameras.get(i).getVisionMeasurement();
             if(optional_measurement.isPresent())
                 vision_measurements.add(optional_measurement.get());
         }
@@ -55,8 +52,9 @@ public class Vision extends SubsystemBase {
     }
     public List<PhotonPipelineResult> getAllDetectedNotes(){
         ArrayList<PhotonPipelineResult> detected_notes = new ArrayList<PhotonPipelineResult>();
-        for(VisionCamera camera : getAllCameras()){
-            var optional_detection = camera.getNoteDetection();
+        List<VisionCamera> all_cameras = getAllCameras();
+        for(int i = 0; i < all_cameras.size(); i++){
+            var optional_detection = all_cameras.get(i).getNoteDetection();
             if(optional_detection.isPresent())
                 detected_notes.add(optional_detection.get());
         }
