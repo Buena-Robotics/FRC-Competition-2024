@@ -133,9 +133,12 @@ public class SwerveDrive extends SubsystemBase {
         navx.periodic();
         var vision_measurements = SubSystems.vision.getAllVisionMeasurements();
         for (TimestampedVisionMeasurement vision_measurement : vision_measurements){
-            if(Robot.isReal())
-                pose_estimator.addVisionMeasurement(vision_measurement.pose.toPose2d(), vision_measurement.timestamp, vision_measurement.std_devs);
+            pose_estimator.addVisionMeasurement(vision_measurement.pose.toPose2d(), vision_measurement.timestamp, vision_measurement.std_devs);
+            
             Logger.recordOutput("PoseEstimation/VisionMeasurement", vision_measurement.pose);
+            Logger.recordOutput("Vision/StdDevs-X", vision_measurement.std_devs.get(0, 0));
+            Logger.recordOutput("Vision/StdDevs-Y", vision_measurement.std_devs.get(1, 0));
+            Logger.recordOutput("Vision/StdDevs-Theta", vision_measurement.std_devs.get(2, 0));
         }
         odometer.update(getRotation2d(), getWheelPositions());
         pose_estimator.update(getRotation2d(), getWheelPositions());

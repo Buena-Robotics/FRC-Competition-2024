@@ -133,6 +133,12 @@
     },
     "transitory": {
       "AdvantageKit": {
+        "RealOutputs": {
+          "Vision": {
+            "open": true
+          },
+          "open": true
+        },
         "open": true
       },
       "SmartDashboard": {

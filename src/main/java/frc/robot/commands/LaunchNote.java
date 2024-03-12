@@ -7,7 +7,7 @@ public class LaunchNote extends Command {
     
     private Shooter shooter;
 
-    public LaunchNote(Shooter shooter) { this.shooter = shooter; }
+    public LaunchNote(Shooter shooter) { this.shooter = shooter; addRequirements(shooter); }
 
     @Override public void initialize() {
         shooter.setLaunchVoltage(Shooter.LAUNCH_SPEED_MAX * 12);

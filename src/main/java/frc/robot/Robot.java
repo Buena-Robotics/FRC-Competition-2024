@@ -91,10 +91,7 @@ public class Robot extends LoggedRobot {
             autonomous_command.cancel();
     }
 
-    @Override public void teleopPeriodic() {
-        // IO.controller.setRumble(RumbleType.kLeftRumble, IO.controller.getRightTriggerAxis());
-        // IO.controller.setRumble(RumbleType.kBothRumble, 1);
-    }
+    @Override public void teleopPeriodic() {}
 
     @Override public void testInit() {
         CommandScheduler.getInstance().cancelAll();

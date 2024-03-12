@@ -136,7 +136,7 @@ public abstract class NoteArm extends SubsystemBase {
                 && isClawOpen() 
                 && !RobotState.shooterHasNote()) 
             {
-                SubSystems.swerve_drive.xStopModules();
+                SubSystems.swerve_drive.stopModules();
                 closeClaw();
             }
         else if(color_sensor_proximity_mm < 30 // Front Intake
@@ -144,7 +144,7 @@ public abstract class NoteArm extends SubsystemBase {
                 && isClawOpen() 
                 && !RobotState.shooterHasNote())
             {
-                SubSystems.swerve_drive.xStopModules();
+                SubSystems.swerve_drive.stopModules();
                 closeClaw();
             }
 

@@ -3,9 +3,18 @@ package frc.robot.subsystems.shooter;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.SubSystems;
+import frc.robot.FieldConstants;
 import frc.robot.RobotState;
+import frc.robot.subsystems.climber.Climb;
 
 public abstract class Shooter extends SubsystemBase {
     @AutoLog public static class ShooterInputs {
@@ -40,9 +49,20 @@ public abstract class Shooter extends SubsystemBase {
         Logger.processInputs("Shooter", inputs);
     }
 
-    public boolean hasNote(){
-        return inputs.holding_note_beam_broke;
+    public static Rotation2d estimatedShooterRotation(){
+        final Transform3d robot_to_shooter = new Transform3d(new Translation3d(Units.inchesToMeters(-14.5),0.0,Units.inchesToMeters(21.5)), new Rotation3d());
+        final Pose3d robot_pose = new Pose3d(SubSystems.swerve_drive.getPose());
+        final Pose3d shooter_pose = robot_pose.plus(robot_to_shooter);
+        
+        final double distance_to_speaker = shooter_pose.toPose2d().getTranslation().getDistance(FieldConstants.getSpeakerPoint().getTranslation());
+
+        final double bound = (distance_to_speaker - 1.646722) / (3.450181 - 1.646722);
+        final Rotation2d estimated_rotation = Climb.ArmPosition.SPEAKER_CLOSE.getRotation().interpolate(Climb.ArmPosition.SPEAKER_STAGE.getRotation(), bound);  
+
+        return estimated_rotation;
     }
+
+    public boolean hasNote(){ return inputs.holding_note_beam_broke; }
 
     public Command intakeCommand() {
         return this.startEnd(() -> {

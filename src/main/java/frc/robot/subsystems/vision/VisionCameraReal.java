@@ -14,11 +14,9 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.Constants.SubSystems;
 
 public class VisionCameraReal extends VisionCamera {
-    public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 8, 16);
-    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
-
     public VisionCameraReal(String photon_camera_name, Transform3d robot_to_camera){
         super(photon_camera_name, robot_to_camera);
     }
@@ -44,14 +42,18 @@ public class VisionCameraReal extends VisionCamera {
         average_ambiguity /= tag_count;
 
         final double ambiguity_factor = average_ambiguity > 0.2 ? average_ambiguity * 16 : 0.8;
+        final double auto_factor = DriverStation.isAutonomous() ? 1.5 : 1;
+        final double moving_factor = SubSystems.swerve_drive.getNavX().isMoving() ? 1.1 : 0.8;
+        final double rotating_factor = SubSystems.swerve_drive.getNavX().isRotating() ? 1.1 : 0.75;
+        final double total_factor = ambiguity_factor * auto_factor * moving_factor * rotating_factor;
 
         // Multi-tag
         if (tag_count > 1) 
-            return VecBuilder.fill(0.5 * ambiguity_factor, 0.5 * ambiguity_factor * 1.25, 1 * ambiguity_factor * 1.5);
+            return VecBuilder.fill(2 * total_factor, 4 * total_factor, 6 * total_factor);
         // Single tag > 4 meters away
         if (tag_count == 1 && average_distance > 4)
-            return VecBuilder.fill(4 * ambiguity_factor, 8 * ambiguity_factor, 16 * ambiguity_factor);
-        return VecBuilder.fill(2 * ambiguity_factor, 3 * ambiguity_factor, 6 * ambiguity_factor);
+            return VecBuilder.fill(7 * total_factor, 11 * total_factor, 19 * total_factor);
+        return VecBuilder.fill(4 * total_factor, 6 * total_factor, 10 * total_factor);
     }
 
     @Override public Optional<TimestampedVisionMeasurement> getVisionMeasurement(){
@@ -62,7 +64,7 @@ public class VisionCameraReal extends VisionCamera {
         final Optional<EstimatedRobotPose> optional_estimated_pose = photon_pose_estimator.update();
         if(optional_estimated_pose.isEmpty())
             return Optional.empty();
-        else{
+        else {
             EstimatedRobotPose estimated_pose = optional_estimated_pose.get();
             if(previous_vision_result_timestamp == estimated_pose.timestampSeconds) return Optional.empty();
             previous_vision_result_timestamp = estimated_pose.timestampSeconds;

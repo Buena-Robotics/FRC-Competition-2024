@@ -75,6 +75,7 @@ public abstract class Climb extends SubsystemBase {
     }
 
     public double getShooterAngleRadians(){ return inputs.bore_absolute_position_radians; }
+    public Rotation2d getShooterAngleRotation(){ return new Rotation2d(inputs.bore_absolute_position_radians); }
 
     public boolean runSetpoint(Rotation2d setpoint){
         final Rotation2d measurement = new Rotation2d(inputs.bore_absolute_position_radians);

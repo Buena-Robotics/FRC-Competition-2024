@@ -14,7 +14,6 @@ import frc.robot.commands.RumbleFeedback;
 import frc.robot.commands.ShooterTurret;
 import frc.robot.commands.SwerveJoystick;
 import frc.robot.subsystems.climber.Climb.ArmPosition;
-import frc.robot.subsystems.climber.Climb;
 import frc.robot.utils.FieldVisualizer;
 import frc.robot.utils.NoteVisualizer;
 
@@ -27,12 +26,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -85,20 +79,9 @@ public class RobotContainer {
 
     private boolean turretMode(){
         final double distance = SubSystems.swerve_drive.getPose().getTranslation().getDistance(FieldConstants.getSpeakerPoint().getTranslation());
-        return distance < 3.5 && RobotState.shooterHasNote();
+        return distance < 3.5 && RobotState.shooterHasNote() && field_oriented_mode;
     }
-    private Rotation2d getEstimatedShooterRotation(){
-        final Transform3d robot_to_shooter = new Transform3d(new Translation3d(Units.inchesToMeters(-14.5),0.0,Units.inchesToMeters(21.5)), new Rotation3d());
-        final Pose3d robot_pose = new Pose3d(SubSystems.swerve_drive.getPose());
-        final Pose3d shooter_pose = robot_pose.plus(robot_to_shooter);
-        
-        final double distance_to_speaker = shooter_pose.toPose2d().getTranslation().getDistance(FieldConstants.getSpeakerPoint().getTranslation());
 
-        final double bound = (distance_to_speaker - 1.646722) / (3.450181 - 1.646722);
-        final Rotation2d estimated_rotation = Climb.ArmPosition.SPEAKER_CLOSE.getRotation().interpolate(Climb.ArmPosition.SPEAKER_STAGE.getRotation(), bound);  
-
-        return estimated_rotation;
-    }
     private double getClimberSpeed() {
         if (IO.controller.getLeftTriggerAxis() > 0.01) 
             return -IO.controller.getLeftTriggerAxis();
@@ -117,12 +100,15 @@ public class RobotContainer {
         SubSystems.climb.setDefaultCommand(SubSystems.climb.moveArmTriggers(this::getClimberSpeed));
         
         final Trigger turretTrigger = new Trigger(this::turretMode);
-        turretTrigger.whileTrue(new ShooterTurret(SubSystems.climb, this::getEstimatedShooterRotation));
+        turretTrigger.whileTrue(new ShooterTurret(SubSystems.climb));
 
         IO.commandController.back().onTrue(new InstantCommand(() -> { field_oriented_mode = !field_oriented_mode; }));
         IO.commandController.leftBumper().whileTrue(SubSystems.shooter.intakeCommand());
 
         IO.commandController.rightBumper().whileTrue(launchNote());
+
+        // IO.commandController.rightStick().onTrue(new LockOnSpeaker(SubSystems.swerve_drive, SubSystems.climb));
+        // IO.commandController.rightStick().onTrue(new XStop(SubSystems.swerve_drive, 680));
 
         IO.commandController.a().onTrue(new InstantCommand(SubSystems.note_arm::openClaw));
         IO.commandController.b().onTrue(new InstantCommand(SubSystems.note_arm::closeClaw));

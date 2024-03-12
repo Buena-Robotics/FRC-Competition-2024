@@ -110,8 +110,17 @@ public abstract class SwerveModule {
     }
 
     public void xStop(){
-        setDriveVoltage(0.0);
-        runSetpoint(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+        double radians_stop = 0;
+
+        switch (index) {
+            case 0: radians_stop = Rotation2d.fromDegrees(270).getRadians(); break;
+            case 3: radians_stop = Rotation2d.fromDegrees(90).getRadians(); break;
+            case 1: radians_stop = Rotation2d.fromDegrees(180).getRadians(); break;
+            case 2: radians_stop = Rotation2d.fromDegrees(0).getRadians(); break;
+            default: break;
+        }
+        setTurn( turn_feedback.calculate(inputs.turn_position_radians, radians_stop));
+        setDriveVoltage(0);
     }
 
     public SwerveModuleState getSimModuleState(){ return inputs.sim_module_state; }
