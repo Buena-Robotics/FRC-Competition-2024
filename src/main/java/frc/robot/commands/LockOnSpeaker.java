@@ -10,7 +10,7 @@ import frc.robot.subsystems.drive.SwerveDrive;
 import frc.robot.subsystems.shooter.Shooter;
 
 public class LockOnSpeaker extends Command {
-    private final PIDController turn_feedback = new PIDController(1, 0, 0);
+    private final PIDController turn_feedback = new PIDController(0.5, 0, 0);
     private final SwerveDrive swerve_drive;
     private final Climb climb;
 

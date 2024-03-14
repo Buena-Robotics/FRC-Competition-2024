@@ -41,19 +41,19 @@ public class VisionCameraReal extends VisionCamera {
         average_distance /= tag_count;
         average_ambiguity /= tag_count;
 
-        final double ambiguity_factor = average_ambiguity > 0.2 ? average_ambiguity * 16 : 0.8;
+        final double ambiguity_factor = average_ambiguity > 0.3 ? average_ambiguity * 6 : 0.8;
         final double auto_factor = DriverStation.isAutonomous() ? 1.5 : 1;
-        final double moving_factor = SubSystems.swerve_drive.getNavX().isMoving() ? 1.1 : 0.8;
-        final double rotating_factor = SubSystems.swerve_drive.getNavX().isRotating() ? 1.1 : 0.75;
+        final double moving_factor = SubSystems.swerve_drive.getNavX().isMoving() ? 1.0 : 0.5;
+        final double rotating_factor = SubSystems.swerve_drive.getNavX().isRotating() ? 1.0 : 0.75;
         final double total_factor = ambiguity_factor * auto_factor * moving_factor * rotating_factor;
 
         // Multi-tag
         if (tag_count > 1) 
-            return VecBuilder.fill(2 * total_factor, 4 * total_factor, 6 * total_factor);
+            return VecBuilder.fill(1 * total_factor, 1.5 * total_factor, 3 * total_factor);
         // Single tag > 4 meters away
         if (tag_count == 1 && average_distance > 4)
-            return VecBuilder.fill(7 * total_factor, 11 * total_factor, 19 * total_factor);
-        return VecBuilder.fill(4 * total_factor, 6 * total_factor, 10 * total_factor);
+            return VecBuilder.fill(5 * total_factor, 8 * total_factor, 14 * total_factor);
+        return VecBuilder.fill(3 * total_factor, 5 * total_factor, 8 * total_factor);
     }
 
     @Override public Optional<TimestampedVisionMeasurement> getVisionMeasurement(){

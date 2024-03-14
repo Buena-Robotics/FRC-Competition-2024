@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotState;
 import frc.robot.Constants.SubSystems;
+import frc.robot.commands.XStop;
 import frc.robot.subsystems.climber.Climb.ArmPosition;
 import frc.robot.utils.TunableNumber;
 
@@ -136,7 +137,7 @@ public abstract class NoteArm extends SubsystemBase {
                 && isClawOpen() 
                 && !RobotState.shooterHasNote()) 
             {
-                SubSystems.swerve_drive.stopModules();
+                new XStop(SubSystems.swerve_drive, 680).schedule();
                 closeClaw();
             }
         else if(color_sensor_proximity_mm < 30 // Front Intake
@@ -144,7 +145,7 @@ public abstract class NoteArm extends SubsystemBase {
                 && isClawOpen() 
                 && !RobotState.shooterHasNote())
             {
-                SubSystems.swerve_drive.stopModules();
+                new XStop(SubSystems.swerve_drive, 680).schedule();
                 closeClaw();
             }
 

@@ -8,6 +8,7 @@ import frc.robot.Constants.SubSystems;
 import frc.robot.Constants.IO;
 import frc.robot.commands.DriveForTime;
 import frc.robot.commands.LaunchNote;
+import frc.robot.commands.LockOnSpeaker;
 import frc.robot.commands.PathFindToClosestPose;
 import frc.robot.commands.PrepareLaunch;
 import frc.robot.commands.RumbleFeedback;
@@ -79,7 +80,7 @@ public class RobotContainer {
 
     private boolean turretMode(){
         final double distance = SubSystems.swerve_drive.getPose().getTranslation().getDistance(FieldConstants.getSpeakerPoint().getTranslation());
-        return distance < 3.5 && RobotState.shooterHasNote() && field_oriented_mode;
+        return distance < 3.5 && RobotState.shooterHasNote() && field_oriented_mode && false;
     }
 
     private double getClimberSpeed() {
@@ -107,7 +108,7 @@ public class RobotContainer {
 
         IO.commandController.rightBumper().whileTrue(launchNote());
 
-        // IO.commandController.rightStick().onTrue(new LockOnSpeaker(SubSystems.swerve_drive, SubSystems.climb));
+        IO.commandController.rightStick().onTrue(new LockOnSpeaker(SubSystems.swerve_drive, SubSystems.climb));
         // IO.commandController.rightStick().onTrue(new XStop(SubSystems.swerve_drive, 680));
 
         IO.commandController.a().onTrue(new InstantCommand(SubSystems.note_arm::openClaw));
@@ -121,10 +122,10 @@ public class RobotContainer {
         IO.commandController.povLeft().onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.SPEAKER_CLOSE));
         IO.commandController.povRight().onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.SPEAKER_STAGE));
 
-        IO.shooterHasNoteTrigger.debounce(0.4).onTrue(
+        IO.shooterHasNoteTrigger.debounce(0.8).onTrue(
             new RumbleFeedback(IO.controller, RumbleType.kLeftRumble, 1, 500)
                 .alongWith(SubSystems.climb.moveArmToPosition(ArmPosition.DOWN)));
-        IO.noteArmHasNoteTrigger.debounce(0.6).onTrue(new RumbleFeedback(IO.controller, RumbleType.kRightRumble, 1, 500));
+        IO.noteArmHasNoteTrigger.debounce(1).onTrue(new RumbleFeedback(IO.controller, RumbleType.kRightRumble, 1, 500));
 
         IO.commandController.start().onTrue(
             new PathFindToClosestPose().pathFindToClosestPose(SubSystems.swerve_drive, SubSystems.swerve_drive::getPose));

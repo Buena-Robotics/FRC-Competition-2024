@@ -36,7 +36,7 @@ public abstract class Climb extends SubsystemBase {
         DOWN(new Rotation2d(1.57079632679 + 0.101)), 
         SOURCE(new Rotation2d(1.11923695855 + 0.101)), 
         SPEAKER_CLOSE(new Rotation2d(0.67147204082 + 0.101)),
-        SPEAKER_STAGE(new Rotation2d(0.931888672229181 + 0.101)),
+        SPEAKER_STAGE(new Rotation2d(0.931888672229181)),
         UP(new Rotation2d());
 
         private Rotation2d rotation;
@@ -85,7 +85,7 @@ public abstract class Climb extends SubsystemBase {
             voltage = Math.sqrt(measurement.unaryMinus().plus(setpoint).getDegrees());
         else 
             voltage = -Math.sqrt(measurement.minus(setpoint).getDegrees());
-        voltage = MathUtil.clamp(voltage * 3, -12, 12);
+        voltage = MathUtil.clamp(voltage * 2, -12, 12);
 
         if(inputs.winch_rotations < 4/64.0 && voltage < 0){
             setWinchVoltage(0);
