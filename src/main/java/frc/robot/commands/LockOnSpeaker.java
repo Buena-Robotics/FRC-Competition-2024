@@ -25,7 +25,7 @@ public class LockOnSpeaker extends Command {
     private Rotation2d getDriveRotationSetpoint(){
         final double y = FieldConstants.getSpeakerPoint().getY() - swerve_drive.getPose().getY();
         final double x = FieldConstants.getSpeakerPoint().getX() - swerve_drive.getPose().getX();
-        final Rotation2d setpoint = new Rotation2d(Math.atan2(y, x)).minus(Rotation2d.fromDegrees(15));
+        final Rotation2d setpoint = new Rotation2d(Math.atan2(y, x)).minus(Rotation2d.fromDegrees(10));
         return setpoint;
     }
 

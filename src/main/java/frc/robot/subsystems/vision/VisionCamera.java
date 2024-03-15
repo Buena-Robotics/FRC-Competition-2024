@@ -21,7 +21,10 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.SubSystems;
+import frc.robot.utils.TunableNumber;
 
 public abstract class VisionCamera {
     public static final AprilTagFieldLayout field_layout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
@@ -65,6 +68,14 @@ public abstract class VisionCamera {
         }
     }
 
+    // protected static final TunableNumber cam_pos_x = new TunableNumber("Cam/Pos/X", Units.inchesToMeters(12.5));
+    // protected static final TunableNumber cam_pos_y = new TunableNumber("Cam/Pos/Y", Units.inchesToMeters(13));
+    // protected static final TunableNumber cam_pos_z = new TunableNumber("Cam/Pos/Z", Units.inchesToMeters(18));
+    // protected static final TunableNumber cam_rot_yaw = new TunableNumber("Cam/Rot/Yaw");
+    // protected static final TunableNumber cam_rot_pitch = new TunableNumber("Cam/Rot/Pitch");
+    // protected static final TunableNumber cam_rot_roll = new TunableNumber("Cam/Rot/Roll");
+
+
     protected final PhotonCamera photon_camera;
     protected final PhotonPoseEstimator photon_pose_estimator;
     protected VisionCameraInputsAutoLogged inputs = new VisionCameraInputsAutoLogged();
@@ -103,6 +114,13 @@ public abstract class VisionCamera {
         updateInputs();
         Logger.processInputs("Vision/VisionCamera-" + photon_camera.getName(), inputs);
         Logger.recordOutput("Vision/VisionCamera-" + photon_camera.getName() + "/CameraPose", getCameraPoseOnRobot(SubSystems.swerve_drive.getPose()));
+        // this.photon_pose_estimator.setRobotToCameraTransform(new Transform3d(
+        //     cam_pos_x.get(), cam_pos_x.get(), cam_pos_z.get(), 
+        //     new Rotation3d(
+        //         Units.degreesToRadians(cam_rot_roll.get()), 
+        //         Units.degreesToRadians(cam_rot_pitch.get()), 
+        //         Units.degreesToRadians(cam_rot_yaw.get()))
+        // ));
     }
 
     public void setPipeline(int index){ pipeline = PhotonPipeline.fromIndex(index); photon_camera.setPipelineIndex(index); }

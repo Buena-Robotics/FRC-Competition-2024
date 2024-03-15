@@ -22,6 +22,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -133,7 +134,8 @@ public class SwerveDrive extends SubsystemBase {
         navx.periodic();
         var vision_measurements = SubSystems.vision.getAllVisionMeasurements();
         for (TimestampedVisionMeasurement vision_measurement : vision_measurements){
-            pose_estimator.addVisionMeasurement(vision_measurement.pose.toPose2d(), vision_measurement.timestamp, vision_measurement.std_devs);
+            if(!DriverStation.isAutonomousEnabled())
+                pose_estimator.addVisionMeasurement(vision_measurement.pose.toPose2d(), vision_measurement.timestamp, vision_measurement.std_devs);
             
             Logger.recordOutput("PoseEstimation/VisionMeasurement", vision_measurement.pose);
             Logger.recordOutput("Vision/StdDevs-X", vision_measurement.std_devs.get(0, 0));

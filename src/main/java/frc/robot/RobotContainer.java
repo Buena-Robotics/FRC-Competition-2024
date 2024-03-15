@@ -37,7 +37,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
-public class RobotContainer {
+public class RobotContainer { //35x35 inches
     private final LoggedDashboardNumber delay_chooser;
     private final LoggedDashboardChooser<Command> auto_chooser;
     private boolean field_oriented_mode = false;
@@ -47,6 +47,7 @@ public class RobotContainer {
         { // Named Commands
             NamedCommands.registerCommand("retract_arm", new WaitCommand(2)); 
             NamedCommands.registerCommand("launch_note", aimLaunchNoteReset());
+            NamedCommands.registerCommand("aim_launch_note", aimLaunchNoteReset());
             NamedCommands.registerCommand("lift_note", SubSystems.note_arm.grabNoteFullCommand());
             NamedCommands.registerCommand("put_note", SubSystems.note_arm.releaseNoteFullCommand());
         }

@@ -44,10 +44,10 @@ public final class Constants {
         public static final ServoSub servo = new ServoSub();
         public static final Vision vision = new Vision(
                 new CameraData("Microsoft_LifeCam_HD-3000 (1)", new Transform3d(
-                        Units.inchesToMeters(14.5),
-                        Units.inchesToMeters(14.5),
-                        Units.inchesToMeters(69/4.0),
-                        new Rotation3d(0,Units.degreesToRadians(-38), Units.degreesToRadians(0))))
+                        Units.inchesToMeters(12.5),
+                        Units.inchesToMeters(13),
+                        Units.inchesToMeters(18),
+                        new Rotation3d(0,Units.degreesToRadians(-30), Units.degreesToRadians(0))))
                         );
     }
 }

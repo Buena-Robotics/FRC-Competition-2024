@@ -13,6 +13,7 @@ import com.revrobotics.ColorSensorV3.ProximitySensorResolution;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -83,7 +84,7 @@ public abstract class NoteArm extends SubsystemBase {
         arm_up_solenoid.set(Value.kOff);
         arm_out_solenoid.set(Value.kOff);
 
-        color_sensor.configureProximitySensor(ProximitySensorResolution.kProxRes11bit, ProximitySensorMeasurementRate.kProxRate6ms);
+        color_sensor.configureProximitySensor(ProximitySensorResolution.kProxRes11bit, ProximitySensorMeasurementRate.kProxRate12ms);
         color_sensor.configureColorSensor(ColorSensorResolution.kColorSensorRes13bit, ColorSensorMeasurementRate.kColorRate25ms, GainFactor.kGain1x);
 
         SmartDashboard.putData("NoteArm/ColorSensor", color_sensor_mechanism);
@@ -137,7 +138,8 @@ public abstract class NoteArm extends SubsystemBase {
                 && isClawOpen() 
                 && !RobotState.shooterHasNote()) 
             {
-                new XStop(SubSystems.swerve_drive, 680).schedule();
+                if(!DriverStation.isAutonomousEnabled())
+                    new XStop(SubSystems.swerve_drive, 680).schedule();
                 closeClaw();
             }
         else if(color_sensor_proximity_mm < 30 // Front Intake
@@ -145,7 +147,8 @@ public abstract class NoteArm extends SubsystemBase {
                 && isClawOpen() 
                 && !RobotState.shooterHasNote())
             {
-                new XStop(SubSystems.swerve_drive, 680).schedule();
+                if(!DriverStation.isAutonomousEnabled())
+                    new XStop(SubSystems.swerve_drive, 680).schedule();
                 closeClaw();
             }
 
