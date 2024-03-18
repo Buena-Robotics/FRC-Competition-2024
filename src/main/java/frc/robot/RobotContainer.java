@@ -110,7 +110,6 @@ public class RobotContainer { //35x35 inches
         IO.commandController.rightBumper().whileTrue(launchNote());
 
         IO.commandController.rightStick().onTrue(new LockOnSpeaker(SubSystems.swerve_drive, SubSystems.climb));
-        // IO.commandController.rightStick().onTrue(new XStop(SubSystems.swerve_drive, 680));
 
         IO.commandController.a().onTrue(new InstantCommand(SubSystems.note_arm::openClaw));
         IO.commandController.b().onTrue(new InstantCommand(SubSystems.note_arm::closeClaw));
@@ -129,7 +128,8 @@ public class RobotContainer { //35x35 inches
         IO.noteArmHasNoteTrigger.debounce(1).onTrue(new RumbleFeedback(IO.controller, RumbleType.kRightRumble, 1, 500));
 
         IO.commandController.start().onTrue(
-            new PathFindToClosestPose().pathFindToClosestPose(SubSystems.swerve_drive, SubSystems.swerve_drive::getPose));
+            new PathFindToClosestPose().pathFindToClosestPose(SubSystems.swerve_drive, SubSystems.swerve_drive::getPose)
+                .alongWith(SubSystems.climb.moveArmToPosition(ArmPosition.DOWN)));
         IO.commandController.start().onFalse(Commands.runOnce(() -> {}, SubSystems.swerve_drive));
     }
     

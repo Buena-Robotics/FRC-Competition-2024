@@ -42,7 +42,8 @@ public abstract class SwerveModule {
     protected static final double TURN_ENCODER_RPM_TO_RADIANS_PER_SECOND = TURN_ENCODER_ROTATION_TO_RADIANS / 60;
     private static final double SET_STATE_SPEED_METERS_PER_SECOND_DEADBAND = 0.001;
 
-    private SimpleMotorFeedforward drive_feedforward;
+    protected SimpleMotorFeedforward drive_feedforward;
+    private final PIDController drive_feedback;
     private final PIDController turn_feedback;
     protected final String module_name;
     protected final int index;
@@ -52,7 +53,6 @@ public abstract class SwerveModule {
     public SwerveModule(String module_name, int index){
         this.module_name = module_name;
         this.index = index;
-
         if(RobotConfig.getRobotMode() == RobotMode.REAL){            
             switch (index) {
                 case 0: this.drive_feedforward = new SimpleMotorFeedforward(0.033927, 2.597, 0.34768); break;
@@ -65,8 +65,8 @@ public abstract class SwerveModule {
         else {
             this.drive_feedforward = new SimpleMotorFeedforward(0, 1.35);
         }
-        this.turn_feedback  = new PIDController(0.2, 0.0, 0.0, Robot.defaultPeriodSecs);
-        
+        this.drive_feedback  = new PIDController(1, 0.0, 0.0, Robot.defaultPeriodSecs);
+        this.turn_feedback  = new PIDController(0.3, 0.0, 0.0, Robot.defaultPeriodSecs);
         this.turn_feedback.enableContinuousInput(-Math.PI, Math.PI);
     }
 
@@ -93,8 +93,12 @@ public abstract class SwerveModule {
 
         optimized_state.speedMetersPerSecond *= Math.cos(turn_feedback.getPositionError());
 
-        setDriveVoltage(drive_feedforward.calculate(optimized_state.speedMetersPerSecond));
+        setDriveVoltage(
+            drive_feedforward.calculate(optimized_state.speedMetersPerSecond)
+             + drive_feedback.calculate(inputs.drive_velocity_meters_per_second, optimized_state.speedMetersPerSecond)
+            );
 
+        optimized_state.speedMetersPerSecond *= -1;
         return optimized_state;
     }
 

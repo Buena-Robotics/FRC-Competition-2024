@@ -12,6 +12,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.FieldConstants;
+import frc.robot.RobotState;
+import frc.robot.Constants.SubSystems;
+import frc.robot.subsystems.climber.Climb.ArmPosition;
 import frc.robot.subsystems.drive.SwerveDrive;
 
 public class PathFindToClosestPose {
@@ -22,29 +25,30 @@ public class PathFindToClosestPose {
     }
 
     private Pose2d getClosestPose(final Pose2d robot_pose){
-        Pose2d closest_pose = FieldConstants.getAmpPathfindPose();
-        
-        if(distanceToPose(robot_pose, closest_pose) > distanceToPose(robot_pose, FieldConstants.getSourceCenterPathfindPose()))
+        Pose2d closest_pose = null;
+        if(RobotState.armHasNote()) {
+            closest_pose = FieldConstants.getAmpPathfindPose();
+        }
+        else if(!RobotState.shooterHasNote()){
             closest_pose = FieldConstants.getSourceCenterPathfindPose();
-        if(distanceToPose(robot_pose, closest_pose) > distanceToPose(robot_pose, FieldConstants.getSourceLeftPathfindPose()))
-            closest_pose = FieldConstants.getSourceLeftPathfindPose();
-        if(distanceToPose(robot_pose, closest_pose) > distanceToPose(robot_pose, FieldConstants.getSourceLeftPathfindPose()))
-            closest_pose = FieldConstants.getSourceLeftPathfindPose();
-        if(distanceToPose(robot_pose, closest_pose) > distanceToPose(robot_pose, FieldConstants.getSourceRightPathfindPose()))
-            closest_pose = FieldConstants.getSourceRightPathfindPose();
-        if(distanceToPose(robot_pose, closest_pose) > distanceToPose(robot_pose, FieldConstants.getSpeakerCenterPathfindPose()))
+            if(distanceToPose(robot_pose, closest_pose) > distanceToPose(robot_pose, FieldConstants.getSourceLeftPathfindPose()))
+                closest_pose = FieldConstants.getSourceLeftPathfindPose();
+            if(distanceToPose(robot_pose, closest_pose) > distanceToPose(robot_pose, FieldConstants.getSourceRightPathfindPose()))
+                closest_pose = FieldConstants.getSourceRightPathfindPose();
+        }
+        else { // Shooter has note  
             closest_pose = FieldConstants.getSpeakerCenterPathfindPose();
-        if(distanceToPose(robot_pose, closest_pose) > distanceToPose(robot_pose, FieldConstants.getSpeakerLowerPathfindPose()))
-            closest_pose = FieldConstants.getSpeakerLowerPathfindPose();
-        if(distanceToPose(robot_pose, closest_pose) > distanceToPose(robot_pose, FieldConstants.getSpeakerUpperPathfindPose()))
-            closest_pose = FieldConstants.getSpeakerUpperPathfindPose();
-
+            if(distanceToPose(robot_pose, closest_pose) > distanceToPose(robot_pose, FieldConstants.getSpeakerLowerPathfindPose()))
+                closest_pose = FieldConstants.getSpeakerLowerPathfindPose();
+            if(distanceToPose(robot_pose, closest_pose) > distanceToPose(robot_pose, FieldConstants.getSpeakerUpperPathfindPose()))
+                closest_pose = FieldConstants.getSpeakerUpperPathfindPose();
+        }
         return closest_pose;
     }
 
     private Command pathFindToClosestPoseCommand(){
         PathConstraints constraints = new PathConstraints(
-                3.5, 4.0,
+                2, 2.0,
                 Units.degreesToRadians(540), Units.degreesToRadians(720));
         Command pathfindingCommand = AutoBuilder.pathfindToPoseFlipped(
             getClosestPose(robot_pose_function.get()),

@@ -155,7 +155,7 @@ public abstract class NoteArm extends SubsystemBase {
         { // Update the previous inputs
             last_note_end_beam_broke = inputs.note_end_beam_broke;
         }
-        Logger.recordOutput("Color Sensor Proximity MM", color_sensor_proximity_mm);
+        Logger.recordOutput("NoteArm/Color Sensor Proximity MM", color_sensor_proximity_mm);
     }
     }
 

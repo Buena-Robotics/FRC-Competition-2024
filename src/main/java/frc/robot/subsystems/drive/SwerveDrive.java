@@ -134,7 +134,8 @@ public class SwerveDrive extends SubsystemBase {
         navx.periodic();
         var vision_measurements = SubSystems.vision.getAllVisionMeasurements();
         for (TimestampedVisionMeasurement vision_measurement : vision_measurements){
-            if(!DriverStation.isAutonomousEnabled())
+            //Ignore vision measurements during auto and if the Z pos is too high
+            if(!DriverStation.isAutonomousEnabled() && Math.abs(vision_measurement.pose.getZ()) < 0.1)
                 pose_estimator.addVisionMeasurement(vision_measurement.pose.toPose2d(), vision_measurement.timestamp, vision_measurement.std_devs);
             
             Logger.recordOutput("PoseEstimation/VisionMeasurement", vision_measurement.pose);
@@ -190,8 +191,7 @@ public class SwerveDrive extends SubsystemBase {
     }
     private ChassisSpeeds getRobotRelativeSpeeds(){ return kinematics.toChassisSpeeds(getModuleStates()); }
     public void driveRobotVelocity(ChassisSpeeds speeds){ 
-        if(Robot.isReal()) setModuleStates(kinematics.toSwerveModuleStates(speeds.unaryMinus()));
-        else setModuleStates(kinematics.toSwerveModuleStates(speeds));
+        setModuleStates(kinematics.toSwerveModuleStates(speeds.unaryMinus()));
     }
 
     private SwerveDriveWheelPositions getWheelPositions(){ return new SwerveDriveWheelPositions(getModulePositions()); }
