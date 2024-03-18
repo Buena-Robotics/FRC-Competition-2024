@@ -25,12 +25,13 @@ public class LockOnSpeaker extends Command {
     private Rotation2d getDriveRotationSetpoint(){
         final double y = FieldConstants.getSpeakerPoint().getY() - swerve_drive.getPose().getY();
         final double x = FieldConstants.getSpeakerPoint().getX() - swerve_drive.getPose().getX();
-        final Rotation2d setpoint = new Rotation2d(Math.atan2(y, x)).minus(Rotation2d.fromDegrees(10));
+        final Rotation2d setpoint = new Rotation2d(Math.atan2(y, x)).minus(Rotation2d.fromDegrees(5));
         return setpoint;
     }
 
     @Override public void execute() { 
-        climb.runSetpoint(Shooter.estimatedShooterRotation());
+        if(Math.abs(climb.getShooterAngleRotation().minus(Shooter.estimatedShooterRotation()).getDegrees()) > 3)
+            climb.runSetpoint(Shooter.estimatedShooterRotation());
 
         final Rotation2d measurement = swerve_drive.getPose().getRotation();
         final Rotation2d setpoint = getDriveRotationSetpoint();
@@ -46,8 +47,8 @@ public class LockOnSpeaker extends Command {
     @Override public boolean isFinished() {
         final Rotation2d measurement = swerve_drive.getPose().getRotation();
         final Rotation2d setpoint = getDriveRotationSetpoint();
-
-        return Math.abs(climb.getShooterAngleRotation().minus(Shooter.estimatedShooterRotation()).getDegrees()) <= 2
-            && Math.abs(setpoint.minus(measurement).getDegrees()) <= 2;
+        System.out.println(Math.abs(setpoint.minus(measurement).getDegrees()));
+        return Math.abs(climb.getShooterAngleRotation().minus(Shooter.estimatedShooterRotation()).getDegrees()) <= 4
+            && Math.abs(setpoint.minus(measurement).getDegrees()) <= 3.5;
     }
 }

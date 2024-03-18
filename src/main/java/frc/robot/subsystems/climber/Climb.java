@@ -36,7 +36,9 @@ public abstract class Climb extends SubsystemBase {
         DOWN(new Rotation2d(1.57079632679 + 0.101)), 
         SOURCE(new Rotation2d(1.11923695855 + 0.101)), 
         SPEAKER_CLOSE(new Rotation2d(0.67147204082 + 0.101)),
-        SPEAKER_STAGE(new Rotation2d(0.931888672229181)),
+        SPEAKER_STAGE(new Rotation2d(0.931888672229181)),        
+        FAR(new Rotation2d(0.983)),
+
         UP(new Rotation2d());
 
         private Rotation2d rotation;

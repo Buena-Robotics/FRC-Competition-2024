@@ -56,8 +56,9 @@ public abstract class Shooter extends SubsystemBase {
         
         final double distance_to_speaker = shooter_pose.toPose2d().getTranslation().getDistance(FieldConstants.getSpeakerPoint().getTranslation());
 
-        final double bound = (distance_to_speaker - 1.646722) / (3.450181 - 1.646722);
-        final Rotation2d estimated_rotation = Climb.ArmPosition.SPEAKER_CLOSE.getRotation().interpolate(Climb.ArmPosition.SPEAKER_STAGE.getRotation(), bound);  
+        // final double bound = (distance_to_speaker - 1.646722) / (3.450181 - 1.646722);
+        final double bound = (distance_to_speaker - 1.646722) / (4.5 - 1.646722);
+        final Rotation2d estimated_rotation = Climb.ArmPosition.SPEAKER_CLOSE.getRotation().interpolate(Climb.ArmPosition.FAR.getRotation(), bound);  
 
         return estimated_rotation;
     }
