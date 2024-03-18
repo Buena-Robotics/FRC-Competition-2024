@@ -32,7 +32,7 @@ public class NoteVisualizer {
                     final Pose3d shooter_start_pose = new Pose3d(robot_pose_supplier.get()).transformBy(shooter_transform);
                     final Pose3d shooter_end_pose = shooter_start_pose.plus(
                         new Transform3d(
-                            new Translation3d(Units.feetToMeters(26), Units.feetToMeters(7) / 2, -0.5), 
+                            new Translation3d(Units.feetToMeters(26), Units.feetToMeters(7) / 2, -1.45), 
                         new Rotation3d()));
 
                     final double duration = shooter_start_pose.getTranslation().getDistance(shooter_end_pose.getTranslation()) / shot_speed_meters_per_seconds;

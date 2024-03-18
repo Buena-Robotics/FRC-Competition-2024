@@ -54,6 +54,8 @@ public class SwerveModuleSim extends SwerveModule {
 
     @Override public void setDriveVoltage(double volts) {
         drive_applied_volts = MathUtil.clamp(volts, -12.0, 12.0);
+        final double drive_applied_volts_fluc = Math.abs(drive_applied_volts) - drive_feedforward.ks - Math.random();
+        drive_applied_volts = Math.copySign(drive_applied_volts_fluc < 0 ? 0 : drive_applied_volts_fluc, drive_applied_volts); 
         drive_sim.setInputVoltage(drive_applied_volts);
     }
 
