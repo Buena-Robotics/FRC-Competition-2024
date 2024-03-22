@@ -31,7 +31,7 @@ public class LockOnSpeaker extends Command {
 
     @Override public void execute() { 
         if(Math.abs(climb.getShooterAngleRotation().minus(Shooter.estimatedShooterRotation()).getDegrees()) > 3)
-            climb.runSetpoint(Shooter.estimatedShooterRotation());
+            climb.runSetpoint(Shooter.estimatedShooterRotation(), 1.5);
 
         final Rotation2d measurement = swerve_drive.getPose().getRotation();
         final Rotation2d setpoint = getDriveRotationSetpoint();

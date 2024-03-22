@@ -13,8 +13,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.FieldConstants;
 import frc.robot.RobotState;
-import frc.robot.Constants.SubSystems;
-import frc.robot.subsystems.climber.Climb.ArmPosition;
 import frc.robot.subsystems.drive.SwerveDrive;
 
 public class PathFindToClosestPose {
@@ -48,7 +46,7 @@ public class PathFindToClosestPose {
 
     private Command pathFindToClosestPoseCommand(){
         PathConstraints constraints = new PathConstraints(
-                1, 1.0,
+                2, 2.0,
                 Units.degreesToRadians(540), Units.degreesToRadians(720));
         Command pathfindingCommand = AutoBuilder.pathfindToPoseFlipped(
             getClosestPose(robot_pose_function.get()),

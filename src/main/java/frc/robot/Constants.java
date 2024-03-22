@@ -22,6 +22,7 @@ import frc.robot.subsystems.shooter.ShooterReal;
 import frc.robot.subsystems.shooter.ShooterSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.Vision.CameraData;
+import frc.robot.subsystems.vision.VisionCamera.PhotonPipeline;
 import frc.robot.vendor.CXboxController;
 
 public final class Constants {
@@ -43,11 +44,17 @@ public final class Constants {
         public static final SwerveDrive swerve_drive = new SwerveDrive();
         public static final ServoSub servo = new ServoSub();
         public static final Vision vision = new Vision(
-                new CameraData("Microsoft_LifeCam_HD-3000 (1)", new Transform3d(
+                new CameraData("Microsoft_LifeCam_HD-3000 (1) (2)", new Transform3d(
                         Units.inchesToMeters(12.5),
                         Units.inchesToMeters(13),
                         Units.inchesToMeters(18),
-                        new Rotation3d(0,Units.degreesToRadians(-30), Units.degreesToRadians(0))))
+                        new Rotation3d(0,Units.degreesToRadians(-38), Units.degreesToRadians(0))), PhotonPipeline.APRILTAG),
+                new CameraData("USB_Camera", new Transform3d(
+                        Units.inchesToMeters(-6),
+                        Units.inchesToMeters(0),
+                        Units.inchesToMeters(42.5),
+                        new Rotation3d(0,Units.degreesToRadians(40), 0)), PhotonPipeline.NOTE_DETECTION)
                         );
+                        //6inches back
     }
 }

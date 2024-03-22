@@ -46,8 +46,6 @@ public class SwerveModuleSim extends SwerveModule {
         inputs.turn_position_radians = turn_relative_position_radians;
         inputs.turn_velocity_radians_per_second = turn_sim.getAngularVelocityRadPerSec();
         inputs.turn_applied_volts = turn_applied_volts;
-        inputs.turn_current_amps = new double[] {Math.abs(turn_sim.getCurrentDrawAmps())};
-        inputs.turn_temp_celcius = new double[] {};
 
         inputs.sim_module_state = new SwerveModuleState(inputs.drive_velocity_meters_per_second, new Rotation2d(inputs.turn_position_radians));
     }

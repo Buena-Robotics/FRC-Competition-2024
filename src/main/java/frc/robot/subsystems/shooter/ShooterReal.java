@@ -42,18 +42,16 @@ public class ShooterReal extends Shooter {
     }
 
     @Override public void updateInputs(){
+        // inputs.beam_break_connected = holding_note_beam_breaker.; //TODO: CHECK THIS LOL
+
         inputs.shooter_ledge_beam_broke = !shooter_ledge_beam_breaker.get();
         inputs.holding_note_beam_broke = !holding_note_beam_breaker.get();
 
         inputs.feed_velocity_rotations_per_second = feed_encoder.getVelocity();
         inputs.feed_applied_volts = feed_motor.getAppliedOutput() * feed_motor.getBusVoltage();
-        inputs.feed_current_amps = new double[] {feed_motor.getOutputCurrent()};
-        inputs.feed_temp_celcius = new double[] {feed_motor.getMotorTemperature()};
 
         inputs.launch_velocity_rotations_per_second = launch_encoder.getVelocity();
         inputs.launch_applied_volts = launch_motor.getAppliedOutput() * launch_motor.getBusVoltage();
-        inputs.launch_current_amps = new double[] {launch_motor.getOutputCurrent()};
-        inputs.launch_temp_celcius = new double[] {launch_motor.getMotorTemperature()};
     }
     @Override public void setFeedVoltage(double volts){ feed_motor.setVoltage(volts); }
     @Override public void setLaunchVoltage(double volts){ launch_motor.setVoltage(volts); }

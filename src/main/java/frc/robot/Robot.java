@@ -68,6 +68,9 @@ public class Robot extends LoggedRobot {
             enabled_flag = true;
             SubSystems.swerve_drive.postEnableSetup();
         }
+        Logger.recordOutput("System/Mem/Free", Runtime.getRuntime().freeMemory() / 1000 / 1000);
+        Logger.recordOutput("System/Mem/Used", (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000 / 1000);
+        Logger.recordOutput("System/Mem/Total", Runtime.getRuntime().totalMemory() / 1000 / 1000);
     }
 
     @Override public void disabledInit() {

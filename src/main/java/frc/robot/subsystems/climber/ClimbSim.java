@@ -22,8 +22,6 @@ public class ClimbSim extends Climb {
         inputs.winch_rotations = inputs.winch_position_radians / (Math.PI * 2);
         inputs.winch_velocity_rotations_per_second = winch_sim.getAngularVelocityRPM() / 60;
         inputs.winch_applied_volts = winch_applied_volts;
-        inputs.winch_current_amps = new double[] {winch_sim.getCurrentDrawAmps()};
-        inputs.winch_temp_celcius = new double[] {};
         inputs.bore_absolute_position_radians = (inputs.winch_rotations/WINCH_TOTAL_FULL_ROTATIONS) * (Math.PI/2);
     }
     @Override public void setWinchVoltage(double volts) {

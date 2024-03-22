@@ -13,7 +13,7 @@ public class VisionCameraSim extends VisionCameraReal {
     private final PhotonCameraSim photon_camera_sim;
     
     public VisionCameraSim(String photon_camera_name, Transform3d robot_to_camera){
-        super(photon_camera_name, robot_to_camera);
+        super(photon_camera_name, robot_to_camera, PhotonPipeline.APRILTAG);
 
         vision_sim = new VisionSystemSim(photon_camera_name + "_sim");
 

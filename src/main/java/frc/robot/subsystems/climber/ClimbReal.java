@@ -37,6 +37,8 @@ public class ClimbReal extends Climb {
     }
 
     @Override public void updateInputs() {
+        inputs.bore_encoder_connected = bore_encoder.isConnected();
+
         inputs.bore_absolute_position_raw = bore_encoder.getAbsolutePosition();
         inputs.bore_absolute_position_radians = ((41*Math.PI)/20) * (bore_encoder.getAbsolutePosition() - 0.142);
         
@@ -48,8 +50,6 @@ public class ClimbReal extends Climb {
         inputs.winch_rotations = winch_encoder.getPosition();
         inputs.winch_velocity_rotations_per_second = winch_encoder.getVelocity() / 60;
         inputs.winch_applied_volts = winch_motor.getAppliedOutput() * winch_motor.getBusVoltage();
-        inputs.winch_current_amps = new double[] {winch_motor.getOutputCurrent()};
-        inputs.winch_temp_celcius = new double[] {};
     }
     @Override public void setWinchVoltage(double volts) { winch_motor.setVoltage(volts); }
 

@@ -4,11 +4,22 @@
       "open": false
     },
     "transitory": {
-      "Shuffleboard": {
-        ".recording": {
+      "AdvantageKit": {
+        "RealOutputs": {
+          "System": {
+            "Mem": {
+              "open": true
+            },
+            "open": true
+          },
           "open": true
         },
         "open": true
+      },
+      "Shuffleboard": {
+        ".recording": {
+          "open": true
+        }
       },
       "SmartDashboard": {
         "DoubleSolenoid[11,0]": {
@@ -72,6 +83,7 @@
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Auto Choices": "String Chooser",
       "/SmartDashboard/Climb": "Mechanism2d",
+      "/SmartDashboard/Climb/ArmVisualization": "Mechanism2d",
       "/SmartDashboard/Climb/Mechanism": "Mechanism2d",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/Nav-X": "Gyro",

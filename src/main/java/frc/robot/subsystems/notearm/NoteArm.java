@@ -30,10 +30,14 @@ import frc.robot.RobotState;
 import frc.robot.Constants.SubSystems;
 import frc.robot.commands.XStop;
 import frc.robot.subsystems.climber.Climb.ArmPosition;
+import frc.robot.utils.Print;
 import frc.robot.utils.TunableNumber;
 
 public abstract class NoteArm extends SubsystemBase {
     @AutoLog public static class NoteArmInputs {
+        public boolean color_sensor_connected = true;
+        public boolean beam_break_connected = true;
+
         public boolean is_claw_open = true;
         public boolean is_arm_out = false;
         public boolean is_arm_up = false;
@@ -47,8 +51,8 @@ public abstract class NoteArm extends SubsystemBase {
         public int color_sensor_ir_raw = 0;
         public int color_sensor_proximity_raw = 2047;
 
-        public double compressor_applied_volts = 0.0;
-        public double compressor_current_amps = 0.0;
+        // public double compressor_applied_volts = 0.0;
+        // public double compressor_current_amps = 0.0;
     }
 
     private static final TunableNumber note_hue_lower_threshold = new TunableNumber("NoteArm/NoteHueLowerThresh", 10);
@@ -93,12 +97,15 @@ public abstract class NoteArm extends SubsystemBase {
     }
 
     protected void updateInputs(){
+        inputs.color_sensor_connected = color_sensor.isConnected();
+        // inputs.beam_break_connected = note_end_beam_breaker.; //TODO: CHECK THIS LOL
+
         inputs.is_claw_open = claw_solenoid.get() == Value.kForward;
         inputs.is_arm_out = arm_out_solenoid.get() == Value.kForward;
         inputs.is_arm_up = arm_up_solenoid.get() == Value.kForward;
 
-        inputs.compressor_applied_volts = compressor.getAnalogVoltage();
-        inputs.compressor_current_amps = compressor.getCurrent();
+        if(!inputs.color_sensor_connected) Print.error("'Color Sensor' Not Connected [NOTE ARM]");
+        if(!inputs.beam_break_connected) Print.error("'Beam Break' Not Connected [NOTE ARM]");
     }
 
     @Override public void periodic() {

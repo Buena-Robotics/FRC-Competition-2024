@@ -1,6 +1,5 @@
 package frc.robot.subsystems.vision;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.littletonrobotics.junction.AutoLog;
@@ -22,7 +21,6 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.SubSystems;
 import frc.robot.utils.TunableNumber;
 
@@ -45,9 +43,9 @@ public abstract class VisionCamera {
         public final Pose3d pose;
         public final double timestamp;
         public final Matrix<N3, N1> std_devs;
-        public final List<PhotonTrackedTarget> targets;
-        public TimestampedVisionMeasurement(Pose3d pose, double timestamp, Matrix<N3, N1> std_devs, List<PhotonTrackedTarget> targets){ 
-            this.pose = pose; this.timestamp = timestamp; this.std_devs = std_devs; this.targets = targets;
+        // public final List<PhotonTrackedTarget> targets;
+        public TimestampedVisionMeasurement(Pose3d pose, double timestamp, Matrix<N3, N1> std_devs){ 
+            this.pose = pose; this.timestamp = timestamp; this.std_devs = std_devs;
         }
     }
     public static enum PhotonPipeline {
@@ -68,12 +66,12 @@ public abstract class VisionCamera {
         }
     }
 
-    // protected static final TunableNumber cam_pos_x = new TunableNumber("Cam/Pos/X", Units.inchesToMeters(12.5));
-    // protected static final TunableNumber cam_pos_y = new TunableNumber("Cam/Pos/Y", Units.inchesToMeters(13));
-    // protected static final TunableNumber cam_pos_z = new TunableNumber("Cam/Pos/Z", Units.inchesToMeters(18));
-    // protected static final TunableNumber cam_rot_yaw = new TunableNumber("Cam/Rot/Yaw");
-    // protected static final TunableNumber cam_rot_pitch = new TunableNumber("Cam/Rot/Pitch");
-    // protected static final TunableNumber cam_rot_roll = new TunableNumber("Cam/Rot/Roll");
+    protected static final TunableNumber cam_pos_x = new TunableNumber("Cam/Pos/X", Units.inchesToMeters(12.5));
+    protected static final TunableNumber cam_pos_y = new TunableNumber("Cam/Pos/Y", Units.inchesToMeters(13));
+    protected static final TunableNumber cam_pos_z = new TunableNumber("Cam/Pos/Z", Units.inchesToMeters(18));
+    protected static final TunableNumber cam_rot_yaw = new TunableNumber("Cam/Rot/Yaw", 0);
+    protected static final TunableNumber cam_rot_pitch = new TunableNumber("Cam/Rot/Pitch", -38);
+    protected static final TunableNumber cam_rot_roll = new TunableNumber("Cam/Rot/Roll", 0);
 
 
     protected final PhotonCamera photon_camera;
@@ -81,24 +79,25 @@ public abstract class VisionCamera {
     protected VisionCameraInputsAutoLogged inputs = new VisionCameraInputsAutoLogged();
     protected PhotonPipeline pipeline = PhotonPipeline.ARUCRO;
     protected double previous_vision_result_timestamp = 0.0;
-    public VisionCamera(String photon_camera_name, Transform3d robot_to_camera){
+    public VisionCamera(String photon_camera_name, Transform3d robot_to_camera, PhotonPipeline pipeline){
         this.photon_camera = new PhotonCamera(photon_camera_name);
         this.photon_pose_estimator = new PhotonPoseEstimator(field_layout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, photon_camera, robot_to_camera);
         this.photon_pose_estimator.setMultiTagFallbackStrategy(PoseStrategy.AVERAGE_BEST_TARGETS);
         this.photon_pose_estimator.setTagModel(TargetModel.kAprilTag36h11);
+        this.pipeline = pipeline;
     }
     public abstract Optional<TimestampedVisionMeasurement> getVisionMeasurement();
     public abstract Optional<PhotonPipelineResult> getNoteDetection();
-
+    
     public void updateInputs(){
-        inputs.pipeline = PhotonPipeline.APRILTAG;
+        // inputs.pipeline = PhotonPipeline.APRILTAG;
         inputs.driver_mode = false;
         
         final PhotonPipelineResult result = photon_camera.getLatestResult();
         
         inputs.result_timestamp_seconds = result.getTimestampSeconds();
         inputs.result_latency_ms = result.getLatencyMillis();
-
+        
         if(result.hasTargets()){
             final PhotonTrackedTarget result_best = result.getBestTarget();
             inputs.result_best_area = result_best.getArea();
@@ -109,7 +108,17 @@ public abstract class VisionCamera {
             inputs.result_best_fidicual_id = result_best.getFiducialId();
         }
     }
-
+    
+    public boolean isConnected(){
+        return photon_camera.isConnected();
+    }
+    public String getName(){
+        return photon_camera.getName();
+    }
+    public Transform3d getTransform(){
+        return photon_pose_estimator.getRobotToCameraTransform();
+    }
+    
     public void periodic(){
         updateInputs();
         Logger.processInputs("Vision/VisionCamera-" + photon_camera.getName(), inputs);
@@ -123,17 +132,23 @@ public abstract class VisionCamera {
         // ));
     }
 
-    public void setPipeline(int index){ pipeline = PhotonPipeline.fromIndex(index); photon_camera.setPipelineIndex(index); }
-    public void setEnablePipeline(boolean enable){ photon_camera.setDriverMode(!enable); }
+    // public void setPipeline(int index){ pipeline = PhotonPipeline.fromIndex(index); photon_camera.setPipelineIndex(index); }
+    // public void setEnablePipeline(boolean enable){ photon_camera.setDriverMode(!enable); }
     public void setCameraRotation(Rotation3d new_rotation){
         Transform3d current_transform = photon_pose_estimator.getRobotToCameraTransform();
         photon_pose_estimator.setRobotToCameraTransform(new Transform3d(current_transform.getTranslation(), new_rotation));
     }
 
-    public boolean isCameraPipelineDisabled(){ return photon_camera.getDriverMode(); }
-    public PhotonPipeline getPhotonPipeline(){ return pipeline; }
+    // public boolean isCameraPipelineDisabled(){ return photon_camera.getDriverMode(); }
+    // public PhotonPipeline getPhotonPipeline(){ return pipeline; }
     public Pose3d getCameraPoseOnRobot(Pose2d robot_pose){
+        return getCameraPoseOnRobot(robot_pose, false);
+    }
+    public Pose3d getCameraPoseOnRobot(Pose2d robot_pose, boolean inverse){
         Transform3d robot_to_camera = this.photon_pose_estimator.getRobotToCameraTransform();
-        return new Pose3d(robot_pose).plus(robot_to_camera);
+        if(inverse)
+            return new Pose3d(robot_pose).plus(robot_to_camera.inverse());
+        else
+            return new Pose3d(robot_pose).plus(robot_to_camera);
     }
 }

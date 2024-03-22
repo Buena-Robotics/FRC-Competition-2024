@@ -31,8 +31,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -155,6 +157,8 @@ public class RobotContainer { //35x35 inches
     }
 
     public Command getAutonomousCommand() {
+        CommandScheduler.getInstance().clearComposedCommands();
+
         final Command auto_command = auto_chooser.get();
         final boolean use_simple_auto = emptyCommand().getName().equals(auto_command.getName());
 
@@ -165,7 +169,6 @@ public class RobotContainer { //35x35 inches
             else // Red Alliance
                 return simpleAuto(robot_pose.getRotation().plus(Rotation2d.fromDegrees(180)).unaryMinus(), 1000);
         }
-
-        return new WaitCommand(delay_chooser.get()).andThen(auto_command); 
+        return new SequentialCommandGroup(new WaitCommand(delay_chooser.get()), auto_command).until(() -> DriverStation.isTeleop()); 
     }
 }

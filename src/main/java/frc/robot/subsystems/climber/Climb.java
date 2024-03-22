@@ -15,9 +15,12 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SubSystems;
+import frc.robot.utils.Print;
 
 public abstract class Climb extends SubsystemBase {
     @AutoLog public static class ClimbInputs {
+        public boolean bore_encoder_connected = true;
+
         public double bore_absolute_position_raw = 0.0;
         public double bore_absolute_position_radians = 0.0;
 
@@ -29,13 +32,11 @@ public abstract class Climb extends SubsystemBase {
         public double winch_velocity_rotations_per_second = 0.0;
         public double winch_rotations = 0.0;
         public double winch_applied_volts = 0.0;
-        public double[] winch_current_amps = new double[] {};
-        public double[] winch_temp_celcius = new double[] {};
     }
     public enum ArmPosition {
         DOWN(new Rotation2d(1.57079632679 + 0.101)), 
-        SOURCE(new Rotation2d(1.11923695855 + 0.101)), 
-        SPEAKER_CLOSE(new Rotation2d(0.67147204082 + 0.101)),
+        SOURCE(new Rotation2d(1.11923695855 + 0.101)),
+        SPEAKER_CLOSE(new Rotation2d(0.67147204082 + 0.101-0.085)),
         SPEAKER_STAGE(new Rotation2d(0.931888672229181)),        
         FAR(new Rotation2d(0.983)),
 
@@ -74,12 +75,17 @@ public abstract class Climb extends SubsystemBase {
         arm_ligament.setAngle(Units.radiansToDegrees(-inputs.bore_absolute_position_radians));
         
         Logger.recordOutput("Climb/Mecha/Arm Mechanism", arm_mechanism);
+        if(!inputs.bore_encoder_connected) Print.error("'Bore Encoder' Not Connected [Climb]");
     }
 
     public double getShooterAngleRadians(){ return inputs.bore_absolute_position_radians; }
     public Rotation2d getShooterAngleRotation(){ return new Rotation2d(inputs.bore_absolute_position_radians); }
 
     public boolean runSetpoint(Rotation2d setpoint){
+        return runSetpoint(setpoint, 3);
+    }
+
+    public boolean runSetpoint(Rotation2d setpoint, double scalar){
         final Rotation2d measurement = new Rotation2d(inputs.bore_absolute_position_radians);
         
         double voltage = 0.0;
@@ -87,7 +93,7 @@ public abstract class Climb extends SubsystemBase {
             voltage = Math.sqrt(measurement.unaryMinus().plus(setpoint).getDegrees());
         else 
             voltage = -Math.sqrt(measurement.minus(setpoint).getDegrees());
-        voltage = MathUtil.clamp(voltage * 2, -12, 12);
+        voltage = MathUtil.clamp(voltage * scalar, -12, 12);
 
         if(inputs.winch_rotations < 4/64.0 && voltage < 0){
             setWinchVoltage(0);

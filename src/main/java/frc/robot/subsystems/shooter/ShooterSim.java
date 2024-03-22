@@ -16,13 +16,9 @@ public class ShooterSim extends Shooter {
 
         inputs.feed_velocity_rotations_per_second = feed_sim.getAngularVelocityRadPerSec();
         inputs.feed_applied_volts = feed_applied_volts;
-        inputs.feed_current_amps = new double[] {};
-        inputs.feed_temp_celcius = new double[] {};
 
         inputs.launch_velocity_rotations_per_second = launch_sim.getAngularVelocityRadPerSec();
         inputs.launch_applied_volts = launch_applied_volts = 0.0;
-        inputs.launch_current_amps = new double[] {};
-        inputs.launch_temp_celcius = new double[] {};
     }
     @Override public void setFeedVoltage(double volts){ 
         feed_applied_volts = MathUtil.clamp(volts, -12.0, 12.0);

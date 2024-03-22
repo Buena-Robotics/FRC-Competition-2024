@@ -69,8 +69,6 @@ public class SwerveModuleReal extends SwerveModule {
         inputs.turn_position_radians = turn_encoder.getPosition();
         inputs.turn_velocity_radians_per_second = turn_encoder.getVelocity();
         inputs.turn_applied_volts = turn_motor.getAppliedOutput() * turn_motor.getBusVoltage();
-        inputs.turn_current_amps = new double[] {turn_motor.getOutputCurrent()};
-        inputs.turn_temp_celcius = new double[] {turn_motor.getMotorTemperature()};
     }
 
     @Override public void setDriveVoltage(double volts) { drive_motor.setVoltage(volts); }

@@ -74,7 +74,8 @@ public class SwerveDrive extends SubsystemBase {
     private final SwerveDriveOdometry odometer;
     private final SwerveDrivePoseEstimator pose_estimator;
 
-    private Pose2d robot_pose = RobotState.isBlueAlliance() ? new Pose2d(1.567501, 5.380708, Rotation2d.fromDegrees(180)) : new Pose2d(14, 5.380708, new Rotation2d());
+    private Pose2d robot_pose = 
+        RobotState.isRedAlliance() ? new Pose2d(14, 5.380708, new Rotation2d()) : new Pose2d(1.567501, 5.380708, Rotation2d.fromDegrees(180));
     // private Pose2d robot_pose = new Pose2d(0.77, 6.58, Rotation2d.fromDegrees(-117.90));
 
     private final SysIdRoutine sysId;
@@ -84,7 +85,10 @@ public class SwerveDrive extends SubsystemBase {
         for(int i = 0; i < 4; i++)
             if(Robot.isReal()) modules[i] = new SwerveModuleReal(module_names[i], i*2 + 1, i*2 + 2, i, abs_encoder_offsets[i]);
             else modules[i] = new SwerveModuleSim(module_names[i], i);
-        
+        for(int i = 0; i < 4; i++) {
+            modules[i].setDriveBrakeMode(false);
+            modules[i].setTurnBrakeMode(false);
+        }
         odometer = new SwerveDriveOdometry(kinematics, navx.getRotation2d(), getModulePositions(), robot_pose);
         pose_estimator = new SwerveDrivePoseEstimator(kinematics, navx.getRotation2d(),
             getModulePositions(),  
@@ -127,18 +131,24 @@ public class SwerveDrive extends SubsystemBase {
                     this));
 
         Logger.recordOutput("PoseEstimation/VisionMeasurement", new Pose3d());
+        Logger.recordOutput("PoseEstimation/VisionMeasurement2D", new Pose2d());
     }
 
     @Override public void periodic(){
+        for(int i = 0; i < 4; i++) if(DriverStation.isEnabled()) {
+            modules[i].setDriveBrakeMode(true);
+            modules[i].setTurnBrakeMode(true);
+        }
         for (var module : modules) module.periodic();
         navx.periodic();
         var vision_measurements = SubSystems.vision.getAllVisionMeasurements();
         for (TimestampedVisionMeasurement vision_measurement : vision_measurements){
             //Ignore vision measurements during auto and if the Z pos is too high
-            if(!DriverStation.isAutonomousEnabled() && Math.abs(vision_measurement.pose.getZ()) < 0.1)
+            if(!DriverStation.isAutonomousEnabled() && Math.abs(vision_measurement.pose.getZ()) < 0.25)
                 pose_estimator.addVisionMeasurement(vision_measurement.pose.toPose2d(), vision_measurement.timestamp, vision_measurement.std_devs);
             
             Logger.recordOutput("PoseEstimation/VisionMeasurement", vision_measurement.pose);
+            Logger.recordOutput("PoseEstimation/VisionMeasurement2D", vision_measurement.pose.toPose2d());
             Logger.recordOutput("Vision/StdDevs-X", vision_measurement.std_devs.get(0, 0));
             Logger.recordOutput("Vision/StdDevs-Y", vision_measurement.std_devs.get(1, 0));
             Logger.recordOutput("Vision/StdDevs-Theta", vision_measurement.std_devs.get(2, 0));
@@ -165,8 +175,10 @@ public class SwerveDrive extends SubsystemBase {
         Logger.recordOutput("PoseEstimation/NavX-Displacement", navx.getPose3d());
         Logger.recordOutput("PoseEstimation/NavX-Odometer", navx.getEstimatedPose());
         Logger.recordOutput("PoseEstimation/FullPoseEstimator", robot_pose);
-        // Logger.recordOutput("DriverCamPose", 
-            // new Pose3d(robot_pose).plus(SubSystems.vision.getCamera("DriverCam").getTransform()));
+        // Logger.recordOutput("Vision/LifeCam/Pose", 
+            // SubSystems.vision.getCamera("Microsoft_LifeCam_HD-3000 (1)").getCameraPoseOnRobot(robot_pose));
+        // Logger.recordOutput("Vision/USB-Camera/Pose", 
+            // SubSystems.vision.getCamera("USB-Camera").getCameraPoseOnRobot(robot_pose));
     }
 
     public Command sysIdQuasistatic(SysIdRoutine.Direction direction) { return sysId.quasistatic(direction); }

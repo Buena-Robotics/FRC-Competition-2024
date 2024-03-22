@@ -15,21 +15,24 @@ import frc.robot.Constants.SubSystems;
 import frc.robot.FieldConstants;
 import frc.robot.RobotState;
 import frc.robot.subsystems.climber.Climb;
+import frc.robot.utils.Print;
 
 public abstract class Shooter extends SubsystemBase {
     @AutoLog public static class ShooterInputs {
+        public boolean beam_break_connected = true;
+
         public boolean shooter_ledge_beam_broke = false;
         public boolean holding_note_beam_broke = false;
 
         public double feed_velocity_rotations_per_second = 0.0;
         public double feed_applied_volts = 0.0;
-        public double[] feed_current_amps = new double[] {};
-        public double[] feed_temp_celcius = new double[] {};
+        // public double[] feed_current_amps = new double[] {};
+        // public double[] feed_temp_celcius = new double[] {};
 
         public double launch_velocity_rotations_per_second = 0.0;
         public double launch_applied_volts = 0.0;
-        public double[] launch_current_amps = new double[] {};
-        public double[] launch_temp_celcius = new double[] {};
+        // public double[] launch_current_amps = new double[] {};
+        // public double[] launch_temp_celcius = new double[] {};
     }
 
     public static final double LAUNCH_SPEED_MAX = 1;
@@ -47,6 +50,8 @@ public abstract class Shooter extends SubsystemBase {
     @Override public void periodic(){
         updateInputs();
         Logger.processInputs("Shooter", inputs);
+
+        if(!inputs.beam_break_connected) Print.error("'Beam Break' Not Connected [Shooter]");
     }
 
     public static Rotation2d estimatedShooterRotation(){

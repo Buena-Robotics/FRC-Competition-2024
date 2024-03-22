@@ -21,12 +21,7 @@ public class NavXSim extends NavX {
     @Override public void updateInputs() {
         updateSim();
         inputs.calibrating = false;
-        inputs.moving = !sim_odometry.getTranslation().equals(last_sim_odometry.getTranslation());
-        inputs.rotating = !sim_odometry.getRotation().equals(last_sim_odometry.getRotation());
 
-        inputs.timestamp = (long)(Timer.getFPGATimestamp() * 100);
-        inputs.angle_adjustment = super.getAngleAdjustment();
-        inputs.temperature_celcius = 0.0;
         inputs.angle = sim_odometry.getRotation();
         inputs.roll_radians = 0.0;
         inputs.pitch_radians = 0.0;

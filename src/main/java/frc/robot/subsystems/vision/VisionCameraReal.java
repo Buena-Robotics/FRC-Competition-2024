@@ -17,8 +17,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.SubSystems;
 
 public class VisionCameraReal extends VisionCamera {
-    public VisionCameraReal(String photon_camera_name, Transform3d robot_to_camera){
-        super(photon_camera_name, robot_to_camera);
+    public VisionCameraReal(String photon_camera_name, Transform3d robot_to_camera, PhotonPipeline pipeline){
+        super(photon_camera_name, robot_to_camera, pipeline);
     }
 
     private Matrix<N3, N1> getEstimationStdDevs(Pose2d estimated_pose) {
@@ -57,7 +57,7 @@ public class VisionCameraReal extends VisionCamera {
     }
 
     @Override public Optional<TimestampedVisionMeasurement> getVisionMeasurement(){
-        // if(pipeline != PhotonPipeline.APRILTAG || pipeline != PhotonPipeline.ARUCRO) return Optional.empty();
+        if(pipeline != PhotonPipeline.APRILTAG) return Optional.empty();
         if(!photon_camera.isConnected()) return Optional.empty();
         // if(isCameraPipelineDisabled()) return Optional.empty();
         
@@ -71,14 +71,13 @@ public class VisionCameraReal extends VisionCamera {
             return Optional.of(new TimestampedVisionMeasurement(
                 estimated_pose.estimatedPose, 
                 estimated_pose.timestampSeconds,
-                getEstimationStdDevs(estimated_pose.estimatedPose.toPose2d()),
-                estimated_pose.targetsUsed ));
+                getEstimationStdDevs(estimated_pose.estimatedPose.toPose2d())));
         }
     }
     @Override public Optional<PhotonPipelineResult> getNoteDetection() {
         if(pipeline != PhotonPipeline.NOTE_DETECTION) return Optional.empty();
         if(!photon_camera.isConnected()) return Optional.empty();
-        if(isCameraPipelineDisabled()) return Optional.empty();
+        // if(isCameraPipelineDisabled()) return Optional.empty();
 
         if(!photon_camera.getLatestResult().hasTargets()) return Optional.empty();
 

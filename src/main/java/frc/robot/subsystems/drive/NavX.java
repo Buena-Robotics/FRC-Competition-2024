@@ -17,12 +17,12 @@ import edu.wpi.first.wpilibj.Timer;
 public abstract class NavX extends AHRS {
     @AutoLog public static class NavXInputs {
         public boolean calibrating = false;
-        public boolean moving = false;
-        public boolean rotating = false;
+        // public boolean moving = false;
+        // public boolean rotating = false;
 
-        public long timestamp = 0;
-        public double angle_adjustment = 0.0;
-        public double temperature_celcius = 0.0;
+        // public long timestamp = 0;
+        // public double angle_adjustment = 0.0;
+        // public double temperature_celcius = 0.0;
 
         public Rotation2d angle = new Rotation2d();
         public double angle_rate = 0.0;
@@ -38,27 +38,27 @@ public abstract class NavX extends AHRS {
         public double displacement_y = 0.0;
         public double displacement_z = 0.0;
 
-        public double update_count = 0.0;
-        public int acceleration_full_scale_range_g = 0;
-        public int get_gyro_full_scale_range_dps = 0;
-        public float compass_heading = 0.0f;
-        public float fused_heading = 0.0f;
+        // public double update_count = 0.0;
+        // public int acceleration_full_scale_range_g = 0;
+        // public int get_gyro_full_scale_range_dps = 0;
+        // public float compass_heading = 0.0f;
+        // public float fused_heading = 0.0f;
 
-        public float raw_acceleration_x = 0.0f;
-        public float raw_acceleration_y = 0.0f;
-        public float raw_acceleration_z = 0.0f;
+        // public float raw_acceleration_x = 0.0f;
+        // public float raw_acceleration_y = 0.0f;
+        // public float raw_acceleration_z = 0.0f;
 
-        public float raw_gyro_x = 0.0f;
-        public float raw_gyro_y = 0.0f;
-        public float raw_gyro_z = 0.0f;
+        // public float raw_gyro_x = 0.0f;
+        // public float raw_gyro_y = 0.0f;
+        // public float raw_gyro_z = 0.0f;
         
-        public float raw_mag_x = 0.0f;
-        public float raw_mag_y = 0.0f;
-        public float raw_mag_z = 0.0f;
+        // public float raw_mag_x = 0.0f;
+        // public float raw_mag_y = 0.0f;
+        // public float raw_mag_z = 0.0f;
 
-        public float world_linear_acceleration_x = 0.0f;
-        public float world_linear_acceleration_y = 0.0f;
-        public float world_linear_acceleration_z = 0.0f;
+        // public float world_linear_acceleration_x = 0.0f;
+        // public float world_linear_acceleration_y = 0.0f;
+        // public float world_linear_acceleration_z = 0.0f;
     }
 
     private Pose2d estimated_pose = new Pose2d();

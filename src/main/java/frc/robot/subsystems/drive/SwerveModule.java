@@ -27,8 +27,8 @@ public abstract class SwerveModule {
         public double turn_position_radians = 0.0;
         public double turn_velocity_radians_per_second = 0.0;
         public double turn_applied_volts = 0.0;
-        public double[] turn_current_amps = new double[] {};
-        public double[] turn_temp_celcius = new double[] {};
+        // public double[] turn_current_amps = new double[] {};
+        // public double[] turn_temp_celcius = new double[] {};
 
         public SwerveModuleState sim_module_state = new SwerveModuleState();
     }
