@@ -2,6 +2,8 @@ package frc.robot.subsystems.vision;
 
 import java.util.Optional;
 
+import frc.robot.utils.ULogger;
+
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;
@@ -122,7 +124,7 @@ public abstract class VisionCamera {
     public void periodic(){
         updateInputs();
         Logger.processInputs("Vision/VisionCamera-" + photon_camera.getName(), inputs);
-        Logger.recordOutput("Vision/VisionCamera-" + photon_camera.getName() + "/CameraPose", getCameraPoseOnRobot(SubSystems.swerve_drive.getPose()));
+        ULogger.recordOutput("Vision/VisionCamera-" + photon_camera.getName() + "/CameraPose", getCameraPoseOnRobot(SubSystems.swerve_drive.getPose()));
         // this.photon_pose_estimator.setRobotToCameraTransform(new Transform3d(
         //     cam_pos_x.get(), cam_pos_x.get(), cam_pos_z.get(), 
         //     new Rotation3d(

@@ -1,5 +1,7 @@
 package frc.robot.subsystems.drive;
 
+import frc.robot.utils.ULogger;
+
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -85,7 +87,7 @@ public abstract class NavX extends AHRS {
         Logger.processInputs("Drive/NavX", inputs);
         
         updateDeltaTime();
-        Logger.recordOutput("NavX/EstimatedPose", updatePose());
+        ULogger.recordOutput("NavX/EstimatedPose", updatePose());
     }
 
     private void updateDeltaTime(){

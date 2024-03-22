@@ -1,5 +1,7 @@
 package frc.robot.subsystems.notearm;
 
+import frc.robot.utils.ULogger;
+
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -113,7 +115,7 @@ public abstract class NoteArm extends SubsystemBase {
         Logger.processInputs("NoteArm", inputs);
 
         color_sensor_mechanism.setBackgroundColor(new Color8Bit(getColor()));
-        Logger.recordOutput("NoteArm/ColorSensorMechanism", color_sensor_mechanism);
+        ULogger.recordOutput("NoteArm/ColorSensorMechanism", color_sensor_mechanism);
 
     }
 
@@ -162,7 +164,7 @@ public abstract class NoteArm extends SubsystemBase {
         { // Update the previous inputs
             last_note_end_beam_broke = inputs.note_end_beam_broke;
         }
-        Logger.recordOutput("NoteArm/Color Sensor Proximity MM", color_sensor_proximity_mm);
+        ULogger.recordOutput("NoteArm/Color Sensor Proximity MM", color_sensor_proximity_mm);
     }
     }
 

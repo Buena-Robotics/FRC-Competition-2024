@@ -3,6 +3,7 @@ package frc.robot.utils;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import frc.robot.utils.ULogger;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -49,7 +50,7 @@ public class NoteVisualizer {
                         .until(() -> timer.hasElapsed(duration))
                         .finallyDo(
                             () -> {
-                                Logger.recordOutput("Shooter/NoteVisualizer", new Pose3d[] {});
+                                ULogger.recordOutput("Shooter/NoteVisualizer", new Pose3d[] {});
                             });
                     },
                     Set.of())

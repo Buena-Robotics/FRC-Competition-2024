@@ -11,7 +11,6 @@ import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
-import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
@@ -24,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.utils.LocalADStarAK;
 import frc.robot.utils.Print;
+import frc.robot.utils.ULogger;
 
 public class Robot extends LoggedRobot {
     private RobotContainer robot_container;
@@ -39,12 +39,12 @@ public class Robot extends LoggedRobot {
         switch (RobotConfig.getRobotMode()) {
         case REAL:
             Logger.addDataReceiver(new WPILOGWriter("/media/sda1/"));
-            Logger.addDataReceiver(new NT4Publisher());
+            // Logger.addDataReceiver(new NT4Publisher());
             break;
         case SIM: 
             if(RobotConfig.LOG_SIMULATION_TO_FILE)
                 Logger.addDataReceiver(new WPILOGWriter("/AdvantageKit-ReplayLogs/Simulation/"));
-            Logger.addDataReceiver(new NT4Publisher());
+            // Logger.addDataReceiver(new NT4Publisher());
             break;
         case REPLAY:
             setUseTiming(false);
@@ -63,14 +63,15 @@ public class Robot extends LoggedRobot {
 
     @Override public void robotPeriodic() {
         CommandScheduler.getInstance().run();
+        ULogger.periodic();
         if(DriverStation.isDisabled()) enabled_flag = false;
         if(!enabled_flag && DriverStation.isEnabled()){
             enabled_flag = true;
             SubSystems.swerve_drive.postEnableSetup();
         }
-        Logger.recordOutput("System/Mem/Free", Runtime.getRuntime().freeMemory() / 1000 / 1000);
-        Logger.recordOutput("System/Mem/Used", (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000 / 1000);
-        Logger.recordOutput("System/Mem/Total", Runtime.getRuntime().totalMemory() / 1000 / 1000);
+        ULogger.recordOutput("System/Mem/Free", Runtime.getRuntime().freeMemory() / 1000 / 1000);
+        ULogger.recordOutput("System/Mem/Used", (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000 / 1000);
+        ULogger.recordOutput("System/Mem/Total", Runtime.getRuntime().totalMemory() / 1000 / 1000);
     }
 
     @Override public void disabledInit() {

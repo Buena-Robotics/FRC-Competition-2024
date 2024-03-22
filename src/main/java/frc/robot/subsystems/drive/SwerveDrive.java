@@ -1,6 +1,6 @@
 package frc.robot.subsystems.drive;
 
-import org.littletonrobotics.junction.Logger;
+import frc.robot.utils.ULogger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -121,7 +121,7 @@ public class SwerveDrive extends SubsystemBase {
             new SysIdRoutine(
                 new SysIdRoutine.Config(
                     null, null, null,
-                    (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
+                    (state) -> ULogger.recordOutput("Drive/SysIdState", state.toString())),
                 new SysIdRoutine.Mechanism(
                     (voltage) -> {
                     for (int i = 0; i < 4; i++) {
@@ -130,8 +130,8 @@ public class SwerveDrive extends SubsystemBase {
                     }, null,
                     this));
 
-        Logger.recordOutput("PoseEstimation/VisionMeasurement", new Pose3d());
-        Logger.recordOutput("PoseEstimation/VisionMeasurement2D", new Pose2d());
+        ULogger.recordOutput("PoseEstimation/VisionMeasurement", new Pose3d());
+        ULogger.recordOutput("PoseEstimation/VisionMeasurement2D", new Pose2d());
     }
 
     @Override public void periodic(){
@@ -147,11 +147,11 @@ public class SwerveDrive extends SubsystemBase {
             if(!DriverStation.isAutonomousEnabled() && Math.abs(vision_measurement.pose.getZ()) < 0.25)
                 pose_estimator.addVisionMeasurement(vision_measurement.pose.toPose2d(), vision_measurement.timestamp, vision_measurement.std_devs);
             
-            Logger.recordOutput("PoseEstimation/VisionMeasurement", vision_measurement.pose);
-            Logger.recordOutput("PoseEstimation/VisionMeasurement2D", vision_measurement.pose.toPose2d());
-            Logger.recordOutput("Vision/StdDevs-X", vision_measurement.std_devs.get(0, 0));
-            Logger.recordOutput("Vision/StdDevs-Y", vision_measurement.std_devs.get(1, 0));
-            Logger.recordOutput("Vision/StdDevs-Theta", vision_measurement.std_devs.get(2, 0));
+            ULogger.recordOutput("PoseEstimation/VisionMeasurement", vision_measurement.pose);
+            ULogger.recordOutput("PoseEstimation/VisionMeasurement2D", vision_measurement.pose.toPose2d());
+            ULogger.recordOutput("Vision/StdDevs-X", vision_measurement.std_devs.get(0, 0));
+            ULogger.recordOutput("Vision/StdDevs-Y", vision_measurement.std_devs.get(1, 0));
+            ULogger.recordOutput("Vision/StdDevs-Theta", vision_measurement.std_devs.get(2, 0));
         }
         odometer.update(getRotation2d(), getWheelPositions());
         pose_estimator.update(getRotation2d(), getWheelPositions());
@@ -168,17 +168,13 @@ public class SwerveDrive extends SubsystemBase {
         
         FieldVisualizer.getField().getObject("Cameras").setPose(SubSystems.vision.getAllCameras().get(0).getCameraPoseOnRobot(robot_pose).toPose2d());
 
-        Logger.recordOutput("Drive/Modules/States/Actual", getModuleStates());
-        Logger.recordOutput("Drive/Modules/States/Sim", getSimModuleStates());
-        Logger.recordOutput("Drive/Modules/Positions", getModulePositions());
-        Logger.recordOutput("PoseEstimation/Odometer", odometer.getPoseMeters());
-        Logger.recordOutput("PoseEstimation/NavX-Displacement", navx.getPose3d());
-        Logger.recordOutput("PoseEstimation/NavX-Odometer", navx.getEstimatedPose());
-        Logger.recordOutput("PoseEstimation/FullPoseEstimator", robot_pose);
-        // Logger.recordOutput("Vision/LifeCam/Pose", 
-            // SubSystems.vision.getCamera("Microsoft_LifeCam_HD-3000 (1)").getCameraPoseOnRobot(robot_pose));
-        // Logger.recordOutput("Vision/USB-Camera/Pose", 
-            // SubSystems.vision.getCamera("USB-Camera").getCameraPoseOnRobot(robot_pose));
+        ULogger.recordOutput("Drive/Modules/States/Actual", getModuleStates());
+        ULogger.recordOutput("Drive/Modules/States/Sim", getSimModuleStates());
+        ULogger.recordOutput("Drive/Modules/Positions", getModulePositions());
+        ULogger.recordOutput("PoseEstimation/Odometer", odometer.getPoseMeters());
+        ULogger.recordOutput("PoseEstimation/NavX-Displacement", navx.getPose3d());
+        ULogger.recordOutput("PoseEstimation/NavX-Odometer", navx.getEstimatedPose());
+        ULogger.recordOutput("PoseEstimation/FullPoseEstimator", robot_pose);
     }
 
     public Command sysIdQuasistatic(SysIdRoutine.Direction direction) { return sysId.quasistatic(direction); }
@@ -240,7 +236,7 @@ public class SwerveDrive extends SubsystemBase {
         SwerveModuleState[] optimized_states = new SwerveModuleState[4];
         for(int i = 0; i < 4; i++) optimized_states[i] = modules[i].runSetpoint(desired_states[i]);
 
-        Logger.recordOutput("Drive/Modules/States/Desired", desired_states);
-        Logger.recordOutput("Drive/Modules/States/DesiredOptimized", optimized_states);
+        ULogger.recordOutput("Drive/Modules/States/Desired", desired_states);
+        ULogger.recordOutput("Drive/Modules/States/DesiredOptimized", optimized_states);
     }
 }

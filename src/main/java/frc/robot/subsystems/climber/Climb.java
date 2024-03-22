@@ -1,5 +1,7 @@
 package frc.robot.subsystems.climber;
 
+import frc.robot.utils.ULogger;
+
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLog;
@@ -74,7 +76,7 @@ public abstract class Climb extends SubsystemBase {
 
         arm_ligament.setAngle(Units.radiansToDegrees(-inputs.bore_absolute_position_radians));
         
-        Logger.recordOutput("Climb/Mecha/Arm Mechanism", arm_mechanism);
+        ULogger.recordOutput("Climb/Mecha/Arm Mechanism", arm_mechanism);
         if(!inputs.bore_encoder_connected) Print.error("'Bore Encoder' Not Connected [Climb]");
     }
 
@@ -138,19 +140,19 @@ public abstract class Climb extends SubsystemBase {
             { addRequirements(SubSystems.climb); }
 
             @Override public void initialize() {
-                Logger.recordOutput("Climb/Preset/Setpoint", setpoint);
+                ULogger.recordOutput("Climb/Preset/Setpoint", setpoint);
                 addRequirements(SubSystems.climb);
             }
 
             @Override public void execute() {
                 setpoint_good = runSetpoint(setpoint);
                 this.measurement = new Rotation2d(inputs.bore_absolute_position_radians);
-                Logger.recordOutput("Climb/Preset/Measurement", measurement);
+                ULogger.recordOutput("Climb/Preset/Measurement", measurement);
             }
             @Override public void end(boolean interrupted) { 
                 setWinchVoltage(0);
-                Logger.recordOutput("Climb/Preset/Setpoint", new Rotation2d(-1.0));
-                Logger.recordOutput("Climb/Preset/Measurement", new Rotation2d(-1.0));
+                ULogger.recordOutput("Climb/Preset/Setpoint", new Rotation2d(-1.0));
+                ULogger.recordOutput("Climb/Preset/Measurement", new Rotation2d(-1.0));
             }
             @Override public boolean isFinished() {
                 return Math.abs(setpoint.minus(measurement).getDegrees()) < 2 || !setpoint_good;

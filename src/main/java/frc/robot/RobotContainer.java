@@ -18,7 +18,8 @@ import frc.robot.subsystems.climber.Climb.ArmPosition;
 import frc.robot.utils.FieldVisualizer;
 import frc.robot.utils.NoteVisualizer;
 
-import org.littletonrobotics.junction.Logger;
+import frc.robot.utils.ULogger;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
@@ -55,12 +56,12 @@ public class RobotContainer { //35x35 inches
         }
 
         { // PathPlanner Logging
-            PathPlannerLogging.setLogCurrentPoseCallback((pose) -> { Logger.recordOutput("PathPlanner/RobotPose", pose); });
-            PathPlannerLogging.setLogTargetPoseCallback((pose) -> { Logger.recordOutput("PathPlanner/TargetPose", pose); });
+            PathPlannerLogging.setLogCurrentPoseCallback((pose) -> { ULogger.recordOutput("PathPlanner/RobotPose", pose); });
+            PathPlannerLogging.setLogTargetPoseCallback((pose) -> { ULogger.recordOutput("PathPlanner/TargetPose", pose); });
             PathPlannerLogging.setLogActivePathCallback((poses) -> {
                 Pose2d[] target_path;
                 target_path = poses.toArray(new Pose2d[poses.size()]);
-                Logger.recordOutput("PathPlanner/TargetPath", target_path);
+                ULogger.recordOutput("PathPlanner/TargetPath", target_path);
                 FieldVisualizer.getField().getObject("Trajectory").setPoses(poses);
             });
         }

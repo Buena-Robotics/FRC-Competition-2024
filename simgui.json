@@ -20,6 +20,9 @@
   },
   "NTProvider": {
     "types": {
+      "/AdvantageKit": "Mechanism2d",
+      "/AdvantageKit/Climb/Mecha/Arm Mechanism": "Mechanism2d",
+      "/AdvantageKit/NoteArm/ColorSensorMechanism": "Mechanism2d",
       "/AdvantageKit/RealOutputs/Climb/Mecha/Arm Mechanism": "Mechanism2d",
       "/AdvantageKit/RealOutputs/Climb/Mecha/Arm Visualization": "Mechanism2d",
       "/AdvantageKit/RealOutputs/Climb/Mecha/Winch Mechansim": "Mechanism2d",

@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.littletonrobotics.junction.Logger;
+import frc.robot.utils.ULogger;
+
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -97,8 +98,8 @@ public class Vision extends SubsystemBase {
                 note_poses2d.add(current_pose.toPose2d());
             }
         }
-        Logger.recordOutput("Vision/Note Poses", note_poses.toArray(new Pose3d[note_poses.size()]) );
-        Logger.recordOutput("Vision/Note Poses2d", note_poses2d.toArray(new Pose2d[note_poses2d.size()]) );
+        ULogger.recordOutput("Vision/Note Poses", note_poses.toArray(new Pose3d[note_poses.size()]) );
+        ULogger.recordOutput("Vision/Note Poses2d", note_poses2d.toArray(new Pose2d[note_poses2d.size()]) );
 
         return note_poses;
     }
