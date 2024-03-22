@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.FieldConstants;
 import frc.robot.subsystems.drive.SwerveDrive;
 import frc.robot.utils.TunableNumber;
@@ -59,8 +60,8 @@ public class SwerveJoystick extends Command {
 
         // Calcaulate new linear velocity
         Translation2d linear_velocity =
-            new Pose2d(new Translation2d(), linear_direction)
-                .transformBy(new Transform2d(linear_magnitude, 0.0, new Rotation2d()))
+            new Pose2d(Constants.Empty.TRANSL2D_ZERO, linear_direction)
+                .transformBy(new Transform2d(linear_magnitude, 0.0, Constants.Empty.R2D_ZERO))
                 .getTranslation();
 
         double x_speed = linear_velocity.getX(),

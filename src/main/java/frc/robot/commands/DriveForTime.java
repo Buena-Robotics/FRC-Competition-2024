@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.drive.SwerveDrive;
 import frc.robot.utils.TimerUtil;
 
@@ -30,8 +31,8 @@ public class DriveForTime extends Command {
     @Override public void initialize() { timer.reset(); }
     @Override public void execute() {
         final Translation2d linear_velocity =
-            new Pose2d(new Translation2d(), direction)
-                .transformBy(new Transform2d(Units.feetToMeters(6), 0.0, new Rotation2d()))
+            new Pose2d(Constants.Empty.TRANSL2D_ZERO, direction)
+                .transformBy(new Transform2d(Units.feetToMeters(6), 0.0, Constants.Empty.R2D_ZERO))
                 .getTranslation();
         
         final ChassisSpeeds chassis_speeds = new ChassisSpeeds(linear_velocity.getX(), linear_velocity.getY(), 0);
