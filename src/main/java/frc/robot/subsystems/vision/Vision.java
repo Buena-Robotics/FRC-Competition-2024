@@ -21,7 +21,6 @@ import frc.robot.subsystems.vision.VisionCamera.PhotonPipeline;
 import frc.robot.subsystems.vision.VisionCamera.TimestampedVisionMeasurement;
 import frc.robot.utils.FieldVisualizer;
 import frc.robot.utils.Print;
-import frc.robot.utils.TunableNumber;
 
 public class Vision extends SubsystemBase {
     public static class CameraData {
