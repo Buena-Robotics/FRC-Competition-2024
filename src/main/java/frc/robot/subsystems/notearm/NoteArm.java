@@ -239,7 +239,9 @@ public abstract class NoteArm extends SubsystemBase {
                     new WaitCommand(0.50),
                     pullArmDownCommand(),
                     new WaitCommand(0.05),
-                    pushArmOutCommand()
+                    pushArmOutCommand(),
+                    new WaitCommand(0.5),
+                    releaseNoteCommand()
                 );
     }
 }

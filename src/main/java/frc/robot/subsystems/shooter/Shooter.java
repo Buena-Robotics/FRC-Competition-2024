@@ -13,9 +13,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SubSystems;
 import frc.robot.FieldConstants;
-import frc.robot.RobotState;
 import frc.robot.subsystems.climber.Climb;
 import frc.robot.utils.Print;
+import frc.robot.utils.ULogger;
 
 public abstract class Shooter extends SubsystemBase {
     @AutoLog public static class ShooterInputs {
@@ -51,6 +51,9 @@ public abstract class Shooter extends SubsystemBase {
         updateInputs();
         Logger.processInputs("Shooter", inputs);
 
+        ULogger.recordOutput("Shooter/FeedSpeed", inputs.feed_velocity_rotations_per_second);
+        ULogger.recordOutput("Shooter/LaunchSpeed", inputs.launch_velocity_rotations_per_second);
+
         if(!inputs.beam_break_connected) Print.error("'Beam Break' Not Connected [Shooter]");
     }
 
@@ -61,9 +64,9 @@ public abstract class Shooter extends SubsystemBase {
         
         final double distance_to_speaker = shooter_pose.toPose2d().getTranslation().getDistance(FieldConstants.getSpeakerPoint().getTranslation());
 
-        // final double bound = (distance_to_speaker - 1.646722) / (3.450181 - 1.646722);
-        final double bound = (distance_to_speaker - 1.646722) / (4.5 - 1.646722);
-        final Rotation2d estimated_rotation = Climb.ArmPosition.SPEAKER_CLOSE.getRotation().interpolate(Climb.ArmPosition.FAR.getRotation(), bound);  
+        final double bound = (distance_to_speaker - 1.646722) / (3.450181 - 1.646722);
+        // final double bound = (distance_to_speaker - 1.646722) / (4.5 - 1.646722);
+        final Rotation2d estimated_rotation = Climb.ArmPosition.SPEAKER_CLOSE.getRotation().interpolate(Climb.ArmPosition.SPEAKER_STAGE.getRotation(), bound);  
 
         return estimated_rotation;
     }
@@ -72,10 +75,10 @@ public abstract class Shooter extends SubsystemBase {
 
     public Command intakeCommand() {
         return this.startEnd(() -> {
-            if(!RobotState.armHasNote()){
-                setFeedVoltage(INTAKE_FEED_SPEED * 12);
-                setLaunchVoltage(INTAKE_LAUNCH_SPEED * 12);
-            }
+            // if(!RobotState.armHasNote()){
+                setFeedVoltage(-0.5 * 12);
+                setLaunchVoltage(-0.5 * 12);
+            // }
         }, () -> { stop(); });
     }
 

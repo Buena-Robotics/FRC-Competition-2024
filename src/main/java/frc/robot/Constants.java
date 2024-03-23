@@ -6,7 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -25,7 +24,6 @@ import frc.robot.subsystems.shooter.ShooterSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.Vision.CameraData;
 import frc.robot.subsystems.vision.VisionCamera.PhotonPipeline;
-import frc.robot.utils.LocalADStarAK;
 import frc.robot.vendor.CXboxController;
 
 public final class Constants {

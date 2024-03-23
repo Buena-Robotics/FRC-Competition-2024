@@ -14,8 +14,8 @@ public class ShooterReal extends Shooter {
     
     private static final int FEED_MOTOR_ID = 10;
     private static final int LAUNCH_MOTOR_ID = 9;
-    private static final int FEED_SMART_CURRENT_LIMIT = 80; 
-    private static final int LAUNCH_SMART_CURRENT_LIMIT = 80;
+    private static final int FEED_SMART_CURRENT_LIMIT = 60; 
+    private static final int LAUNCH_SMART_CURRENT_LIMIT = 60;
 
     private final DigitalInput shooter_ledge_beam_breaker = new DigitalInput(SHOOTER_LEDGE_BREAKER_ID);
     private final DigitalInput holding_note_beam_breaker = new DigitalInput(HOLDING_NOTE_BREAKER_ID);

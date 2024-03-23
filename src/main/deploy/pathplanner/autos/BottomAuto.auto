@@ -8,13 +8,13 @@
         {
           "type": "named",
           "data": {
-            "name": "aim_launch_note"
+            "name": "launch_note"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "DownToSourceGrab"
+            "pathName": "BottomNote"
           }
         }
       ]

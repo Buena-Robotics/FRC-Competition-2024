@@ -22,7 +22,6 @@ import frc.robot.Constants.SubSystems;
 import frc.robot.subsystems.vision.VisionCamera.PhotonPipeline;
 import frc.robot.subsystems.vision.VisionCamera.TimestampedVisionMeasurement;
 import frc.robot.utils.FieldVisualizer;
-import frc.robot.utils.Print;
 
 public class Vision extends SubsystemBase {
     public static class CameraData {
@@ -49,11 +48,11 @@ public class Vision extends SubsystemBase {
         List<VisionCamera> all_cameras = getAllCameras();
         for(int i = 0; i < all_cameras.size(); i++) { 
             all_cameras.get(i).periodic(); 
-            if(!all_cameras.get(i).isConnected()){
-                Print.error("'Camera {%s}' Not Connected [Vision]", all_cameras.get(i).getName());
-            }
+            // if(!all_cameras.get(i).isConnected()){
+                // Print.error("'Camera {%s}' Not Connected [Vision]", all_cameras.get(i).getName());
+            // }
         }
-        getAllDetectedNoteEstimatedPoses();
+        getAllDetectedNoteEstimatedPosesPeriodic();
     }
 
     public VisionCamera getCamera(String key){ return camera_map.get(key); }
@@ -83,10 +82,10 @@ public class Vision extends SubsystemBase {
         return detected_notes;
     }
 
-    final int MAX_TIMESTEPS = 100;
-    final List<Pose3d> note_poses = new ArrayList<Pose3d>(5);
-    final List<Pose2d> note_poses2d = new ArrayList<Pose2d>(5);
-    public List<Pose3d> getAllDetectedNoteEstimatedPoses(){
+    final private int MAX_TIMESTEPS = 100;
+    final private List<Pose3d> note_poses = new ArrayList<Pose3d>(5);
+    final private List<Pose2d> note_poses2d = new ArrayList<Pose2d>(5);
+    private List<Pose3d> getAllDetectedNoteEstimatedPosesPeriodic(){
         note_poses.clear();
         note_poses2d.clear();
 
@@ -95,10 +94,10 @@ public class Vision extends SubsystemBase {
                    
                 Pose3d current_pose = camera_map.get("USB_Camera").getCameraPoseOnRobot(SubSystems.swerve_drive.getPose());
                 // TODO: Check this
-                current_pose = current_pose.rotateBy(new Rotation3d(0, Units.degreesToRadians(target.getPitch()), 
-                    Units.degreesToRadians(target.getYaw())));
-                // current_pose = current_pose.transformBy(new Transform3d(0,0,0, new Rotation3d(0, Units.degreesToRadians(target.getPitch()), 
-                   // Units.degreesToRadians(target.getYaw()))));
+                // current_pose = current_pose.rotateBy(new Rotation3d(0, Units.degreesToRadians(-target.getPitch()), 
+                    // Units.degreesToRadians(-target.getYaw())));
+                current_pose = current_pose.transformBy(new Transform3d(0,0,0, new Rotation3d(0, Units.degreesToRadians(-target.getPitch()), 
+                   Units.degreesToRadians(-target.getYaw()))));
                 for(int i = 0; current_pose.getZ() > 0 && i < MAX_TIMESTEPS; i++){
                     current_pose = current_pose.transformBy(new Transform3d(Units.inchesToMeters(1),0,0, Constants.Empty.R3D_ZERO));
                 }
@@ -114,7 +113,8 @@ public class Vision extends SubsystemBase {
 
         return note_poses;
     }
-
+    public List<Pose3d> getAllDetectedNoteEstimatedPoses(){ return note_poses; }
+    public List<Pose2d> getAllDetectedNoteEstimatedPoses2d(){ return note_poses2d; }
         // ArrayList<Double> found_fidicual_ids = new ArrayList<Double>();
 
         // for(VisionCamera camera : cameras){

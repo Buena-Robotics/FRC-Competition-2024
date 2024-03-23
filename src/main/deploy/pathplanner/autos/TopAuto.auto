@@ -1,12 +1,6 @@
 {
   "version": 1.0,
-  "startingPose": {
-    "position": {
-      "x": 0.7805585557503859,
-      "y": 4.523190155503746
-    },
-    "rotation": 125.12075250666084
-  },
+  "startingPose": null,
   "command": {
     "type": "sequential",
     "data": {
@@ -14,19 +8,25 @@
         {
           "type": "named",
           "data": {
-            "name": "launch_note"
+            "name": "aim_launch_note"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "BottomNote"
+            "pathName": "TopNote"
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "ThroughStage"
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "lift_note"
           }
         },
         {
@@ -36,9 +36,15 @@
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "AmpToCenterSource"
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "put_note"
           }
         }
       ]

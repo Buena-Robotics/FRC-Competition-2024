@@ -8,7 +8,9 @@ import frc.robot.Constants.SubSystems;
 import frc.robot.Constants.IO;
 import frc.robot.commands.DriveForTime;
 import frc.robot.commands.LaunchNote;
+import frc.robot.commands.LockOnNote;
 import frc.robot.commands.LockOnSpeaker;
+import frc.robot.commands.PathFindNote;
 import frc.robot.commands.PathFindToClosestPose;
 import frc.robot.commands.PrepareLaunch;
 import frc.robot.commands.RumbleFeedback;
@@ -17,11 +19,10 @@ import frc.robot.commands.SwerveJoystick;
 import frc.robot.subsystems.climber.Climb.ArmPosition;
 import frc.robot.utils.FieldVisualizer;
 import frc.robot.utils.NoteVisualizer;
-
+import frc.robot.utils.TunableNumber;
 import frc.robot.utils.ULogger;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -38,10 +39,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 public class RobotContainer { //35x35 inches
-    private final LoggedDashboardNumber delay_chooser;
+    private final TunableNumber delay_chooser = new TunableNumber("Auto Delay", 0);
     private final LoggedDashboardChooser<Command> auto_chooser;
     private boolean field_oriented_mode = false;
 
@@ -67,14 +67,13 @@ public class RobotContainer { //35x35 inches
         }
         
         auto_chooser = new LoggedDashboardChooser<Command>("Auto Choices", AutoBuilder.buildAutoChooser());
-        delay_chooser = new LoggedDashboardNumber("Auto Delay", 0);
 
-        if( !DriverStation.isFMSAttached() ) { // SYSID
-            auto_chooser.addOption("Drive SysId (Quasistatic Forward)", SubSystems.swerve_drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-            auto_chooser.addOption("Drive SysId (Quasistatic Reverse)", SubSystems.swerve_drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-            auto_chooser.addOption("Drive SysId (Dynamic Forward)", SubSystems.swerve_drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-            auto_chooser.addOption("Drive SysId (Dynamic Reverse)", SubSystems.swerve_drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-        }
+        // if( !DriverStation.isFMSAttached() ) { // SYSID
+        //     auto_chooser.addOption("Drive SysId (Quasistatic Forward)", SubSystems.swerve_drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        //     auto_chooser.addOption("Drive SysId (Quasistatic Reverse)", SubSystems.swerve_drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        //     auto_chooser.addOption("Drive SysId (Dynamic Forward)", SubSystems.swerve_drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        //     auto_chooser.addOption("Drive SysId (Dynamic Reverse)", SubSystems.swerve_drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        // }
         { // Simple Autos
             auto_chooser.addDefaultOption("Simple Auto", emptyCommand());
         }
@@ -112,6 +111,12 @@ public class RobotContainer { //35x35 inches
 
         IO.commandController.rightBumper().whileTrue(launchNote());
 
+        // IO.commandController.leftStick().onTrue(new LockOnNote(SubSystems.swerve_drive).andThen(SubSystems.note_arm.releaseNoteCommand()));
+        IO.commandController.leftStick().onTrue(
+            new LockOnNote(SubSystems.swerve_drive)
+                .andThen(SubSystems.note_arm.releaseNoteCommand(), new PathFindNote().pathFindToClosestNote(SubSystems.swerve_drive)));
+
+        // IO.commandController.leftStick().onTrue();
         IO.commandController.rightStick().onTrue(new LockOnSpeaker(SubSystems.swerve_drive, SubSystems.climb));
 
         IO.commandController.a().onTrue(new InstantCommand(SubSystems.note_arm::openClaw));
@@ -125,7 +130,7 @@ public class RobotContainer { //35x35 inches
         IO.commandController.povLeft().onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.SPEAKER_CLOSE));
         IO.commandController.povRight().onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.SPEAKER_STAGE));
 
-        IO.shooterHasNoteTrigger.debounce(0.8).onTrue(
+        IO.shooterHasNoteTrigger.debounce(0.8).and(() -> DriverStation.isFMSAttached()).onTrue(
             new RumbleFeedback(IO.controller, RumbleType.kLeftRumble, 1, 500)
                 .alongWith(SubSystems.climb.moveArmToPosition(ArmPosition.DOWN)));
         IO.noteArmHasNoteTrigger.debounce(1).onTrue(new RumbleFeedback(IO.controller, RumbleType.kRightRumble, 1, 500));
@@ -143,9 +148,9 @@ public class RobotContainer { //35x35 inches
     }
     public Command launchNote(){
         return new PrepareLaunch(SubSystems.shooter)
-            .withTimeout(1)
+            .withTimeout(1.3)
             .andThen(
-                new LaunchNote(SubSystems.shooter).withTimeout(0.25),
+                new LaunchNote(SubSystems.shooter).withTimeout(1),
                 NoteVisualizer.shoot(SubSystems.swerve_drive::getPose, SubSystems.climb::getShooterAngleRadians)
             )
             .handleInterrupt(SubSystems.shooter::stop);
@@ -166,9 +171,9 @@ public class RobotContainer { //35x35 inches
         if(use_simple_auto) {
             final Pose2d robot_pose = SubSystems.swerve_drive.getPose();
             if(RobotState.isBlueAlliance())
-                return simpleAuto(robot_pose.getRotation().unaryMinus(), 1000);
+                return new WaitCommand(delay_chooser.get()).andThen(simpleAuto(robot_pose.getRotation().unaryMinus(), 1800));
             else // Red Alliance
-                return simpleAuto(robot_pose.getRotation().plus(Rotation2d.fromDegrees(180)).unaryMinus(), 1000);
+                return new WaitCommand(delay_chooser.get()).andThen(simpleAuto(robot_pose.getRotation().plus(Rotation2d.fromDegrees(180)).unaryMinus(), 1800));
         }
         return new SequentialCommandGroup(new WaitCommand(delay_chooser.get()), auto_command).until(() -> DriverStation.isTeleop()); 
     }

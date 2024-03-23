@@ -9,9 +9,9 @@ import frc.robot.Constants.SubSystems;
 public final class RobotState {
     public static boolean isRedAlliance(){
         Optional<Alliance> alliance = DriverStation.getAlliance();
-        return alliance.isPresent() && alliance.get() == Alliance.Red && !RobotConfig.FORCE_BLUE_ALLIANCE;
+        return alliance.isPresent() && alliance.get() == Alliance.Red;
     }
-    public static boolean isBlueAlliance(){ return RobotConfig.FORCE_BLUE_ALLIANCE || !isRedAlliance(); }
+    public static boolean isBlueAlliance(){ return !isRedAlliance(); }
     public static boolean shooterHasNote(){ return SubSystems.shooter.hasNote(); }
     public static boolean armHasNote(){ return SubSystems.note_arm.hasNote(); }
 }

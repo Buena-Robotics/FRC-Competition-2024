@@ -38,8 +38,8 @@ public abstract class Climb extends SubsystemBase {
     public enum ArmPosition {
         DOWN(new Rotation2d(1.57079632679 + 0.101)), 
         SOURCE(new Rotation2d(1.11923695855 + 0.101)),
-        SPEAKER_CLOSE(new Rotation2d(0.67147204082 + 0.101-0.085)),
-        SPEAKER_STAGE(new Rotation2d(0.931888672229181)),        
+        SPEAKER_CLOSE(new Rotation2d(0.67147204082 + 0.101-0.03)),
+        SPEAKER_STAGE(new Rotation2d(0.908)),        
         FAR(new Rotation2d(0.983)),
 
         UP(new Rotation2d());
@@ -75,7 +75,8 @@ public abstract class Climb extends SubsystemBase {
         Logger.processInputs("Climb", inputs);
 
         arm_ligament.setAngle(Units.radiansToDegrees(-inputs.bore_absolute_position_radians));
-        
+
+        ULogger.recordOutput("Climb/BoreRadians", inputs.bore_absolute_position_radians);
         ULogger.recordOutput("Climb/Mecha/Arm Mechanism", arm_mechanism);
         if(!inputs.bore_encoder_connected) Print.error("'Bore Encoder' Not Connected [Climb]");
     }

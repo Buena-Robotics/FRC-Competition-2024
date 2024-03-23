@@ -16,8 +16,12 @@ public final class ULogger {
     private static NT4Publisher publisher = new NT4Publisher();
 
     public static void periodic(){
-        publisher.putTable(table);
-        table = new LogTable(Logger.getRealTimestamp()).getSubtable("RealOutputs");
+        try {            
+            publisher.putTable(table);
+            table = new LogTable(Logger.getRealTimestamp()).getSubtable("RealOutputs");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     public static void recordOutput(String key, byte[] value) {
         Logger.recordOutput(key, value);

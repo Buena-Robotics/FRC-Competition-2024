@@ -38,7 +38,8 @@ public class Robot extends LoggedRobot {
 
         switch (RobotConfig.getRobotMode()) {
         case REAL:
-            Logger.addDataReceiver(new WPILOGWriter("/media/sda1/"));
+            // if(!DriverStation.isFMSAttached())
+                Logger.addDataReceiver(new WPILOGWriter("/media/sda1/"));
             // Logger.addDataReceiver(new NT4Publisher());
             break;
         case SIM: 

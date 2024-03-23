@@ -75,7 +75,7 @@ public class SwerveDrive extends SubsystemBase {
     private final SwerveDrivePoseEstimator pose_estimator;
 
     private Pose2d robot_pose = 
-        RobotState.isRedAlliance() ? new Pose2d(14, 5.380708, new Rotation2d()) : new Pose2d(1.567501, 5.380708, Rotation2d.fromDegrees(180));
+        RobotState.isRedAlliance() ? new Pose2d(14, 5.380708, new Rotation2d()) : new Pose2d(2.3, 5.380708, Rotation2d.fromDegrees(180));
     // private Pose2d robot_pose = new Pose2d(0.77, 6.58, Rotation2d.fromDegrees(-117.90));
 
     private final SysIdRoutine sysId;
@@ -95,7 +95,7 @@ public class SwerveDrive extends SubsystemBase {
             robot_pose, 
             POSITION_STD_DEV,
             VISION_STD_DEV);
-
+        resetPose(robot_pose);
         new Thread(() -> {
             TimerUtil calibration_timer = new TimerUtil();
             while(navx.isCalibrating()) 
