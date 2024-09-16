@@ -44,7 +44,7 @@ public final class Constants {
         public static final NoteArm note_arm = Robot.isReal() ? new NoteArmReal() : new NoteArmSim();
         public static final SwerveDrive swerve_drive = new SwerveDrive();
         public static final Vision vision = new Vision(
-                new CameraData("Microsoft_LifeCam_HD-3000 (1) (2)", new Transform3d(
+                new CameraData("Microsoft_LifeCam_HD-3000 (1)", new Transform3d(
                         Units.inchesToMeters(12.5),
                         Units.inchesToMeters(13),
                         Units.inchesToMeters(18),

@@ -38,7 +38,7 @@ public class PathFindNote extends Command {
     }
     private Command pathFindToNote(){
         PathConstraints constraints = new PathConstraints(
-                1.0, 0.5,
+                0.4, 0.4,
                 Units.degreesToRadians(540), Units.degreesToRadians(720));
         Optional<Pose2d> closest_pose_opt = getClosestPose();
         Command command = new WaitCommand(0);

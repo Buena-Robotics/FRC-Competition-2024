@@ -14,6 +14,7 @@ import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -34,12 +35,13 @@ public class Robot extends LoggedRobot {
         super(Robot.defaultPeriodSecs);
     }
     @Override public void robotInit() {
-        Pathfinding.setPathfinder(new LocalADStarAK());        
+        Pathfinding.setPathfinder(new LocalADStarAK());
+        PathfindingCommand.warmupCommand().schedule();
 
         switch (RobotConfig.getRobotMode()) {
         case REAL:
             // if(!DriverStation.isFMSAttached())
-                Logger.addDataReceiver(new WPILOGWriter("/media/sda1/"));
+                // Logger.addDataReceiver(new WPILOGWriter("/media/sda1/"));
             // Logger.addDataReceiver(new NT4Publisher());
             break;
         case SIM: 
@@ -73,6 +75,7 @@ public class Robot extends LoggedRobot {
         ULogger.recordOutput("System/Mem/Free", Runtime.getRuntime().freeMemory() / 1000 / 1000);
         ULogger.recordOutput("System/Mem/Used", (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000 / 1000);
         ULogger.recordOutput("System/Mem/Total", Runtime.getRuntime().totalMemory() / 1000 / 1000);
+        ULogger.recordOutput("System/RunningUAuto", RobotState.runningUAuto());
     }
 
     @Override public void disabledInit() {

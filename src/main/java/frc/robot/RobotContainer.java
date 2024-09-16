@@ -53,6 +53,8 @@ public class RobotContainer { //35x35 inches
             NamedCommands.registerCommand("aim_launch_note", aimLaunchNoteReset());
             NamedCommands.registerCommand("lift_note", SubSystems.note_arm.grabNoteFullCommand());
             NamedCommands.registerCommand("put_note", SubSystems.note_arm.releaseNoteFullCommand());
+            NamedCommands.registerCommand("find_grab_note", new LockOnNote(SubSystems.swerve_drive)
+                .andThen(SubSystems.note_arm.releaseNoteCommand(), new PathFindNote().pathFindToClosestNote(SubSystems.swerve_drive)));
         }
 
         { // PathPlanner Logging
@@ -76,6 +78,7 @@ public class RobotContainer { //35x35 inches
         // }
         { // Simple Autos
             auto_chooser.addDefaultOption("Simple Auto", emptyCommand());
+            auto_chooser.addDefaultOption("Just Launch", aimLaunchNoteReset());
         }
 
         configureBindings();
@@ -114,7 +117,7 @@ public class RobotContainer { //35x35 inches
         // IO.commandController.leftStick().onTrue(new LockOnNote(SubSystems.swerve_drive).andThen(SubSystems.note_arm.releaseNoteCommand()));
         IO.commandController.leftStick().onTrue(
             new LockOnNote(SubSystems.swerve_drive)
-                .andThen(SubSystems.note_arm.releaseNoteCommand(), new PathFindNote().pathFindToClosestNote(SubSystems.swerve_drive)));
+                .andThen(SubSystems.note_arm.releaseNoteCommand()));
 
         // IO.commandController.leftStick().onTrue();
         IO.commandController.rightStick().onTrue(new LockOnSpeaker(SubSystems.swerve_drive, SubSystems.climb));
@@ -130,10 +133,22 @@ public class RobotContainer { //35x35 inches
         IO.commandController.povLeft().onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.SPEAKER_CLOSE));
         IO.commandController.povRight().onTrue(SubSystems.climb.moveArmToPosition(ArmPosition.SPEAKER_STAGE));
 
-        IO.shooterHasNoteTrigger.debounce(0.8).and(() -> DriverStation.isFMSAttached()).onTrue(
-            new RumbleFeedback(IO.controller, RumbleType.kLeftRumble, 1, 500)
-                .alongWith(SubSystems.climb.moveArmToPosition(ArmPosition.DOWN)));
-        IO.noteArmHasNoteTrigger.debounce(1).onTrue(new RumbleFeedback(IO.controller, RumbleType.kRightRumble, 1, 500));
+        IO.shooterHasNoteTrigger.debounce(0.8)
+            .and(() -> DriverStation.isFMSAttached()).onTrue(
+                new RumbleFeedback(IO.controller, RumbleType.kLeftRumble, 1, 500)
+                    .alongWith(
+                        SubSystems.climb.moveArmToPosition(ArmPosition.DOWN)
+                        // RobotConfig.FEATURE_UAUTO ? 
+                            // new PathFindToClosestPose().pathFindToClosestPose(SubSystems.swerve_drive, SubSystems.swerve_drive::getPose)
+                                // : new WaitCommand(0)
+                ));
+        IO.noteArmHasNoteTrigger.debounce(1.5).onTrue(
+            new RumbleFeedback(IO.controller, RumbleType.kRightRumble, 1, 500)
+                // .alongWith(
+                    // RobotConfig.FEATURE_UAUTO ? 
+                        // new PathFindToClosestPose().pathFindToClosestPose(SubSystems.swerve_drive, SubSystems.swerve_drive::getPose)
+                            // : new WaitCommand(0)
+            );
 
         IO.commandController.start().onTrue(
             new PathFindToClosestPose().pathFindToClosestPose(SubSystems.swerve_drive, SubSystems.swerve_drive::getPose)

@@ -144,7 +144,8 @@ public class SwerveDrive extends SubsystemBase {
         var vision_measurements = SubSystems.vision.getAllVisionMeasurements();
         for (TimestampedVisionMeasurement vision_measurement : vision_measurements){
             //Ignore vision measurements during auto and if the Z pos is too high
-            if(!DriverStation.isAutonomousEnabled() && Math.abs(vision_measurement.pose.getZ()) < 0.25)
+            // if(!DriverStation.isAutonomousEnabled() && Math.abs(vision_measurement.pose.getZ()) < 0.3)
+            if(Math.abs(vision_measurement.pose.getZ()) < 0.4)
                 pose_estimator.addVisionMeasurement(vision_measurement.pose.toPose2d(), vision_measurement.timestamp, vision_measurement.std_devs);
             
             ULogger.recordOutput("PoseEstimation/VisionMeasurement", vision_measurement.pose);

@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.SubSystems;
 
 public final class RobotState {
+    private static boolean running_uauto = false;
     public static boolean isRedAlliance(){
         Optional<Alliance> alliance = DriverStation.getAlliance();
         return alliance.isPresent() && alliance.get() == Alliance.Red;
@@ -14,4 +15,7 @@ public final class RobotState {
     public static boolean isBlueAlliance(){ return !isRedAlliance(); }
     public static boolean shooterHasNote(){ return SubSystems.shooter.hasNote(); }
     public static boolean armHasNote(){ return SubSystems.note_arm.hasNote(); }
+    public static boolean runningUAuto(){ return running_uauto; }
+
+    public static void setRunningUAuto(boolean r){ running_uauto = r; }
 }

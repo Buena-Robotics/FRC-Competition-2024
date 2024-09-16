@@ -65,7 +65,7 @@ public abstract class SwerveModule {
         else {
             this.drive_feedforward = new SimpleMotorFeedforward(0, 1.35);
         }
-        this.drive_feedback  = new PIDController(1, 0.0, 0.0, Robot.defaultPeriodSecs);
+        this.drive_feedback  = new PIDController(3, 0.0, 0.0, Robot.defaultPeriodSecs);
         this.turn_feedback  = new PIDController(0.3, 0.0, 0.0, Robot.defaultPeriodSecs);
         this.turn_feedback.enableContinuousInput(-Math.PI, Math.PI);
     }

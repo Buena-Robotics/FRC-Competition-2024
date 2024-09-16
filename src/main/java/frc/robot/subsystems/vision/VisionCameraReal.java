@@ -27,8 +27,8 @@ public class VisionCameraReal extends VisionCamera {
         super(photon_camera_name, robot_to_camera, pipeline);
     }
 
-    private final TimerUtil uauto_reset_timer = new TimerUtil();
-    private boolean uatuo_timer_running = false;
+    private final TimerUtil Uauto_reset_timer = new TimerUtil();
+    private boolean Uauto_timer_running = false;
     private Matrix<N3, N1> getEstimationStdDevs(Pose2d estimated_pose) {
         if(DriverStation.isDisabled()){
             return VecBuilder.fill(0.5, 0.5, 2); // Not moving
@@ -48,19 +48,19 @@ public class VisionCameraReal extends VisionCamera {
         }
 
         if(RobotConfig.FEATURE_UAUTO){
-            if(uatuo_timer_running && uauto_reset_timer.hasTimeElapsed(500, true)){
-                uatuo_timer_running = false;
+            if(Uauto_timer_running && Uauto_reset_timer.hasTimeElapsed(500, true)){
+                Uauto_timer_running = false;
+                RobotState.setRunningUAuto(false);
             }
-            if( !uatuo_timer_running && ((RobotState.isRedAlliance() && (found_ids.contains(9) || found_ids.contains(10)))
+            if( !Uauto_timer_running && ((RobotState.isRedAlliance() && (found_ids.contains(9) || found_ids.contains(10)))
                         || (RobotState.isBlueAlliance() && (found_ids.contains(1) || found_ids.contains(2) )))
                         && average_distance < 3 ){
                 SubSystems.climb.moveArmToPosition(ArmPosition.SOURCE).schedule();
-                uatuo_timer_running = true;
-                uauto_reset_timer.reset();
+                Uauto_timer_running = true;
+                RobotState.setRunningUAuto(true);
+                Uauto_reset_timer.reset();
             }
         }
-        
-
 
         // Should be unreachable
         if (tag_count == 0) return VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
@@ -68,10 +68,11 @@ public class VisionCameraReal extends VisionCamera {
         average_ambiguity /= tag_count;
 
         final double ambiguity_factor = average_ambiguity > 0.3 ? average_ambiguity * 3 : 0.5;
-        final double auto_factor = DriverStation.isAutonomous() ? 1.5 : 1;
+        final double auto_factor = DriverStation.isAutonomous() ? 1.2 : 1;
         final double moving_factor = SubSystems.swerve_drive.getNavX().isMoving() ? 1.0 : 0.3;
         final double rotating_factor = SubSystems.swerve_drive.getNavX().isRotating() ? 1.0 : 0.5;
-        final double total_factor = ambiguity_factor * auto_factor * moving_factor * rotating_factor;
+        final double Uauto_factor = RobotConfig.FEATURE_UAUTO ? 0.1 : 1.0;
+        final double total_factor = ambiguity_factor * auto_factor * moving_factor * rotating_factor * Uauto_factor;
 
         // Multi-tag
         if (tag_count > 1) 

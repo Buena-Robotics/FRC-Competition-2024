@@ -116,7 +116,7 @@ public abstract class NoteArm extends SubsystemBase {
 
         color_sensor_mechanism.setBackgroundColor(new Color8Bit(getColor()));
         ULogger.recordOutput("NoteArm/ColorSensorMechanism", color_sensor_mechanism);
-
+        ULogger.recordOutput("NoteArm/HasNote", !inputs.is_claw_open);
     }
 
     private double proximityToMM(double x){
@@ -238,9 +238,9 @@ public abstract class NoteArm extends SubsystemBase {
                     pullArmInCommand(),
                     new WaitCommand(0.50),
                     pullArmDownCommand(),
-                    new WaitCommand(0.05),
+                    new WaitCommand(0.032),
                     pushArmOutCommand(),
-                    new WaitCommand(0.5),
+                    new WaitCommand(1),
                     releaseNoteCommand()
                 );
     }

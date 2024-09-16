@@ -16,6 +16,30 @@
           "data": {
             "pathName": "DownToSourceGrab"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "find_grab_note"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AroundStage"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp"
+          }
         }
       ]
     }
